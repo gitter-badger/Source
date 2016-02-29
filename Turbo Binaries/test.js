@@ -14,7 +14,7 @@
 
 /* Unit 3: Non-reference features */
 
-function unitTestAnonymousFunction()
+function testAnonymousFunction()
 {
 	var test = function(a, b)
 	{
@@ -28,14 +28,14 @@ function unitTestAnonymousFunction()
 
 // Array Handling
 
-function unitTestArray()
+function testArray()
 {
 	var my_array = new Array();
 	for (var i = 0; i < 10; i++) my_array[i] = i;
 	return my_array[4];
 }
 
-function unitTestArray_concat()
+function testArray_concat()
 {
 	var a, b, c;
 	a = new Array(1, 2, 3);
@@ -44,7 +44,7 @@ function unitTestArray_concat()
 	return a.concat(b, c);
 }
 
-function unitTestArray_pop_push()
+function testArray_pop_push()
 {
 	var my_array = new Array();
 
@@ -64,13 +64,13 @@ function unitTestArray_pop_push()
 	return s;
 }
 
-function unitTestArray_join()
+function testArray_join()
 {
 	var a = new Array(0, 1, 2, 3, 4);
 	return a.join("-");
 }
 
-function unitTestArray_length()
+function testArray_length()
 {
 	var my_array = new Array();
 	my_array[2] = "Test";
@@ -78,25 +78,25 @@ function unitTestArray_length()
 	return my_array.length;
 }
 
-function unitTestArray_reverse()
+function testArray_reverse()
 {
 	var a = new Array(0, 1, 2, 3, 4);
 	return a.reverse();
 }
 
-function unitTestArray_slice()
+function testArray_slice()
 {
 	var myArray = new Array(4,3,5,65);
 	return myArray.slice(0, -1);
 }
 
-function unitTestArray_sort()
+function testArray_sort()
 {
 	var a = new Array("X" ,"y" ,"d", "Z", "v","m","r");
 	return a.sort();
 }
 
-function unitTestArray_shift()
+function testArray_shift()
 {
 	var ar = new Array(10, 11, 12);
 	var s = "";
@@ -111,13 +111,13 @@ function unitTestArray_shift()
 }
 
 
-function unitTestConstants_undefined()
+function testConstants_undefined()
 {
 	var declared;
 	if (declared == undefined) return 42;
 }
 
-function unitTestControlflow_break()
+function testControlflow_break()
 {
 	var i = 100;
 	while (i --> 0)
@@ -127,7 +127,7 @@ function unitTestControlflow_break()
 	return ++i;
 }
 
-function unitTestControlflow_breakLabeled()
+function testControlflow_breakLabeled()
 {
 	var i = 0;
 	Outer:
@@ -142,7 +142,7 @@ function unitTestControlflow_breakLabeled()
 	return i;
 }
 
-function unitTestControlflow_continue()
+function testControlflow_continue()
 {
 	var s = "", i = 0;
 	while (i < 10)
@@ -154,14 +154,14 @@ function unitTestControlflow_continue()
 	return s;
 }
 
-function unitTestControlflow_do_while()
+function testControlflow_do_while()
 {
 	var i = 0;
 	do i++; while (i < 10);
 	return i;
 }
 
-function unitTestControlflow_for()
+function testControlflow_for()
 {
 	var myarray = new Array();
 	for (var i = 0; i < 10; i++)
@@ -171,7 +171,7 @@ function unitTestControlflow_for()
 	return myarray;
 }
 
-function unitTestControlflow_for_in()
+function testControlflow_for_in()
 {
 	var ret = "";
 	var obj =
@@ -185,7 +185,7 @@ function unitTestControlflow_for_in()
 	return ret;
 }
 
-function unitTestControlflow_if_else()
+function testControlflow_if_else()
 {
 	var x = 5, y = 7;
 	if (x == 5)
@@ -195,7 +195,7 @@ function unitTestControlflow_if_else()
 			return 20;
 }
 
-function unitTestControlflow_switch()
+function testControlflow_switch()
 {
 	var obj = new Date();
 	switch (obj.constructor)
@@ -214,7 +214,7 @@ function unitTestControlflow_switch()
 	}
 }
 
-function unitTestDate_getDate()
+function testDate_getDate()
 {
 	var s = "Today's date is: ";
 	var d = new Date();
@@ -224,7 +224,7 @@ function unitTestDate_getDate()
 	return s;
 }
 
-function unitTestDate_getDay()
+function testDate_getDay()
 {
 	var x = new Array("Sunday", "Monday", "Tuesday");
 	x = x.concat("Wednesday","Thursday", "Friday");
@@ -234,7 +234,7 @@ function unitTestDate_getDay()
    return "Today is: " + x[day];
 }
 
-function unitTestDate_getFullYear()
+function testDate_getFullYear()
 {
 	var d = new Date();
 	var s = (d.getMonth() + 1) + "/";
@@ -243,7 +243,7 @@ function unitTestDate_getFullYear()
 	return "Today's date is: " + s;
 }
 
-function unitTestDate_getHours()
+function testDate_getHours()
 {
 	var s = "The current local time is: ";
 	var d = new Date();
@@ -254,7 +254,7 @@ function unitTestDate_getHours()
 	return s;
 }
 
-function unitTestDate_getTime()
+function testDate_getTime()
 {
 	var MinMilli = 1000 * 60;
 	var HrMilli = MinMilli * 60;
@@ -265,7 +265,7 @@ function unitTestDate_getTime()
 	return s + Math.round(t / DyMilli) + " days since 1/1/70";
 }
 
-function unitTestDate_getTimezoneOffset()
+function testDate_getTimezoneOffset()
 {
 	var s = "The current local time is ";
 	var d = new Date();
@@ -279,7 +279,7 @@ function unitTestDate_getTimezoneOffset()
 	return s;
 }
 
-function unitTestDate_getUTCDay()
+function testDate_getUTCDay()
 {
 	var x = new Array("Sunday", "Monday", "Tuesday");
 	x = x.concat("Wednesday","Thursday", "Friday");
@@ -289,7 +289,7 @@ function unitTestDate_getUTCDay()
 	return "Today is " + x[day] + " in UTC.";
 }
 
-function unitTestDate_getUTCDate()
+function testDate_getUTCDate()
 {
 	var s = "Today's UTC date is: ";
 	var d = new Date();
@@ -299,7 +299,7 @@ function unitTestDate_getUTCDate()
 	return s;
 }
 
-function unitTestDate_getUTCHours()
+function testDate_getUTCHours()
 {
 	var d = new Date();
 	var s = d.getUTCHours() + ":";
@@ -309,112 +309,112 @@ function unitTestDate_getUTCHours()
 	return "Current Coordinated Universal Time (UTC) is: " + s;
 }
 
-function unitTestDate_setDate()
+function testDate_setDate()
 {
 	var d = new Date();
 	d.setDate(242);
 	return "Current setting is " + d.toLocaleString();
 }
 
-function unitTestDate_setFullYear()
+function testDate_setFullYear()
 {
 	var d = new Date();
 	d.setFullYear(2042);
 	return "Current setting is " + d.toLocaleString();
 }
 
-function unitTestDate_setHours()
+function testDate_setHours()
 {
 	var d = new Date();
 	d.setHours(01, 23, 45);
 	return "Current setting is " + d.toLocaleString();
 }
 
-function unitTestDate_setMilliseconds()
+function testDate_setMilliseconds()
 {
 	var d = new Date();
 	d.setMilliseconds(456);
 	return "Current setting is " + d.toLocaleString() + "." + d.getMilliseconds();
 }
 
-function unitTestDate_setMinutes()
+function testDate_setMinutes()
 {
 	var d = new Date();
 	d.setMinutes(23, 45);
 	return "Current setting is " + d.toLocaleString();
 }
 
-function unitTestDate_setMonth()
+function testDate_setMonth()
 {
 	var d = new Date();
 	d.setMonth(5);
 	return "Current setting is " + d.toLocaleString();
 }
 
-function unitTestDate_setSeconds()
+function testDate_setSeconds()
 {
 	var d = new Date();
 	d.setSeconds(23, 456);
 	return "Current setting is " + d.toLocaleString() + "." + d.getMilliseconds();
 }
 
-function unitTestDate_setTime()
+function testDate_setTime()
 {
 	var d = new Date();
 	d.setTime(4865553867925);
 	return "Current setting is " + d.toUTCString();
 }
 
-function unitTestDate_setUTCDate()
+function testDate_setUTCDate()
 {
 	var d = new Date();
 	d.setUTCDate(242);
 	return "Current setting is " + d.toUTCString();
 }
 
-function unitTestDate_setUTCFullYear()
+function testDate_setUTCFullYear()
 {
 	var d = new Date();
 	d.setUTCFullYear(2345);
 	return "Current setting is " + d.toUTCString();
 }
 
-function unitTestDate_setUTCHours()
+function testDate_setUTCHours()
 {
 	var d = new Date();
 	d.setUTCHours(01, 23, 45);
 	return "Current setting is " + d.toUTCString();
 }
 
-function unitTestDate_setUTCMilliseconds()
+function testDate_setUTCMilliseconds()
 {
 	var d = new Date();
 	d.setUTCMilliseconds(456);
 	return "Current setting is " + d.toUTCString() + "." + d.getUTCMilliseconds();
 }
 
-function unitTestDate_setUTCMinutes()
+function testDate_setUTCMinutes()
 {
 	var d = new Date();
 	d.setUTCMinutes(23, 45);
 	return "Current setting is " + d.toUTCString();
 }
 
-function unitTestDate_setUTCMonth()
+function testDate_setUTCMonth()
 {
 	var d = new Date();
 	d.setUTCMonth(4);
 	return "Current setting is " + d.toUTCString();
 }
 
-function unitTestDate_setUTCSeconds()
+function testDate_setUTCSeconds()
 {
 	var d = new Date();
 	d.setUTCSeconds(45, 678);
 	return "Current UTC milliseconds setting is " + d.getUTCMilliseconds();
 }
 
-function unitTestDate_UTC()
+function testDate_UTC()
 {
 	var MinMilli = 1000 * 60
 	var HrMilli = MinMilli * 60
@@ -464,7 +464,7 @@ function printFacts(name, ... info : Object[])
 	return s;
 }
 
-class unitTestDeclarations_this
+class testDeclarations_this
 {
 	var color, make, model;
 
@@ -476,10 +476,10 @@ class unitTestDeclarations_this
 	}
 }
 
-var unitTestDeclarations_this_Instance = new unitTestDeclarations_this;
-unitTestDeclarations_this_Instance.Car("Blue", "VW", "Polo");
+var testDeclarations_this_Instance = new testDeclarations_this;
+testDeclarations_this_Instance.Car("Blue", "VW", "Polo");
 
-function unitTestDeclarations_with()
+function testDeclarations_with()
 {
 	var x, y;
 	with (Math)
@@ -491,7 +491,7 @@ function unitTestDeclarations_with()
 }
 /* Function Defs END */
 
-function unitTestError_Object()
+function testError_Object()
 {
 	try
 	{
@@ -503,18 +503,18 @@ function unitTestError_Object()
 	}
 }
 
-function unitTestJIT_Function()
+function testJIT_Function()
 {
 	var add = new Function("x", "y", "return(x+y)");
 	return add(2, 3);
 }
 
-function unitTestJIT_length(a, b)
+function testJIT_length(a, b)
 {
-	return "Args expected: " + unitTestJIT_length.length;
+	return "Args expected: " + testJIT_length.length;
 }
 
-function unitTestGlobal_eval()
+function testGlobal_eval()
 {
 	var dateFn = "Date(1971,3,8)";
 	var mydate;
@@ -522,17 +522,17 @@ function unitTestGlobal_eval()
 	return mydate.constructor == Date;
 }
 
-function unitTestGlobal_parseInt()
+function testGlobal_parseInt()
 {
 	return parseInt("12abc");
 }
 
-function unitTestGlobal_parseFloat()
+function testGlobal_parseFloat()
 {
 	return parseFloat("1.2abc");
 }
 
-function unitTestMath_all()
+function testMath_all()
 {
 	var x = 0.0;
 	with (Math)
@@ -566,19 +566,19 @@ function unitTestMath_all()
 	return Math.floor(x);
 }
 
-function unitTestObject_constructor()
+function testObject_constructor()
 {
 	var x = new String("Hi");
 	return (x.constructor == String) ? "Object is a String." : "Dunno";
 }
 
-function unitTestObject_instanceof()
+function testObject_instanceof()
 {
 	var x = new Array();
 	return x instanceof Array;
 }
 
-function unitTestOperators_delete()
+function testOperators_delete()
 {
 	var cities =
 	{
@@ -594,7 +594,7 @@ function unitTestOperators_delete()
 	return s;
 }
 
-function unitTestOperators_void()
+function testOperators_void()
 {
 	var mute = function()
 	{
@@ -604,13 +604,13 @@ function unitTestOperators_void()
 	return void mute();
 }
 
-function unitTestOperators_typeof()
+function testOperators_typeof()
 {
 	var x = "Hello";
 	return typeof x;
 }
 
-function unitTestRegExp_index()
+function testRegExp_index()
 {
 	var src = "The rain in Spain.";
 	var re = /\w+/g;
@@ -620,7 +620,7 @@ function unitTestRegExp_index()
 	return s;
 }
 
-function unitTestRegExp_source()
+function testRegExp_source()
 {
 	var src = "Spain";
 	var re = /in/g;
@@ -634,80 +634,80 @@ function unitTestRegExp_source()
 	return "The string " + src + s1 + re.source + ".";
 }
 
-function unitTestString_charAt()
+function testString_charAt()
 {
 	var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	return str.charAt(5);
 }
 
-function unitTestString_charCodeAt()
+function testString_charCodeAt()
 {
 	var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	return str.charCodeAt(5);
 }
 
-function unitTestString_fromCharCode()
+function testString_fromCharCode()
 {
 	return String.fromCharCode(112, 108, 97, 105, 110);
 }
 
-function unitTestString_indexOf()
+function testString_indexOf()
 {
 	var str1 = "BABEBIBOBUBABEBIBOBU"
 	return str1.indexOf("BIBO", 0);
 }
 
-function unitTestString_lastIndexOf()
+function testString_lastIndexOf()
 {
 	var str1 = "BABEBIBOBUBABEBIBOBU"
 	return str1.lastIndexOf("B");
 }
 
-function unitTestString_split()
+function testString_split()
 {
 	var s = "The rain in Spain.";
 	return s.split(" ");
 }
 
-function unitTestString_toLowerCase()
+function testString_toLowerCase()
 {
 	var s = "I'M VERY LOUD!";
 	return s.toLowerCase();
 }
 
-function unitTestString_toUpperCase()
+function testString_toUpperCase()
 {
 	var s = "i'm very quiet.";
 	return s.toUpperCase();
 }
 
-function unitTestString_length()
+function testString_length()
 {
 	var s = "Lorem ipsum dolor sit amet.";
 	return s.length;
 }
 
-function unitTestString_slice()
+function testString_slice()
 {
 	var str = "hello world";
 	return str.slice(0, 5);
 }
 
-function unitTestString_match()
+function testString_match()
 {
 	var s = "Hello, World!";
 	var r = /\w+/g;
 	return s.match(r);
 }
 
-function unitTestString_replace()
+function testString_replace()
 {
 	var ss = "The rain in Spain.";
 	var re = /(\S+)(\s+)(\S+)/g;
 	return ss.replace(re, "$3$2$1");
 }
 
-function unitTestString_search()
+function testString_search()
 {
 	var s = "The rain in Spain falls mainly in the plain.";
 	var re = /falls/i;
@@ -849,6 +849,7 @@ class CDog extends CAnimal
 		return "A dog has four legs.";
 	}
 }
+
 class CKangaroo extends CAnimal
 {
 	function printQualities()
@@ -947,7 +948,7 @@ var expobj = new exptest.constructor(456);
 
 /* Enum objects */
 
-function unitTestEnumerator()
+function testEnumerator()
 {
 	var fso = new ActiveXObject("Scripting.FileSystemObject");
 	var e = new Enumerator(fso.Drives);
@@ -1021,73 +1022,73 @@ var failedTests = 0;
 var numberTests = 0;
 
 /* Perform tests */
-print("# " + unitTestDate_getDate());
-print("# " + unitTestDate_getDay());
-print("# " + unitTestDate_getFullYear());
-print("# " + unitTestDate_getHours());
-print("# " + unitTestDate_getTime());
-print("# " + unitTestDate_getTimezoneOffset());
-print("# " + unitTestDate_getUTCDay());
-print("# " + unitTestDate_getUTCDate());
-print("# " + unitTestDate_getUTCHours());
-print("# " + unitTestDate_setDate());
-print("# " + unitTestDate_setFullYear());
-print("# " + unitTestDate_setHours());
-print("# " + unitTestDate_setMilliseconds());
-print("# " + unitTestDate_setMinutes());
-print("# " + unitTestDate_setMonth());
-print("# " + unitTestDate_setSeconds());
-print("# " + unitTestDate_setTime());
-print("# " + unitTestDate_setUTCDate());
-print("# " + unitTestDate_setUTCFullYear());
-print("# " + unitTestDate_setUTCHours());
-print("# " + unitTestDate_setUTCMilliseconds());
-print("# " + unitTestDate_setUTCMinutes());
-print("# " + unitTestDate_setUTCMonth());
-print("# " + unitTestDate_setUTCSeconds());
-print("# " + unitTestDate_UTC());
+print("# " + testDate_getDate());
+print("# " + testDate_getDay());
+print("# " + testDate_getFullYear());
+print("# " + testDate_getHours());
+print("# " + testDate_getTime());
+print("# " + testDate_getTimezoneOffset());
+print("# " + testDate_getUTCDay());
+print("# " + testDate_getUTCDate());
+print("# " + testDate_getUTCHours());
+print("# " + testDate_setDate());
+print("# " + testDate_setFullYear());
+print("# " + testDate_setHours());
+print("# " + testDate_setMilliseconds());
+print("# " + testDate_setMinutes());
+print("# " + testDate_setMonth());
+print("# " + testDate_setSeconds());
+print("# " + testDate_setTime());
+print("# " + testDate_setUTCDate());
+print("# " + testDate_setUTCFullYear());
+print("# " + testDate_setUTCHours());
+print("# " + testDate_setUTCMilliseconds());
+print("# " + testDate_setUTCMinutes());
+print("# " + testDate_setUTCMonth());
+print("# " + testDate_setUTCSeconds());
+print("# " + testDate_UTC());
 
-proof(unitTestAnonymousFunction(),                                  3);
+proof(testAnonymousFunction(),                                  3);
 
-proof(unitTestArray(),                                              4);
-proof(unitTestArray_concat(),                      "1,2,3,One,42,Two");
-proof(unitTestArray_join(),                               "0-1-2-3-4");
-proof(unitTestArray_length(),                                       7);
-proof(unitTestArray_reverse(),                            "4,3,2,1,0");
-proof(unitTestArray_slice(),                                  "4,3,5");
-proof(unitTestArray_sort(),                           "X,Z,d,m,r,v,y");
-proof(unitTestArray_pop_push(),                          "9 8 7 6 5 ");
-proof(unitTestArray_shift(),                              "10 11 12 ");
+proof(testArray(),                                              4);
+proof(testArray_concat(),                      "1,2,3,One,42,Two");
+proof(testArray_join(),                               "0-1-2-3-4");
+proof(testArray_length(),                                       7);
+proof(testArray_reverse(),                            "4,3,2,1,0");
+proof(testArray_slice(),                                  "4,3,5");
+proof(testArray_sort(),                           "X,Z,d,m,r,v,y");
+proof(testArray_pop_push(),                          "9 8 7 6 5 ");
+proof(testArray_shift(),                              "10 11 12 ");
 
-proof(unitTestConstants_undefined(),                               42);
+proof(testConstants_undefined(),                               42);
 
-proof(unitTestControlflow_break(),                                 43);
-proof(unitTestControlflow_breakLabeled(),                          42);
-proof(unitTestControlflow_continue(),                    "1234678910");
-proof(unitTestControlflow_do_while(),                              10);
-proof(unitTestControlflow_for(),                "0,1,2,3,4,5,6,7,8,9");
-proof(unitTestControlflow_for_in(), "a:Athens, b:Belgrade, c:Cairo, ");
-proof(unitTestControlflow_if_else(),                               20);
-proof(unitTestControlflow_switch(),               "Object is a Date.");
+proof(testControlflow_break(),                                 43);
+proof(testControlflow_breakLabeled(),                          42);
+proof(testControlflow_continue(),                    "1234678910");
+proof(testControlflow_do_while(),                              10);
+proof(testControlflow_for(),                "0,1,2,3,4,5,6,7,8,9");
+proof(testControlflow_for_in(), "a:Athens, b:Belgrade, c:Cairo, ");
+proof(testControlflow_if_else(),                               20);
+proof(testControlflow_switch(),               "Object is a Date.");
 
 proof(zSq,                                                         25);
 proof(derivedForm.blank(),                           "This is blank.");
 proof(baseForm.blank(),                              "This is blank.");
 proof(printFacts("A", [1, 4, 9], "B"),   "Name: AInfo: 20: 1,4,91: B");
 
-proof(unitTestDeclarations_this_Instance.color,                "Blue");
-proof(unitTestDeclarations_with(),                           "-26,37");
+proof(testDeclarations_this_Instance.color,                "Blue");
+proof(testDeclarations_with(),                           "-26,37");
 
-proof(unitTestError_Object(),     "Error: No question, 42No question");
+proof(testError_Object(),     "Error: No question, 42No question");
 
-proof(unitTestJIT_Function(),                                       5);
-proof(unitTestJIT_length(1, 2),                    "Args expected: 2");
+proof(testJIT_Function(),                                       5);
+proof(testJIT_length(1, 2),                    "Args expected: 2");
 
-proof(unitTestGlobal_eval(),                                     true);
-proof(unitTestGlobal_parseInt(),                                   12);
-proof(unitTestGlobal_parseFloat(),                                1.2);
+proof(testGlobal_eval(),                                     true);
+proof(testGlobal_parseInt(),                                   12);
+proof(testGlobal_parseFloat(),                                1.2);
 
-proof(unitTestMath_all(),                                743008370728);
+proof(testMath_all(),                                743008370728);
 
 with (Number)
 {
@@ -1097,29 +1098,29 @@ with (Number)
 	proof(POSITIVE_INFINITY,  "Infinity");
 }
 
-proof(unitTestObject_constructor(),             "Object is a String.");
-proof(unitTestObject_instanceof(),                               true);
+proof(testObject_constructor(),             "Object is a String.");
+proof(testObject_instanceof(),                               true);
 
-proof(unitTestOperators_delete(),                       "AthensCairo");
-proof(unitTestOperators_void(),                             undefined);
-proof(unitTestOperators_typeof(),                            "string");
+proof(testOperators_delete(),                       "AthensCairo");
+proof(testOperators_void(),                             undefined);
+proof(testOperators_typeof(),                            "string");
 
-proof(unitTestRegExp_index(),     "0-3,The4-8,rain9-11,in12-17,Spain");
-proof(unitTestRegExp_source(),        "The string Spain contains in.");
+proof(testRegExp_index(),     "0-3,The4-8,rain9-11,in12-17,Spain");
+proof(testRegExp_source(),        "The string Spain contains in.");
 
-proof(unitTestString_charAt(),                                    "F");
-proof(unitTestString_charCodeAt(),                                 70);
-proof(unitTestString_fromCharCode(),                          "plain");
-proof(unitTestString_indexOf(),                                     4);
-proof(unitTestString_lastIndexOf(),                                 0);
-proof(unitTestString_split(),                    "The,rain,in,Spain.");
-proof(unitTestString_toLowerCase(),                  "i'm very loud!");
-proof(unitTestString_toUpperCase(),                 "I'M VERY QUIET.");
-proof(unitTestString_length(),                                     27);
-proof(unitTestString_slice(),                                 "hello");
-proof(unitTestString_match(),                           "Hello,World");
-proof(unitTestString_replace(),                  "rain The Spain. in");
-proof(unitTestString_search(),                                     18);
+proof(testString_charAt(),                                    "F");
+proof(testString_charCodeAt(),                                 70);
+proof(testString_fromCharCode(),                          "plain");
+proof(testString_indexOf(),                                     4);
+proof(testString_lastIndexOf(),                                 0);
+proof(testString_split(),                    "The,rain,in,Spain.");
+proof(testString_toLowerCase(),                  "i'm very loud!");
+proof(testString_toUpperCase(),                 "I'M VERY QUIET.");
+proof(testString_length(),                                     27);
+proof(testString_slice(),                                 "hello");
+proof(testString_match(),                           "Hello,World");
+proof(testString_replace(),                  "rain The Spain. in");
+proof(testString_search(),                                     18);
 
 proof(John.printMailingLabel(),        "John Doe, Some place remote.");
 proof(CPerson.printBlankLabel(),                            "-blank-");
@@ -1167,11 +1168,11 @@ proof(Units.distance,                                         "meter");
 proof(France.Units.distance,                                  "meter");
 proof(function(a,b){return a+b;},        "function(a,b){return a+b;}");
 
-print("\n" + unitTestEnumerator());
+print("\n" + testEnumerator());
 
 
 
-@set @myvar1 = 12
+@set @myvar1 = (6 * 2)
 @if (@myvar1 == 12)
 	print("> PP works.");
 @else
