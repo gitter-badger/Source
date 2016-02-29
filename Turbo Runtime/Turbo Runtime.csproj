@@ -1,0 +1,368 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{9738D611-56D2-4BFF-9F20-9600142FEB77}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Turbo.Runtime</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Turbo.Runtime</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Turbo64|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>.\</OutputPath>
+    <Optimize>true</Optimize>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classes\THPEngine\THPEngine.cs" />
+    <Compile Include="Classes\THPErrDescription\THPErrDescription.cs" />
+    <Compile Include="Classes\THPSite\THPSite.cs" />
+    <Compile Include="Classes\THPStartup\THPStartup.cs" />
+    <Compile Include="Classes\THPSite\THPDefaultSite\THPDefaultSite.cs" />
+    <Compile Include="Interfaces\ITHPItem\ITHPItemCode\ITHPItemCode.cs" />
+    <Compile Include="Interfaces\ITHPEngine\ITHPEngine.cs" />
+    <Compile Include="Interfaces\ITHPError\ITHPError.cs" />
+    <Compile Include="Interfaces\ITHPItem\ITHPItemGlobal\ITHPItemGlobal.cs" />
+    <Compile Include="Interfaces\ITHPItem\ITHPItem.cs" />
+    <Compile Include="Interfaces\ITHPItems\ITHPItems.cs" />
+    <Compile Include="Interfaces\ITHPPersistSite\ITHPPersistSite.cs" />
+    <Compile Include="Interfaces\ITHPItem\ITHPItemReference\ITHPItemReference.cs" />
+    <Compile Include="Interfaces\ITHPSite\ITHPSite.cs" />
+    <Compile Include="Enums\ETHPError\ETHPError.cs" />
+    <Compile Include="Classes\THPException\THPException.cs" />
+    <Compile Include="Enums\ETHPItemFlag\ETHPItemFlag.cs" />
+    <Compile Include="Enums\ETHPItemType\ETHPItemType.cs" />
+    <Compile Include="Enums\ETHPLoaderAPI\ETHPLoaderAPI.cs" />
+    <Compile Include="Classes\TPHResInfo\TPHResInfo.cs" />
+    <Compile Include="Classes\THPEngine\THPMainEngine\THPMainEngine.cs" />
+    <Compile Include="Classes\ScriptObject\ActivationObject\ActivationObject.cs" />
+    <Compile Include="Classes\ScriptFunction\ActiveXObjectConstructor\ActiveXObjectConstructor.cs" />
+    <Compile Include="Classes\AST\UnaryOp\AddressOf\AddressOf.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ArgumentsObject\ArgumentsObject.cs" />
+    <Compile Include="Classes\ScriptFunction\ArrayConstructor\ArrayConstructor.cs" />
+    <Compile Include="Classes\ArrayEnumerator\ArrayEnumerator.cs" />
+    <Compile Include="Classes\AST\ArrayLiteral\ArrayLiteral.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ArrayObject\ArrayObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ArrayObject\ArrayPrototype\ArrayPrototype.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ArrayObject\ArrayWrapper\ArrayWrapper.cs" />
+    <Compile Include="Classes\AST\AssemblyCustomAttributeList\AssemblyCustomAttributeList.cs" />
+    <Compile Include="Enums\AssemblyFlags\AssemblyFlags.cs" />
+    <Compile Include="Classes\AssertException\AssertException.cs" />
+    <Compile Include="Classes\AST\Assign\Assign.cs" />
+    <Compile Include="Classes\AST\AST.cs" />
+    <Compile Include="Classes\AST\ASTList\ASTList.cs" />
+    <Compile Include="Classes\AstListItem\AstListItem.cs" />
+    <Compile Include="Classes\AST\BinaryOp\BinaryOp.cs" />
+    <Compile Include="Classes\AST\Binding\Binding.cs" />
+    <Compile Include="Classes\AST\BinaryOp\BitwiseBinary\BitwiseBinary.cs" />
+    <Compile Include="Classes\AST\BinaryOp\BitwiseBinaryAssign\BitwiseBinaryAssign.cs" />
+    <Compile Include="Classes\AST\Block\Block.cs" />
+    <Compile Include="Classes\ScriptObject\ActivationObject\BlockScope\BlockScope.cs" />
+    <Compile Include="Classes\ScriptFunction\BooleanConstructor\BooleanConstructor.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\BooleanObject\BooleanObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\BooleanObject\BooleanPrototype\BooleanPrototype.cs" />
+    <Compile Include="Classes\AST\Break\Break.cs" />
+    <Compile Include="Classes\BreakOutOfFinally\BreakOutOfFinally.cs" />
+    <Compile Include="Classes\BuildVersionInfo\BuildVersionInfo.cs" />
+    <Compile Include="Classes\ScriptFunction\BuiltinFunction\BuiltinFunction.cs" />
+    <Compile Include="Classes\AST\Call\Call.cs" />
+    <Compile Include="Classes\AST\Binding\CallableExpression\CallableExpression.cs" />
+    <Compile Include="Classes\CallContext\CallContext.cs" />
+    <Compile Include="Classes\AST\Class\Class.cs" />
+    <Compile Include="Classes\ScriptObject\ActivationObject\ClassScope\ClassScope.cs" />
+    <Compile Include="Classes\ScriptFunction\Closure\Closure.cs" />
+    <Compile Include="Enums\CLSComplianceSpec\CLSComplianceSpec.cs" />
+    <Compile Include="Enums\CmdLineError\CmdLineError.cs" />
+    <Compile Include="Classes\CmdLineException\CmdLineException.cs" />
+    <Compile Include="Classes\CmdLineOptionParser\CmdLineOptionParser.cs" />
+    <Compile Include="Classes\COMCharStream\COMCharStream.cs" />
+    <Compile Include="Classes\COMFieldInfo\COMFieldInfo.cs" />
+    <Compile Include="Classes\COMMethodInfo\COMGetterMethod\COMGetterMethod.cs" />
+    <Compile Include="Classes\AST\BinaryOp\Comma\Comma.cs" />
+    <Compile Include="Enums\COMMemberInfo\COMMemberInfo.cs" />
+    <Compile Include="Classes\TMethod\COMMethodInfo\COMMethodInfo.cs" />
+    <Compile Include="Classes\CompilerGlobals\CompilerGlobals.cs" />
+    <Compile Include="Classes\Completion\Completion.cs" />
+    <Compile Include="Classes\COMPropertyInfo\COMPropertyInfo.cs" />
+    <Compile Include="Classes\COMMethodInfo\COMSetterMethod\COMSetterMethod.cs" />
+    <Compile Include="Classes\ConcatString\ConcatString.cs" />
+    <Compile Include="Classes\AST\Conditional\Conditional.cs" />
+    <Compile Include="Classes\AST\Constant\Constant.cs" />
+    <Compile Include="Classes\ConstantListItem\ConstantListItem.cs" />
+    <Compile Include="Classes\AST\ConstantWrapper\ConstantWrapper.cs" />
+    <Compile Include="Classes\AST\ConstructorCall\ConstructorCall.cs" />
+    <Compile Include="Classes\Context\Context.cs" />
+    <Compile Include="Classes\AST\Continue\Continue.cs" />
+    <Compile Include="Classes\ContinueOutOfFinally\ContinueOutOfFinally.cs" />
+    <Compile Include="Classes\Convert\Convert.cs" />
+    <Compile Include="Classes\AST\CustomAttribute\CustomAttribute.cs" />
+    <Compile Include="Classes\AST\CustomAttributeList\CustomAttributeList.cs" />
+    <Compile Include="Classes\ScriptFunction\DateConstructor\DateConstructor.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\DateObject\DateObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\DateObject\DatePrototype\DatePrototype.cs" />
+    <Compile Include="Classes\Debug\Debug.cs" />
+    <Compile Include="Classes\DebugArrayFieldEnumerator\DebugArrayFieldEnumerator.cs" />
+    <Compile Include="Classes\AST\DebugBreak\DebugBreak.cs" />
+    <Compile Include="Classes\DebugConvert\DebugConvert.cs" />
+    <Compile Include="Classes\DebuggingHelper\DebuggingHelper.cs" />
+    <Compile Include="Classes\EnumWrapper\DeclaredEnumValue\DeclaredEnumValue.cs" />
+    <Compile Include="Classes\AST\UnaryOp\Delete\Delete.cs" />
+    <Compile Include="Classes\DocumentContext\DocumentContext.cs" />
+    <Compile Include="Classes\AST\DoWhile\DoWhile.cs" />
+    <Compile Include="Classes\DynamicFieldInfo\DynamicFieldInfo.cs" />
+    <Compile Include="Classes\Empty\Empty.cs" />
+    <Compile Include="Classes\AST\ConstantWrapper\EmptyLiteral\EmptyLiteral.cs" />
+    <Compile Include="Classes\ParserException\EndOfFile\EndOfFile.cs" />
+    <Compile Include="Classes\AST\Class\EnumDeclaration\EnumDeclaration.cs" />
+    <Compile Include="Classes\ScriptFunction\EnumeratorConstructor\EnumeratorConstructor.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\EnumeratorObject\EnumeratorObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\EnumeratorPrototype\EnumeratorPrototype.cs" />
+    <Compile Include="Classes\EnumWrapper\EnumWrapper.cs" />
+    <Compile Include="Classes\AST\BinaryOp\Equality\Equality.cs" />
+    <Compile Include="Classes\ScriptFunction\ErrorConstructor\ErrorConstructor.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorObject\ErrorObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorPrototype\ErrorPrototype.cs" />
+    <Compile Include="Enums\ErrorType\ErrorType.cs" />
+    <Compile Include="Classes\AST\Eval\Eval.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorObject\EvalErrorObject\EvalErrorObject.cs" />
+    <Compile Include="Classes\DynamicElement\DynamicElement.cs" />
+    <Compile Include="Classes\AST\Expression\Expression.cs" />
+    <Compile Include="Classes\FieldAccessor\FieldAccessor.cs" />
+    <Compile Include="Classes\AST\For\For.cs" />
+    <Compile Include="Classes\AST\ForIn\ForIn.cs" />
+    <Compile Include="Classes\ScriptFunction\FunctionConstructor\FunctionConstructor.cs" />
+    <Compile Include="Classes\AST\FunctionDeclaration\FunctionDeclaration.cs" />
+    <Compile Include="Classes\AST\FunctionExpression\FunctionExpression.cs" />
+    <Compile Include="Classes\ScriptFunction\FunctionObject\FunctionObject.cs" />
+    <Compile Include="Classes\ScriptFunction\FunctionPrototype\FunctionPrototype.cs" />
+    <Compile Include="Classes\ScriptObject\ActivationObject\FunctionScope\FunctionScope.cs" />
+    <Compile Include="Classes\ScriptFunction\FunctionWrapper\FunctionWrapper.cs" />
+    <Compile Include="Classes\GlobalObject\GlobalObject.cs" />
+    <Compile Include="Classes\Globals\Globals.cs" />
+    <Compile Include="Classes\ScriptObject\ActivationObject\GlobalScope\GlobalScope.cs" />
+    <Compile Include="Classes\HashtableEntry\HashtableEntry.cs" />
+    <Compile Include="Classes\Hide\Hide.cs" />
+    <Compile Include="Interfaces\IActivationObject\IActivationObject.cs" />
+    <Compile Include="Interfaces\IDebugConvert\IDebugConvert.cs" />
+    <Compile Include="Interfaces\IDebugConvertExotic\IDebugConvertExotic.cs" />
+    <Compile Include="Interfaces\IDebuggerObject\IDebuggerObject.cs" />
+    <Compile Include="Interfaces\IDebugScriptScope\IDebugScriptScope.cs" />
+    <Compile Include="Interfaces\IDebugType\IDebugType.cs" />
+    <Compile Include="Interfaces\IDebugTHPScriptCodeItem\IDebugTHPScriptCodeItem.cs" />
+    <Compile Include="Interfaces\IDefineEvent\IDefineEvent.cs" />
+    <Compile Include="Classes\AST\IdentifierLiteral\IdentifierLiteral.cs" />
+    <Compile Include="Interfaces\ITEngine\ITEngine.cs" />
+    <Compile Include="Interfaces\IErrorHandler\IErrorHandler.cs" />
+    <Compile Include="Classes\AST\If\If.cs" />
+    <Compile Include="Interfaces\IMessageReceiver\IMessageReceiver.cs" />
+    <Compile Include="Interfaces\IMethodsCompletionInfo\IMethodsCompletionInfo.cs" />
+    <Compile Include="Classes\AST\Import\Import.cs" />
+    <Compile Include="Classes\AST\BinaryOp\In\In.cs" />
+    <Compile Include="Interfaces\INeedEngine\INeedEngine.cs" />
+    <Compile Include="Classes\AST\BinaryOp\Instanceof\Instanceof.cs" />
+    <Compile Include="Interfaces\IDynamicElement\IDynamicElement.cs" />
+    <Compile Include="Interfaces\IObjectCompletionInfo\IObjectCompletionInfo.cs" />
+    <Compile Include="Interfaces\IParseText\IParseText.cs" />
+    <Compile Include="Interfaces\IRedirectOutput\IRedirectOutput.cs" />
+    <Compile Include="Interfaces\ISite\ISite.cs" />
+    <Compile Include="Interfaces\ITHPError\ITHPFullErrorInfo\ITHPFullErrorInfo.cs" />
+    <Compile Include="Interfaces\ITHPItem\ITHPItemCode\ITHPScriptCodeItem\ITHPScriptCodeItem.cs" />
+    <Compile Include="Interfaces\ITHPItem\ITHPScriptScope\ITHPScriptScope.cs" />
+    <Compile Include="Interfaces\IWrappedMember\IWrappedMember.cs" />
+    <Compile Include="Classes\TBinder\TBinder.cs" />
+    <Compile Include="Enums\TBuiltin\TBuiltin.cs" />
+    <Compile Include="Classes\TField\TVariableField\TClosureField\TClosureField.cs" />
+    <Compile Include="Classes\TMethod\TClosureMethod\TClosureMethod.cs" />
+    <Compile Include="Classes\TWrappedProperty\TClosureProperty\TClosureProperty.cs" />
+    <Compile Include="Classes\TCodeGenerator\TCodeGenerator.cs" />
+    <Compile Include="Classes\TCodeSense\TCodeSense.cs" />
+    <Compile Include="Classes\TConstructor\TConstructor.cs" />
+    <Compile Include="Classes\TurboCodeProvider\TurboCodeProvider.cs" />
+    <Compile Include="Classes\TurboException\TurboException.cs" />
+    <Compile Include="Enums\TError\TError.cs" />
+    <Compile Include="Classes\TField\TDynamicElementField\TDynamicElementField.cs" />
+    <Compile Include="Classes\TMethod\TDynamicElementIndexerMethod\TDynamicElementIndexerMethod.cs" />
+    <Compile Include="Classes\TField\TField.cs" />
+    <Compile Include="Classes\TFieldInfo\TFieldInfo.cs" />
+    <Compile Include="Classes\TMethod\TFieldMethod\TFieldMethod.cs" />
+    <Compile Include="Classes\TFunctionAttribute\TFunctionAttribute.cs" />
+    <Compile Include="Enums\TFunctionAttributeEnum\TFunctionAttributeEnum.cs" />
+    <Compile Include="Classes\TField\TVariableField\TGlobalField\TGlobalField.cs" />
+    <Compile Include="Classes\TKeyword\TKeyword.cs" />
+    <Compile Include="Classes\TField\TVariableField\TLocalField\TLocalField.cs" />
+    <Compile Include="Classes\TField\TVariableField\TMemberField\TMemberField.cs" />
+    <Compile Include="Classes\TMethod\TMethod.cs" />
+    <Compile Include="Classes\TMethodInfo\TMethodInfo.cs" />
+    <Compile Include="Classes\TMethod\TNativeMethod\TNativeMethod.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\TObject.cs" />
+    <Compile Include="Classes\TParameterInfo\TParameterInfo.cs" />
+    <Compile Include="Classes\TurboParser\TurboParser.cs" />
+    <Compile Include="Classes\TProperty\TProperty.cs" />
+    <Compile Include="Classes\TField\TPropertyField\TPropertyField.cs" />
+    <Compile Include="Classes\TPropertyInfo\TPropertyInfo.cs" />
+    <Compile Include="Classes\TField\TPrototypeField\TPrototypeField.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\TPrototypeObject\TPrototypeObject.cs" />
+    <Compile Include="Classes\TScanner\TScanner.cs" />
+    <Compile Include="Enums\TToken\TToken.cs" />
+    <Compile Include="Classes\TField\TVariableField\TVariableField.cs" />
+    <Compile Include="Classes\TField\TWrappedField\TWrappedField.cs" />
+    <Compile Include="Classes\TMethod\TWrappedMethod\TWrappedMethod.cs" />
+    <Compile Include="Classes\TWrappedProperty\TWrappedProperty.cs" />
+    <Compile Include="Classes\TWrappedProperty\TWrappedPropertyAndMethod\TWrappedPropertyAndMethod.cs" />
+    <Compile Include="Classes\LateBinding\LateBinding.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ArrayObject\ArrayPrototype\LenientArrayPrototype\LenientArrayPrototype.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\BooleanObject\BooleanPrototype\LenientBooleanPrototype\LenientBooleanPrototype.cs" />
+    <Compile Include="Classes\ScriptFunction\DateConstructor\LenientDateConstructor\LenientDateConstructor.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\DateObject\DatePrototype\LenientDatePrototype\LenientDatePrototype.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\EnumeratorPrototype\LenientEnumeratorPrototype\LenientEnumeratorPrototype.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorPrototype\LenientErrorPrototype\LenientErrorPrototype.cs" />
+    <Compile Include="Classes\ScriptFunction\FunctionPrototype\LenientFunctionPrototype\LenientFunctionPrototype.cs" />
+    <Compile Include="Classes\GlobalObject\LenientGlobalObject\LenientGlobalObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\MathObject\LenientMathObject\LenientMathObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\NumberObject\NumberPrototype\LenientNumberPrototype\LenientNumberPrototype.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ObjectPrototype\LenientObjectPrototype\LenientObjectPrototype.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\RegExpPrototype\LenientRegExpPrototype\LenientRegExpPrototype.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\StringConstructor\LenientStringConstructor\LenientStringConstructor.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\StringObject\StringPrototype\LenientStringPrototype\LenientStringPrototype.cs" />
+    <Compile Include="Classes\ListEnumerator\ListEnumerator.cs" />
+    <Compile Include="Classes\AST\BinaryOp\Logical_and\Logical_and.cs" />
+    <Compile Include="Classes\AST\BinaryOp\Logical_or\Logical_or.cs" />
+    <Compile Include="Classes\AST\Binding\Lookup\Lookup.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\MathObject\MathObject.cs" />
+    <Compile Include="Classes\AST\Binding\Member\Member.cs" />
+    <Compile Include="Interfaces\MemberInfoInitializer\MemberInfoInitializer.cs" />
+    <Compile Include="Classes\MemberInfoList\MemberInfoList.cs" />
+    <Compile Include="Classes\EnumWrapper\MetadataEnumValue\MetadataEnumValue.cs" />
+    <Compile Include="Classes\MethodInvoker\MethodInvoker.cs" />
+    <Compile Include="Classes\Missing\Missing.cs" />
+    <Compile Include="Classes\Namespace\Namespace.cs" />
+    <Compile Include="Classes\NoContextException\NoContextException.cs" />
+    <Compile Include="Classes\NoSkipTokenSet\NoSkipTokenSet.cs" />
+    <Compile Include="Classes\NotRecommended\NotRecommended.cs" />
+    <Compile Include="Classes\AST\ConstantWrapper\NullLiteral\NullLiteral.cs" />
+    <Compile Include="Classes\ScriptFunction\NumberConstructor\NumberConstructor.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\NumberObject\NumberObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\NumberObject\NumberPrototype\NumberPrototype.cs" />
+    <Compile Include="Classes\AST\BinaryOp\NumericBinary\NumericBinary.cs" />
+    <Compile Include="Classes\AST\BinaryOp\NumericBinaryAssign\NumericBinaryAssign.cs" />
+    <Compile Include="Classes\AST\UnaryOp\NumericUnary\NumericUnary.cs" />
+    <Compile Include="Classes\ScriptFunction\ObjectConstructor\ObjectConstructor.cs" />
+    <Compile Include="Classes\AST\ObjectLiteral\ObjectLiteral.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ObjectPrototype\ObjectPrototype.cs" />
+    <Compile Include="Classes\OpListItem\OpListItem.cs" />
+    <Compile Include="Enums\OpPrec\OpPrec.cs" />
+    <Compile Include="Classes\Override\Override.cs" />
+    <Compile Include="Classes\AST\Package\Package.cs" />
+    <Compile Include="Classes\ScriptObject\ActivationObject\PackageScope\PackageScope.cs" />
+    <Compile Include="Classes\ParameterDeclaration\ParameterDeclaration.cs" />
+    <Compile Include="Classes\ParserException\ParserException.cs" />
+    <Compile Include="Classes\AST\BinaryOp\Plus\Plus.cs" />
+    <Compile Include="Classes\AST\BinaryOp\PlusAssign\PlusAssign.cs" />
+    <Compile Include="Classes\AssertException\PostConditionException\PostConditionException.cs" />
+    <Compile Include="Enums\PostOrPrefix\PostOrPrefix.cs" />
+    <Compile Include="Classes\AST\UnaryOp\PostOrPrefixOperator\PostOrPrefixOperator.cs" />
+    <Compile Include="Classes\AssertException\PreConditionException\PreConditionException.cs" />
+    <Compile Include="Enums\PreferredType\PreferredType.cs" />
+    <Compile Include="Classes\AST\Print\Print.cs" />
+    <Compile Include="Enums\Ps\Ps.cs" />
+    <Compile Include="Classes\QuickSort\QuickSort.cs" />
+    <Compile Include="Classes\RangeEnumerator\RangeEnumerator.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorObject\RangeErrorObject\RangeErrorObject.cs" />
+    <Compile Include="Classes\ParserException\RecoveryTokenException\RecoveryTokenException.cs" />
+    <Compile Include="Classes\ReferenceAttribute\ReferenceAttribute.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorObject\ReferenceErrorObject\ReferenceErrorObject.cs" />
+    <Compile Include="Classes\ScriptFunction\RegExpConstructor\RegExpConstructor.cs" />
+    <Compile Include="Classes\AST\RegExpLiteral\RegExpLiteral.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ArrayObject\RegExpMatch\RegExpMatch.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\RegExpObject\RegExpObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\RegExpPrototype\RegExpPrototype.cs" />
+    <Compile Include="Classes\RegExpReplace\RegExpReplace.cs" />
+    <Compile Include="Classes\AST\BinaryOp\Relational\Relational.cs" />
+    <Compile Include="Classes\RegExpReplace\ReplaceWithString\ReplaceWithString.cs" />
+    <Compile Include="Classes\AST\Return\Return.cs" />
+    <Compile Include="Classes\ReturnOutOfFinally\ReturnOutOfFinally.cs" />
+    <Compile Include="Classes\Runtime\Runtime.cs" />
+    <Compile Include="Classes\ScannerException\ScannerException.cs" />
+    <Compile Include="Classes\AST\ScriptBlock\ScriptBlock.cs" />
+    <Compile Include="Classes\ScriptFunction\ScriptFunction.cs" />
+    <Compile Include="Classes\ScriptObject\ScriptObject.cs" />
+    <Compile Include="Classes\ScriptObjectPropertyEnumerator\ScriptObjectPropertyEnumerator.cs" />
+    <Compile Include="Classes\ScriptStream\ScriptStream.cs" />
+    <Compile Include="Classes\SimpleHashtable\SimpleHashtable.cs" />
+    <Compile Include="Classes\SimpleHashtableEnumerator\SimpleHashtableEnumerator.cs" />
+    <Compile Include="Classes\Stack\Stack.cs" />
+    <Compile Include="Classes\ScriptObject\StackFrame\StackFrame.cs" />
+    <Compile Include="Classes\AST\StaticInitializer\StaticInitializer.cs" />
+    <Compile Include="Classes\AST\BinaryOp\StrictEquality\StrictEquality.cs" />
+    <Compile Include="Classes\ScriptFunction\StringConstructor\StringConstructor.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\StringObject\StringObject.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\StringObject\StringPrototype\StringPrototype.cs" />
+    <Compile Include="Classes\SuperTypeMembersSorter\SuperTypeMembersSorter.cs" />
+    <Compile Include="Classes\AST\Switch\Switch.cs" />
+    <Compile Include="Classes\AST\SwitchCase\SwitchCase.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorObject\SyntaxErrorObject\SyntaxErrorObject.cs" />
+    <Compile Include="Classes\AST\ThisLiteral\ThisLiteral.cs" />
+    <Compile Include="Classes\AST\Throw\Throw.cs" />
+    <Compile Include="Enums\Tk\Tk.cs" />
+    <Compile Include="Classes\TRHashtable\TRHashtable.cs" />
+    <Compile Include="Classes\AST\Try\Try.cs" />
+    <Compile Include="Classes\TypedArray\TypedArray.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorObject\TypeErrorObject\TypeErrorObject.cs" />
+    <Compile Include="Classes\AST\TypeExpression\TypeExpression.cs" />
+    <Compile Include="Classes\Typeob\Typeob.cs" />
+    <Compile Include="Classes\AST\UnaryOp\Typeof\Typeof.cs" />
+    <Compile Include="Classes\TypeReferences\TypeReferences.cs" />
+    <Compile Include="Classes\ScriptObject\TypeReflector\TypeReflector.cs" />
+    <Compile Include="Classes\AST\UnaryOp\UnaryOp.cs" />
+    <Compile Include="Classes\ScriptObject\TObject\ErrorObject\URIErrorObject\URIErrorObject.cs" />
+    <Compile Include="Classes\AST\VariableDeclaration\VariableDeclaration.cs" />
+    <Compile Include="Classes\AST\UnaryOp\VoidOp\VoidOp.cs" />
+    <Compile Include="Classes\THPItem\THPHostObject\THPHostObject.cs" />
+    <Compile Include="Classes\THPItem\THPItem.cs" />
+    <Compile Include="Classes\THPItems\THPItems.cs" />
+    <Compile Include="Interfaces\THPItemType\THPItemType.cs" />
+    <Compile Include="Classes\ScriptObject\THPNamedItemScope\THPNamedItemScope.cs" />
+    <Compile Include="Classes\THPItem\THPReference\THPReference.cs" />
+    <Compile Include="Classes\THPItem\THPScriptCode\THPScriptCode.cs" />
+    <Compile Include="Classes\THPItem\THPScriptScope\THPScriptScope.cs" />
+    <Compile Include="Classes\THPSite\THPSiteEx\THPSiteEx.cs" />
+    <Compile Include="Classes\THPItem\THPStaticCode\THPStaticCode.cs" />
+    <Compile Include="Classes\AST\While\While.cs" />
+    <Compile Include="Classes\AST\With\With.cs" />
+    <Compile Include="Classes\ScriptObject\WithObject\WithObject.cs" />
+    <Compile Include="Classes\ScriptObject\ActivationObject\WrappedNamespace\WrappedNamespace.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbo Runtime", "Turbo Runtime\Turbo Runtime.csproj", "{9738D611-56D2-4BFF-9F20-9600142FEB77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbo CLI", "Turbo CLI\Turbo CLI.csproj", "{9F01B7BC-CCC0-47A2-9C30-FCF4EF61F0FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Turbo64|x64 = Turbo64|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9738D611-56D2-4BFF-9F20-9600142FEB77}.Turbo64|x64.ActiveCfg = Turbo64|x64
+		{9738D611-56D2-4BFF-9F20-9600142FEB77}.Turbo64|x64.Build.0 = Turbo64|x64
+		{9F01B7BC-CCC0-47A2-9C30-FCF4EF61F0FA}.Turbo64|x64.ActiveCfg = Turbo64|x64
+		{9F01B7BC-CCC0-47A2-9C30-FCF4EF61F0FA}.Turbo64|x64.Build.0 = Turbo64|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
