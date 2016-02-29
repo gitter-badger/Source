@@ -50,20 +50,10 @@
  */
 #endregion
 
-using System;
-
 namespace TurboCLI
 {
     internal static class Program
     {
-        private static int Main(string[] args)
-        {
-            Console.WriteLine(@"# +++++++++++++ Turbo +++++++++++++ #");
-            Console.WriteLine(@"# (2006 - 2011) << MS JScript Team  #");
-            Console.WriteLine(@"# (2013 -     ) << Turbo Developers #");
-            Console.WriteLine(@"# +++++++++ turbolang.org +++++++++ #" + Environment.NewLine);
-
-            return args.Length == 0 ? 0 : CLICompiler.Run(args);
-        }
+        private static int Main(string[] args) => args.Length == 0 ? 0 : CLICompiler.Run(args);
     }
 }

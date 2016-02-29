@@ -1,63 +1,118 @@
+#region LICENSE
+
+/*
+ * This  license  governs  use  of  the accompanying software. If you use the software, you accept this
+ * license. If you do not accept the license, do not use the software.
+ *
+ * 1. Definitions
+ *
+ * The terms "reproduce", "reproduction", "derivative works",  and "distribution" have the same meaning
+ * here as under U.S.  copyright law.  A " contribution"  is the original software, or any additions or
+ * changes to the software.  A "contributor" is any person that distributes its contribution under this
+ * license.  "Licensed patents" are contributor's patent claims that read directly on its contribution.
+ *
+ * 2. Grant of Rights
+ *
+ * (A) Copyright  Grant-  Subject  to  the  terms of this license, including the license conditions and
+ * limitations in section 3,  each  contributor  grants you a  non-exclusive,  worldwide,  royalty-free
+ * copyright license to reproduce its contribution,  prepare derivative works of its contribution,  and
+ * distribute its contribution or any derivative works that you create.
+ *
+ * (B) Patent  Grant-  Subject  to  the  terms  of  this  license, including the license conditions and
+ * limitations in section 3,  each  contributor  grants you a  non-exclusive,  worldwide,  royalty-free
+ * license under its licensed patents to make,  have made,  use,  sell,  offer for sale, import, and/or
+ * otherwise dispose of its contribution in the software or derivative works of the contribution in the
+ * software.
+ *
+ * 3. Conditions and Limitations
+ *
+ * (A) Reciprocal Grants-  For any file you distribute that contains code from the software  (in source
+ * code or binary format),  you must provide  recipients a copy of this license.  You may license other
+ * files that are  entirely your own work and do not contain code from the software under any terms you
+ * choose.
+ *
+ * (B) No Trademark License- This license does not grant you rights to use a contributors'  name, logo,
+ * or trademarks.
+ *
+ * (C) If you bring a patent claim against any contributor over patents that you claim are infringed by
+ * the software, your patent license from such contributor to the software ends automatically.
+ *
+ * (D) If you distribute any portion of the software, you must retain all copyright, patent, trademark,
+ * and attribution notices that are present in the software.
+ *
+ * (E) If you distribute any portion of the software in source code form, you may do so while including
+ * a complete copy of this license with your distribution.
+ *
+ * (F) The software is licensed as-is. You bear the risk of using it.  The contributors give no express
+ * warranties, guarantees or conditions.  You may have additional consumer rights under your local laws
+ * which this license cannot change.  To the extent permitted under  your local laws,  the contributors
+ * exclude  the  implied  warranties  of  merchantability,  fitness  for  a particular purpose and non-
+ * infringement.
+ */
+
+#endregion
+
 using System;
 using System.Globalization;
 using System.Reflection;
 
 namespace Turbo.Runtime
 {
-	internal sealed class TWrappedField : TField, IWrappedMember
-	{
-		internal readonly FieldInfo wrappedField;
+    internal sealed class TWrappedField : TField, IWrappedMember
+    {
+        internal readonly FieldInfo wrappedField;
 
-		internal readonly object wrappedObject;
+        internal readonly object wrappedObject;
 
-		public override string Name => wrappedField.Name;
+        public override string Name => wrappedField.Name;
 
-	    public override FieldAttributes Attributes => wrappedField.Attributes;
+        public override FieldAttributes Attributes => wrappedField.Attributes;
 
-	    public override Type DeclaringType => wrappedField.DeclaringType;
+        public override Type DeclaringType => wrappedField.DeclaringType;
 
-	    public override Type FieldType => wrappedField.FieldType;
+        public override Type FieldType => wrappedField.FieldType;
 
-	    internal TWrappedField(FieldInfo field, object obj)
-		{
-			if (field is TFieldInfo)
-			{
-				field = ((TFieldInfo)field).field;
-			}
-			wrappedField = field;
-			wrappedObject = obj;
-	        if (!(obj is TObject) || Typeob.TObject.IsAssignableFrom(field.DeclaringType)) return;
-	        if (obj is BooleanObject)
-	        {
-	            wrappedObject = ((BooleanObject)obj).value;
-	            return;
-	        }
-	        if (obj is NumberObject)
-	        {
-	            wrappedObject = ((NumberObject)obj).value;
-	            return;
-	        }
-	        if (obj is StringObject)
-	        {
-	            wrappedObject = ((StringObject)obj).value;
-	        }
-		}
+        internal TWrappedField(FieldInfo field, object obj)
+        {
+            if (field is TFieldInfo)
+            {
+                field = ((TFieldInfo) field).field;
+            }
+            wrappedField = field;
+            wrappedObject = obj;
+            if (!(obj is TObject) || Typeob.TObject.IsAssignableFrom(field.DeclaringType)) return;
+            if (obj is BooleanObject)
+            {
+                wrappedObject = ((BooleanObject) obj).value;
+                return;
+            }
+            if (obj is NumberObject)
+            {
+                wrappedObject = ((NumberObject) obj).value;
+                return;
+            }
+            if (obj is StringObject)
+            {
+                wrappedObject = ((StringObject) obj).value;
+            }
+        }
 
-		internal override string GetClassFullName() 
+        internal override string GetClassFullName()
             => wrappedField is TField ? ((TField) wrappedField).GetClassFullName() : wrappedField.DeclaringType.FullName;
 
-	    internal override object GetMetaData() 
+        internal override object GetMetaData()
             => wrappedField is TField ? ((TField) wrappedField).GetMetaData() : wrappedField;
 
-	    internal override PackageScope GetPackage() => (wrappedField as TField)?.GetPackage();
+        internal override PackageScope GetPackage() => (wrappedField as TField)?.GetPackage();
 
-	    public override object GetValue(object obj) => wrappedField.GetValue(wrappedObject);
+        public override object GetValue(object obj) => wrappedField.GetValue(wrappedObject);
 
-	    public object GetWrappedObject() => wrappedObject;
+        public object GetWrappedObject() => wrappedObject;
 
-	    public override void SetValue(object obj, object value, BindingFlags invokeAttr, Binder binder, CultureInfo locale)
-		{
-			wrappedField.SetValue(wrappedObject, value, invokeAttr, binder, locale);
-		}
-	}
+        public override void SetValue(object obj, object value, BindingFlags invokeAttr, Binder binder,
+            CultureInfo locale)
+        {
+            wrappedField.SetValue(wrappedObject, value, invokeAttr, binder, locale);
+        }
+    }
 }

@@ -1,3 +1,57 @@
+#region LICENSE
+
+/*
+ * This  license  governs  use  of  the accompanying software. If you use the software, you accept this
+ * license. If you do not accept the license, do not use the software.
+ *
+ * 1. Definitions
+ *
+ * The terms "reproduce", "reproduction", "derivative works",  and "distribution" have the same meaning
+ * here as under U.S.  copyright law.  A " contribution"  is the original software, or any additions or
+ * changes to the software.  A "contributor" is any person that distributes its contribution under this
+ * license.  "Licensed patents" are contributor's patent claims that read directly on its contribution.
+ *
+ * 2. Grant of Rights
+ *
+ * (A) Copyright  Grant-  Subject  to  the  terms of this license, including the license conditions and
+ * limitations in section 3,  each  contributor  grants you a  non-exclusive,  worldwide,  royalty-free
+ * copyright license to reproduce its contribution,  prepare derivative works of its contribution,  and
+ * distribute its contribution or any derivative works that you create.
+ *
+ * (B) Patent  Grant-  Subject  to  the  terms  of  this  license, including the license conditions and
+ * limitations in section 3,  each  contributor  grants you a  non-exclusive,  worldwide,  royalty-free
+ * license under its licensed patents to make,  have made,  use,  sell,  offer for sale, import, and/or
+ * otherwise dispose of its contribution in the software or derivative works of the contribution in the
+ * software.
+ *
+ * 3. Conditions and Limitations
+ *
+ * (A) Reciprocal Grants-  For any file you distribute that contains code from the software  (in source
+ * code or binary format),  you must provide  recipients a copy of this license.  You may license other
+ * files that are  entirely your own work and do not contain code from the software under any terms you
+ * choose.
+ *
+ * (B) No Trademark License- This license does not grant you rights to use a contributors'  name, logo,
+ * or trademarks.
+ *
+ * (C) If you bring a patent claim against any contributor over patents that you claim are infringed by
+ * the software, your patent license from such contributor to the software ends automatically.
+ *
+ * (D) If you distribute any portion of the software, you must retain all copyright, patent, trademark,
+ * and attribution notices that are present in the software.
+ *
+ * (E) If you distribute any portion of the software in source code form, you may do so while including
+ * a complete copy of this license with your distribution.
+ *
+ * (F) The software is licensed as-is. You bear the risk of using it.  The contributors give no express
+ * warranties, guarantees or conditions.  You may have additional consumer rights under your local laws
+ * which this license cannot change.  To the extent permitted under  your local laws,  the contributors
+ * exclude  the  implied  warranties  of  merchantability,  fitness  for  a particular purpose and non-
+ * infringement.
+ */
+
+#endregion
+
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -89,58 +143,58 @@ namespace Turbo.Runtime
 
         public static ObjectConstructor Object => ObjectConstructor.ob;
 
-        internal virtual ActiveXObjectConstructor originalActiveXObject 
+        internal virtual ActiveXObjectConstructor originalActiveXObject
             => originalActiveXObjectField ?? (originalActiveXObjectField = ActiveXObjectConstructor.ob);
 
-        internal virtual ArrayConstructor originalArray 
+        internal virtual ArrayConstructor originalArray
             => originalArrayField ?? (originalArrayField = ArrayConstructor.ob);
 
-        internal virtual BooleanConstructor originalBoolean 
+        internal virtual BooleanConstructor originalBoolean
             => originalBooleanField ?? (originalBooleanField = BooleanConstructor.ob);
 
-        internal virtual DateConstructor originalDate 
+        internal virtual DateConstructor originalDate
             => originalDateField ?? (originalDateField = DateConstructor.ob);
 
-        internal virtual EnumeratorConstructor originalEnumerator 
+        internal virtual EnumeratorConstructor originalEnumerator
             => originalEnumeratorField ?? (originalEnumeratorField = EnumeratorConstructor.ob);
 
-        internal virtual ErrorConstructor originalError 
+        internal virtual ErrorConstructor originalError
             => originalErrorField ?? (originalErrorField = ErrorConstructor.ob);
 
-        internal virtual ErrorConstructor originalEvalError 
+        internal virtual ErrorConstructor originalEvalError
             => originalEvalErrorField ?? (originalEvalErrorField = ErrorConstructor.evalOb);
 
-        internal virtual FunctionConstructor originalFunction 
+        internal virtual FunctionConstructor originalFunction
             => originalFunctionField ?? (originalFunctionField = FunctionConstructor.ob);
 
-        internal virtual NumberConstructor originalNumber 
+        internal virtual NumberConstructor originalNumber
             => originalNumberField ?? (originalNumberField = NumberConstructor.ob);
 
-        internal virtual ObjectConstructor originalObject 
+        internal virtual ObjectConstructor originalObject
             => originalObjectField ?? (originalObjectField = ObjectConstructor.ob);
 
-        internal virtual ObjectPrototype originalObjectPrototype 
+        internal virtual ObjectPrototype originalObjectPrototype
             => originalObjectPrototypeField ?? (originalObjectPrototypeField = ObjectPrototype.ob);
 
-        internal virtual ErrorConstructor originalRangeError 
+        internal virtual ErrorConstructor originalRangeError
             => originalRangeErrorField ?? (originalRangeErrorField = ErrorConstructor.rangeOb);
 
-        internal virtual ErrorConstructor originalReferenceError 
+        internal virtual ErrorConstructor originalReferenceError
             => originalReferenceErrorField ?? (originalReferenceErrorField = ErrorConstructor.referenceOb);
 
-        internal virtual RegExpConstructor originalRegExp 
+        internal virtual RegExpConstructor originalRegExp
             => originalRegExpField ?? (originalRegExpField = RegExpConstructor.ob);
 
-        internal virtual StringConstructor originalString 
+        internal virtual StringConstructor originalString
             => originalStringField ?? (originalStringField = StringConstructor.ob);
 
-        internal virtual ErrorConstructor originalSyntaxError 
+        internal virtual ErrorConstructor originalSyntaxError
             => originalSyntaxErrorField ?? (originalSyntaxErrorField = ErrorConstructor.syntaxOb);
 
-        internal virtual ErrorConstructor originalTypeError 
+        internal virtual ErrorConstructor originalTypeError
             => originalTypeErrorField ?? (originalTypeErrorField = ErrorConstructor.typeOb);
 
-        internal virtual ErrorConstructor originalURIError 
+        internal virtual ErrorConstructor originalURIError
             => originalURIErrorField ?? (originalURIErrorField = ErrorConstructor.uriOb);
 
         public static ErrorConstructor RangeError => ErrorConstructor.rangeOb;
@@ -160,7 +214,7 @@ namespace Turbo.Runtime
         public static ErrorConstructor TypeError => ErrorConstructor.typeOb;
 
         public static ErrorConstructor URIError => ErrorConstructor.uriOb;
-        
+
         public static Type @void => Typeob.Void;
 
         public static Type @uint => Typeob.UInt32;
@@ -245,10 +299,10 @@ namespace Turbo.Runtime
         {
             return c >= '0' && c <= '9'
                 ? c - '0'
-                : (c >= 'A' && c <= 'F' 
-                    ? '\n' + c - 'A' 
-                    : (c >= 'a' && c <= 'f' 
-                        ? '\n' + c - 'a' 
+                : (c >= 'A' && c <= 'F'
+                    ? '\n' + c - 'A'
+                    : (c >= 'a' && c <= 'f'
+                        ? '\n' + c - 'a'
                         : -1));
         }
 
@@ -260,12 +314,11 @@ namespace Turbo.Runtime
         public static bool isFinite(double number) => !double.IsInfinity(number) && !double.IsNaN(number);
 
         [TFunction(TFunctionAttributeEnum.None, TBuiltin.Global_parseFloat)]
-        public static double parseFloat(object @string) 
+        public static double parseFloat(object @string)
             => Convert.ToNumber(Convert.ToString(@string), false, false, Missing.Value);
 
         [TFunction(TFunctionAttributeEnum.None, TBuiltin.Global_parseInt)]
-        public static double parseInt(object @string, object radix) 
+        public static double parseInt(object @string, object radix)
             => Convert.ToNumber(Convert.ToString(@string), true, true, radix);
-
     }
 }
