@@ -187,7 +187,9 @@ namespace Turbo.Runtime
                 if (this.ifaceId != null) text2 = ifaceId + "." + text2;
                 var jSVariableField = (TVariableField) ((ActivationObject) scriptObject).name_table[text2];
                 if (jSVariableField != null
-                    && (!((jSVariableField as TMemberField)?.value is FunctionObject) || func.isDynamicElementMethod))
+                    //~ && (!((jSVariableField as TMemberField)?.value is FunctionObject) || func.isDynamicElementMethod))
+					// !TODO: Monofix
+                    && (!((jSVariableField as TMemberField).value is FunctionObject) || func.isDynamicElementMethod))
                 {
                     if (text != name)
                     {
@@ -202,7 +204,9 @@ namespace Turbo.Runtime
                 }
                 if (this.isMethod)
                 {
-                    if (!((jSVariableField as TMemberField)?.value is FunctionObject) || text != name)
+                    //~ if (!((jSVariableField as TMemberField)?.value is FunctionObject) || text != name)
+					// !TODO: Monofix
+                    if (!((jSVariableField as TMemberField).value is FunctionObject) || text != name)
                     {
                         field = ((ActivationObject) scriptObject).AddNewField(
                             text2,

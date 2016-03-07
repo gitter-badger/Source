@@ -88,7 +88,9 @@ namespace Turbo.Runtime
                     if (block == null || block.list.Count != 0)
                     {
                         var expression = obj as Expression;
-                        if (!(expression?.operand is AssemblyCustomAttributeList))
+                        //~ if (!(expression?.operand is AssemblyCustomAttributeList))
+						// !TODO: Monofix
+                        if (!(expression.operand is AssemblyCustomAttributeList))
                         {
                             ((AST) obj).context.HandleError(TError.OnlyClassesAndPackagesAllowed);
                             return;

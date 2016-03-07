@@ -94,7 +94,9 @@ namespace Turbo.Runtime
             var member = ((TObject) thisob).GetMember(name2,
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public);
             var num2 = member.Length;
-            return num2 > 1 || (num2 >= 1 && (!((member[0] as TPrototypeField)?.value is Missing)));
+            //~ return num2 > 1 || (num2 >= 1 && (!((member[0] as TPrototypeField)?.value is Missing)));
+			// !TODO: Monofix
+            return num2 > 1 || (num2 >= 1 && (!((member[0] as TPrototypeField).value is Missing)));
         }
 
         [TFunction(TFunctionAttributeEnum.HasThisObject, TBuiltin.Object_isPrototypeOf)]

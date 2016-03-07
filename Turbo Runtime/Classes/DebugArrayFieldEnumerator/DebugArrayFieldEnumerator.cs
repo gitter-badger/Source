@@ -62,12 +62,16 @@ namespace Turbo.Runtime
 
         private int count;
 
-        private readonly ArrayObject arrayObject;
+        //~ private readonly ArrayObject arrayObject;
+		// !TODO: Monofix
 
-        internal DebugArrayFieldEnumerator(ScriptObjectPropertyEnumerator enumerator, ArrayObject arrayObject)
+        //~ internal DebugArrayFieldEnumerator(ScriptObjectPropertyEnumerator enumerator, ArrayObject arrayObject)
+		// !TODO: Monofix
+        internal DebugArrayFieldEnumerator(ScriptObjectPropertyEnumerator enumerator, ArrayObject arrayObject = null)
         {
             this.enumerator = enumerator;
-            this.arrayObject = arrayObject;
+            //~ this.arrayObject = arrayObject;
+			// !TODO: Monofix
             EnsureCount();
         }
 
