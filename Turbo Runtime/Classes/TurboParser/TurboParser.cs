@@ -2327,6 +2327,7 @@ namespace Turbo.Runtime
         {
             var context = currentToken.Clone();
             Context tryEndContext = null;
+            // ReSharper disable once RedundantAssignment
             AST body = null;
             AST aST = null;
             AST aST2 = null;
