@@ -126,7 +126,7 @@ namespace Turbo.Runtime
             operand1.SetPartialValue(binOp);
             if (!Engine.doFast) return this;
             var binding = operand1 as Binding;
-            if (!(binding?.member is TVariableField)) return this;
+            if (binding == null || !(binding.member is TVariableField)) return this;
             var type = ((TVariableField) binding.member).type;
             if (type != null && ReferenceEquals(type.InferType(null), Typeob.String))
             {

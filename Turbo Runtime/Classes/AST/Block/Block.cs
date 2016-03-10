@@ -88,7 +88,7 @@ namespace Turbo.Runtime
                     if (block == null || block.list.Count != 0)
                     {
                         var expression = obj as Expression;
-                        if (!(expression?.operand is AssemblyCustomAttributeList))
+                        if (expression != null && !(expression.operand is AssemblyCustomAttributeList))
                         {
                             ((AST) obj).context.HandleError(TError.OnlyClassesAndPackagesAllowed);
                             return;
@@ -340,7 +340,7 @@ namespace Turbo.Runtime
                     aST.TranslateToILInitializer(il);
                     aST.TranslateToIL(il, Typeob.Void);
                 }
-                else if (aST is FunctionDeclaration && !((FunctionDeclaration) aST).func.isStatic)
+                else if (aST is FunctionDeclaration && !((FunctionDeclaration) aST).Func.isStatic)
                 {
                     aST.TranslateToILInitializer(il);
                 }
@@ -373,7 +373,7 @@ namespace Turbo.Runtime
                 {
                     aST.TranslateToIL(il, Typeob.Void);
                 }
-                else if (aST is FunctionDeclaration && ((FunctionDeclaration) aST).func.isStatic)
+                else if (aST is FunctionDeclaration && ((FunctionDeclaration) aST).Func.isStatic)
                 {
                     aST.TranslateToILInitializer(il);
                 }

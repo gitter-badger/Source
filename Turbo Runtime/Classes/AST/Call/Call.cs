@@ -217,7 +217,7 @@ namespace Turbo.Runtime
             {
                 var callableExpression = func as CallableExpression;
                 object obj;
-                if (!(callableExpression?.expression is Call))
+                if (callableExpression == null || !(callableExpression.expression is Call))
                 {
                     obj = lateBinding.Call(array, isConstructor, inBrackets, Engine);
                 }

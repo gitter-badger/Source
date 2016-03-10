@@ -163,10 +163,10 @@ namespace Turbo.Runtime
             var functionDeclaration = obj as FunctionDeclaration;
             if (functionDeclaration != null)
             {
-                if ((validOn & AttributeTargets.Property) != 0 && functionDeclaration.enclosingProperty != null)
+                if ((validOn & AttributeTargets.Property) != 0 && functionDeclaration.EnclosingProperty != null)
                 {
-                    if (functionDeclaration.enclosingProperty.getter == null ||
-                        ((TFieldMethod) functionDeclaration.enclosingProperty.getter).func == functionDeclaration.func)
+                    if (functionDeclaration.EnclosingProperty.getter == null ||
+                        ((TFieldMethod) functionDeclaration.EnclosingProperty.getter).func == functionDeclaration.Func)
                     {
                         raiseToPropertyLevel = true;
                         return true;
@@ -174,11 +174,11 @@ namespace Turbo.Runtime
                     context.HandleError(TError.PropertyLevelAttributesMustBeOnGetter);
                     return false;
                 }
-                if ((validOn & AttributeTargets.Method) != 0 && functionDeclaration.isMethod)
+                if ((validOn & AttributeTargets.Method) != 0 && functionDeclaration.IsMethod)
                 {
                     return true;
                 }
-                if ((validOn & AttributeTargets.Constructor) != 0 && functionDeclaration.func.isConstructor)
+                if ((validOn & AttributeTargets.Constructor) != 0 && functionDeclaration.Func.isConstructor)
                 {
                     return true;
                 }

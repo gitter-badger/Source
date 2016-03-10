@@ -60,31 +60,31 @@ namespace Turbo.Runtime
 {
     public sealed class FunctionDeclaration : AST
     {
-        internal readonly FunctionObject func;
+        internal readonly FunctionObject Func;
 
-        private readonly Member declaringObject;
+        private readonly Member _declaringObject;
 
-        private readonly TypeExpression ifaceId;
+        private readonly TypeExpression _ifaceId;
 
-        private readonly string name;
+        private readonly string _name;
 
-        internal readonly bool isMethod;
+        internal readonly bool IsMethod;
 
-        private readonly bool inFastScope;
+        private readonly bool _inFastScope;
 
-        private readonly TVariableField field;
+        private readonly TVariableField _field;
 
-        internal readonly TProperty enclosingProperty;
+        internal readonly TProperty EnclosingProperty;
 
-        private readonly Completion completion = new Completion();
+        private readonly Completion _completion = new Completion();
 
         internal FunctionDeclaration(Context context,
             AST ifaceId,
             AST id,
-            ParameterDeclaration[] formal_parameters,
-            TypeExpression return_type,
+            ParameterDeclaration[] formalParameters,
+            TypeExpression returnType,
             Block body,
-            FunctionScope own_scope,
+            FunctionScope ownScope,
             FieldAttributes attributes,
             bool isMethod,
             bool isGetter,
@@ -114,20 +114,20 @@ namespace Turbo.Runtime
 
             if (isAbstract) methodAttributes |= MethodAttributes.Abstract;
             if (isFinal) methodAttributes |= MethodAttributes.Final;
-            name = id.ToString();
-            this.isMethod = isMethod;
+            _name = id.ToString();
+            IsMethod = isMethod;
             if (ifaceId != null)
             {
                 if (isMethod)
                 {
-                    this.ifaceId = new TypeExpression(ifaceId);
+                    _ifaceId = new TypeExpression(ifaceId);
                     methodAttributes &= ~MethodAttributes.MemberAccessMask;
                     methodAttributes |= (MethodAttributes.Private | MethodAttributes.Final);
                 }
                 else
                 {
-                    declaringObject = new Member(ifaceId.context, ifaceId, id);
-                    name = declaringObject.ToString();
+                    _declaringObject = new Member(ifaceId.context, ifaceId, id);
+                    _name = _declaringObject.ToString();
                 }
             }
             var scriptObject = Globals.ScopeStack.Peek();
@@ -143,20 +143,20 @@ namespace Turbo.Runtime
             }
             if (scriptObject is ActivationObject)
             {
-                inFastScope = ((ActivationObject) scriptObject).fast;
-                var text = name;
+                _inFastScope = ((ActivationObject) scriptObject).fast;
+                var text = _name;
                 if (isGetter)
                 {
                     methodAttributes |= MethodAttributes.SpecialName;
-                    name = "get_" + name;
-                    if (return_type == null)
-                        return_type = new TypeExpression(new ConstantWrapper(Typeob.Object, context));
+                    _name = "get_" + _name;
+                    if (returnType == null)
+                        returnType = new TypeExpression(new ConstantWrapper(Typeob.Object, context));
                 }
                 else if (isSetter)
                 {
                     methodAttributes |= MethodAttributes.SpecialName;
-                    name = "set_" + name;
-                    return_type = new TypeExpression(new ConstantWrapper(Typeob.Void, context));
+                    _name = "set_" + _name;
+                    returnType = new TypeExpression(new ConstantWrapper(Typeob.Void, context));
                 }
                 attributes &= FieldAttributes.FieldAccessMask;
                 var methodAttributes2 = methodAttributes & MethodAttributes.MemberAccessMask;
@@ -169,63 +169,63 @@ namespace Turbo.Runtime
                     methodAttributes |= MethodAttributes.CheckAccessOnOverride;
                 }
 
-                func = new FunctionObject(
-                    name,
-                    formal_parameters,
-                    return_type,
+                Func = new FunctionObject(
+                    _name,
+                    formalParameters,
+                    returnType,
                     body,
-                    own_scope,
+                    ownScope,
                     scriptObject,
                     this.context,
                     methodAttributes,
                     customAttributes,
-                    this.isMethod
+                    IsMethod
                     );
 
-                if (declaringObject != null) return;
-                var text2 = name;
-                if (this.ifaceId != null) text2 = ifaceId + "." + text2;
+                if (_declaringObject != null) return;
+                var text2 = _name;
+                if (_ifaceId != null) text2 = ifaceId + "." + text2;
                 var jSVariableField = (TVariableField) ((ActivationObject) scriptObject).name_table[text2];
-                if (jSVariableField != null
-                    && (!((jSVariableField as TMemberField)?.value is FunctionObject) || func.isDynamicElementMethod))
+                var memberField = jSVariableField as TMemberField;
+                if (memberField != null && ((!(memberField.value is FunctionObject) || Func.isDynamicElementMethod)))
                 {
-                    if (text != name)
+                    if (text != _name)
                     {
                         jSVariableField.originalContext.HandleError(TError.ClashWithProperty);
                     }
                     else
                     {
-                        id.context.HandleError(TError.DuplicateName, func.isDynamicElementMethod);
+                        id.context.HandleError(TError.DuplicateName, Func.isDynamicElementMethod);
                         if (jSVariableField.value is FunctionObject)
                             ((FunctionObject) jSVariableField.value).suppressIL = true;
                     }
                 }
-                if (this.isMethod)
+                if (IsMethod)
                 {
-                    if (!((jSVariableField as TMemberField)?.value is FunctionObject) || text != name)
+                    if (!(jSVariableField is TMemberField) || !(((TMemberField) jSVariableField).value is FunctionObject) || text != _name)
                     {
-                        field = ((ActivationObject) scriptObject).AddNewField(
+                        _field = ((ActivationObject) scriptObject).AddNewField(
                             text2,
-                            func,
+                            Func,
                             attributes | FieldAttributes.Literal
                             );
 
-                        if (text == name)
-                            field.type = new TypeExpression(new ConstantWrapper(Typeob.FunctionWrapper, this.context));
+                        if (text == _name)
+                            _field.type = new TypeExpression(new ConstantWrapper(Typeob.FunctionWrapper, this.context));
                     }
                     else
                     {
-                        field = ((TMemberField) jSVariableField).AddOverload(func, attributes | FieldAttributes.Literal);
+                        _field = ((TMemberField) jSVariableField).AddOverload(Func, attributes | FieldAttributes.Literal);
                     }
                 }
                 else if (scriptObject is FunctionScope)
                 {
-                    if (inFastScope) attributes |= FieldAttributes.Literal;
-                    field = ((FunctionScope) scriptObject).AddNewField(name, attributes, func);
-                    if (field is TLocalField)
+                    if (_inFastScope) attributes |= FieldAttributes.Literal;
+                    _field = ((FunctionScope) scriptObject).AddNewField(_name, attributes, Func);
+                    if (_field is TLocalField)
                     {
-                        var jSLocalField = (TLocalField) field;
-                        if (inFastScope)
+                        var jSLocalField = (TLocalField) _field;
+                        if (_inFastScope)
                         {
                             jSLocalField.type = new TypeExpression(
                                 new ConstantWrapper(Typeob.ScriptFunction, this.context)
@@ -236,74 +236,72 @@ namespace Turbo.Runtime
                         jSLocalField.isDefined = true;
                     }
                 }
-                else if (inFastScope)
+                else if (_inFastScope)
                 {
-                    field = ((ActivationObject) scriptObject).AddNewField(name, func,
+                    _field = ((ActivationObject) scriptObject).AddNewField(_name, Func,
                         attributes | FieldAttributes.Literal);
-                    field.type = new TypeExpression(new ConstantWrapper(Typeob.ScriptFunction, this.context));
+                    _field.type = new TypeExpression(new ConstantWrapper(Typeob.ScriptFunction, this.context));
                 }
                 else
                 {
-                    field = ((ActivationObject) scriptObject).AddNewField(name, func,
+                    _field = ((ActivationObject) scriptObject).AddNewField(_name, Func,
                         attributes | FieldAttributes.Static);
                 }
-                field.originalContext = context;
-                if (text == name) return;
+                _field.originalContext = context;
+                if (text == _name) return;
                 var key = text;
-                if (this.ifaceId != null) key = ifaceId + "." + text;
+                if (_ifaceId != null) key = ifaceId + "." + text;
                 var fieldInfo = (FieldInfo) ((ClassScope) scriptObject).name_table[key];
                 if (fieldInfo != null)
                 {
                     if (fieldInfo.IsLiteral)
                     {
                         var value = ((TVariableField) fieldInfo).value;
-                        if (value is TProperty) enclosingProperty = (TProperty) value;
+                        if (value is TProperty) EnclosingProperty = (TProperty) value;
                     }
-                    if (enclosingProperty == null) id.context.HandleError(TError.DuplicateName, true);
+                    if (EnclosingProperty == null) id.context.HandleError(TError.DuplicateName, true);
                 }
-                if (enclosingProperty == null)
+                if (EnclosingProperty == null)
                 {
-                    enclosingProperty = new TProperty(text);
+                    EnclosingProperty = new TProperty(text);
 
                     fieldInfo = ((ActivationObject) scriptObject).AddNewField(
                         key,
-                        enclosingProperty,
+                        EnclosingProperty,
                         attributes | FieldAttributes.Literal
                         );
 
                     ((TMemberField) fieldInfo).originalContext = this.context;
                 }
-                else if ((isGetter && enclosingProperty.getter != null) || (isSetter && enclosingProperty.setter != null))
+                else if ((isGetter && EnclosingProperty.getter != null) || (isSetter && EnclosingProperty.setter != null))
                 {
                     id.context.HandleError(TError.DuplicateName, true);
                 }
                 if (isGetter)
                 {
-                    enclosingProperty.getter = new TFieldMethod(field, scriptObject);
+                    EnclosingProperty.getter = new TFieldMethod(_field, scriptObject);
                     return;
                 }
-                enclosingProperty.setter = new TFieldMethod(field, scriptObject);
+                EnclosingProperty.setter = new TFieldMethod(_field, scriptObject);
             }
             else
             {
-                inFastScope = false;
+                _inFastScope = false;
 
-                func = new FunctionObject(
-                    name,
-                    formal_parameters,
-                    return_type,
+                Func = new FunctionObject(
+                    _name,
+                    formalParameters,
+                    returnType,
                     body,
-                    own_scope,
+                    ownScope,
                     scriptObject,
                     this.context,
-                    MethodAttributes.Public,
-                    null,
-                    false
+                    MethodAttributes.Public
                     );
 
-                field = ((StackFrame) scriptObject).AddNewField(
-                    name,
-                    new Closure(func),
+                _field = ((StackFrame) scriptObject).AddNewField(
+                    _name,
+                    new Closure(Func),
                     attributes | FieldAttributes.Static
                     );
             }
@@ -311,16 +309,16 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            if (declaringObject != null) declaringObject.SetValue(func);
-            return completion;
+            _declaringObject?.SetValue(Func);
+            return _completion;
         }
 
         public static Closure TurboFunctionDeclaration(RuntimeTypeHandle handle,
             string name,
-            string method_name,
-            string[] formal_parameters,
+            string methodName,
+            string[] formalParameters,
             TLocalField[] fields,
-            bool must_save_stack_locals,
+            bool mustSaveStackLocals,
             bool hasArgumentsObject,
             string text,
             object declaringObject,
@@ -329,10 +327,10 @@ namespace Turbo.Runtime
                 new FunctionObject(
                     Type.GetTypeFromHandle(handle),
                     name,
-                    method_name,
-                    formal_parameters,
+                    methodName,
+                    formalParameters,
                     fields,
-                    must_save_stack_locals,
+                    mustSaveStackLocals,
                     hasArgumentsObject,
                     text,
                     engine
@@ -344,63 +342,60 @@ namespace Turbo.Runtime
 
         internal override AST PartiallyEvaluate()
         {
-            if (ifaceId != null)
+            if (_ifaceId != null)
             {
-                ifaceId.PartiallyEvaluate();
-                func.implementedIface = ifaceId.ToIReflect();
-                var type = func.implementedIface as Type;
-                var classScope = func.implementedIface as ClassScope;
+                _ifaceId.PartiallyEvaluate();
+                Func.implementedIface = _ifaceId.ToIReflect();
+                var type = Func.implementedIface as Type;
+                var classScope = Func.implementedIface as ClassScope;
                 if ((type != null && !type.IsInterface) || (classScope != null && !classScope.owner.isInterface))
                 {
-                    ifaceId.context.HandleError(TError.NeedInterface);
-                    func.implementedIface = null;
+                    _ifaceId.context.HandleError(TError.NeedInterface);
+                    Func.implementedIface = null;
                 }
-                if ((func.attributes & MethodAttributes.Abstract) != MethodAttributes.PrivateScope)
-                    func.funcContext.HandleError(TError.AbstractCannotBePrivate);
+                if ((Func.attributes & MethodAttributes.Abstract) != MethodAttributes.PrivateScope)
+                    Func.funcContext.HandleError(TError.AbstractCannotBePrivate);
             }
-            else if (declaringObject != null)
-            {
-                declaringObject.PartiallyEvaluateAsCallable();
-            }
-            func.PartiallyEvaluate();
-            if (inFastScope && func.isDynamicElementMethod && field?.type != null)
-                field.type.expression = new ConstantWrapper(Typeob.ScriptFunction, null);
+            else _declaringObject?.PartiallyEvaluateAsCallable();
+            Func.PartiallyEvaluate();
+            if (_inFastScope && Func.isDynamicElementMethod && _field?.type != null)
+                _field.type.expression = new ConstantWrapper(Typeob.ScriptFunction, null);
 
-            if ((func.attributes & MethodAttributes.Abstract) != MethodAttributes.PrivateScope
-                && !((ClassScope) func.enclosing_scope).owner.isAbstract)
+            if ((Func.attributes & MethodAttributes.Abstract) != MethodAttributes.PrivateScope
+                && !((ClassScope) Func.enclosing_scope).owner.isAbstract)
             {
-                ((ClassScope) func.enclosing_scope).owner.attributes |= TypeAttributes.Abstract;
-                ((ClassScope) func.enclosing_scope).owner.context.HandleError(TError.CannotBeAbstract, name);
+                ((ClassScope) Func.enclosing_scope).owner.attributes |= TypeAttributes.Abstract;
+                ((ClassScope) Func.enclosing_scope).owner.context.HandleError(TError.CannotBeAbstract, _name);
             }
 
-            if (enclosingProperty != null && !enclosingProperty.GetterAndSetterAreConsistent())
+            if (EnclosingProperty != null && !EnclosingProperty.GetterAndSetterAreConsistent())
                 context.HandleError(TError.GetAndSetAreInconsistent);
 
             return this;
         }
 
-        private void TranslateToILClosure(ILGenerator il)
+        private void TranslateToIlClosure(ILGenerator il)
         {
-            if (!func.isStatic) il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldtoken, func.classwriter ?? compilerGlobals.classwriter);
-            il.Emit(OpCodes.Ldstr, name);
-            il.Emit(OpCodes.Ldstr, func.GetName());
-            var num = func.formal_parameters.Length;
+            if (!Func.isStatic) il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldtoken, Func.classwriter ?? compilerGlobals.classwriter);
+            il.Emit(OpCodes.Ldstr, _name);
+            il.Emit(OpCodes.Ldstr, Func.GetName());
+            var num = Func.formal_parameters.Length;
             ConstantWrapper.TranslateToILInt(il, num);
             il.Emit(OpCodes.Newarr, Typeob.String);
             for (var i = 0; i < num; i++)
             {
                 il.Emit(OpCodes.Dup);
                 ConstantWrapper.TranslateToILInt(il, i);
-                il.Emit(OpCodes.Ldstr, func.formal_parameters[i]);
+                il.Emit(OpCodes.Ldstr, Func.formal_parameters[i]);
                 il.Emit(OpCodes.Stelem_Ref);
             }
-            num = func.fields.Length;
+            num = Func.fields.Length;
             ConstantWrapper.TranslateToILInt(il, num);
             il.Emit(OpCodes.Newarr, Typeob.TLocalField);
             for (var j = 0; j < num; j++)
             {
-                var localField = func.fields[j];
+                var localField = Func.fields[j];
                 il.Emit(OpCodes.Dup);
                 ConstantWrapper.TranslateToILInt(il, j);
                 il.Emit(OpCodes.Ldstr, localField.Name);
@@ -409,10 +404,10 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Newobj, CompilerGlobals.tLocalFieldConstructor);
                 il.Emit(OpCodes.Stelem_Ref);
             }
-            il.Emit(func.must_save_stack_locals ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
-            il.Emit(func.hasArgumentsObject ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
-            il.Emit(OpCodes.Ldstr, func.ToString());
-            il.Emit(!func.isStatic ? OpCodes.Ldarg_0 : OpCodes.Ldnull);
+            il.Emit(Func.must_save_stack_locals ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+            il.Emit(Func.hasArgumentsObject ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+            il.Emit(OpCodes.Ldstr, Func.ToString());
+            il.Emit(!Func.isStatic ? OpCodes.Ldarg_0 : OpCodes.Ldnull);
             EmitILToLoadEngine(il);
             il.Emit(OpCodes.Call, CompilerGlobals.TurboFunctionDeclarationMethod);
         }
@@ -423,33 +418,33 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            if (func.suppressIL) return;
-            func.TranslateToIL(compilerGlobals);
-            if (declaringObject != null)
+            if (Func.suppressIL) return;
+            Func.TranslateToIL(compilerGlobals);
+            if (_declaringObject != null)
             {
-                declaringObject.TranslateToILInitializer(il);
-                declaringObject.TranslateToILPreSet(il);
-                TranslateToILClosure(il);
-                declaringObject.TranslateToILSet(il);
+                _declaringObject.TranslateToILInitializer(il);
+                _declaringObject.TranslateToILPreSet(il);
+                TranslateToIlClosure(il);
+                _declaringObject.TranslateToILSet(il);
                 return;
             }
-            var metaData = field.metaData;
-            if (func.isMethod)
+            var metaData = _field.metaData;
+            if (Func.isMethod)
             {
                 if (metaData is FunctionDeclaration)
                 {
-                    field.metaData = null;
+                    _field.metaData = null;
                     return;
                 }
             }
             if (metaData == null) return;
-            TranslateToILClosure(il);
+            TranslateToIlClosure(il);
             if (metaData is LocalBuilder)
             {
                 il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
                 return;
             }
-            if (func.isStatic)
+            if (Func.isStatic)
             {
                 il.Emit(OpCodes.Stsfld, (FieldInfo) metaData);
                 return;

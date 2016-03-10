@@ -62,12 +62,9 @@ namespace Turbo.Runtime
 
         private int count;
 
-        private readonly ArrayObject arrayObject;
-
         internal DebugArrayFieldEnumerator(ScriptObjectPropertyEnumerator enumerator, ArrayObject arrayObject)
         {
             this.enumerator = enumerator;
-            this.arrayObject = arrayObject;
             EnsureCount();
         }
 

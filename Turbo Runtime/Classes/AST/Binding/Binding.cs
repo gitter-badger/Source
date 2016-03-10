@@ -993,11 +993,12 @@ namespace Turbo.Runtime
             }
             if (!(memberInfo is FieldInfo)) return false;
             var fieldInfo = (FieldInfo) memberInfo;
-            return fieldInfo.IsLiteral
-                ? (!((fieldInfo as TMemberField)?.value is ClassScope) || fieldInfo.IsStatic) &&
+            var memberField = fieldInfo as TMemberField;
+            return memberField != null && (fieldInfo.IsLiteral
+                ? (!(memberField.value is ClassScope) || fieldInfo.IsStatic) &&
                   (isFullyResolved = true)
                 : !(memberInfo is TField) && fieldInfo.IsStatic && fieldInfo.GetValue(null) is Type &&
-                  (isFullyResolved = true);
+                  (isFullyResolved = true));
         }
 
         private int PlaceValuesForHiddenParametersOnStack(ILGenerator il, MethodInfo meth,
@@ -2605,13 +2606,10 @@ namespace Turbo.Runtime
                         var propertyInfo = (PropertyInfo) member;
                         var methodInfo = TProperty.GetSetMethod(propertyInfo, false);
                         var jSWrappedMethod = methodInfo as TWrappedMethod;
-                        if (!(jSWrappedMethod?.GetWrappedObject() is GlobalObject))
+                        if (jSWrappedMethod != null && !(jSWrappedMethod.GetWrappedObject() is GlobalObject))
                         {
                             methodInfo = GetMethodInfoMetadata(methodInfo);
-                            if (rhvalue != null)
-                            {
-                                rhvalue.TranslateToIL(il, propertyInfo.PropertyType);
-                            }
+                            rhvalue?.TranslateToIL(il, propertyInfo.PropertyType);
                             if (methodInfo.IsVirtual && !methodInfo.IsFinal &&
                                 (!methodInfo.ReflectedType.IsSealed || !methodInfo.ReflectedType.IsValueType))
                             {
