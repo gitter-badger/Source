@@ -4,4 +4,4 @@ Mono | [![Build Status](https://travis-ci.org/turbo/Source.svg?branch=master)](h
 .NET | OK*
 
 ---
-* .NET build status is always verified before pushing to master.
+\* .NET build status is always verified before pushing to master.
