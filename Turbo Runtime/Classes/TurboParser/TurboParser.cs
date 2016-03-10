@@ -2327,9 +2327,7 @@ namespace Turbo.Runtime
         {
             var context = currentToken.Clone();
             Context tryEndContext = null;
-            //~ AST body;
-			// !TODO: Monofix
-            AST body = null;
+            AST body;
             AST aST = null;
             AST aST2 = null;
             AST aST3 = null;

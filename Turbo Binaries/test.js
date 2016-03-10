@@ -946,6 +946,32 @@ var exptest = new CExpandoExample2;
 var expstr = exptest.constructor(123);
 var expobj = new exptest.constructor(456);
 
+/* Enum objects */
+
+function testEnumerator()
+{
+	var fso = new ActiveXObject("Scripting.FileSystemObject");
+	var e = new Enumerator(fso.Drives);
+	var s = "", x, n;
+
+	for (; !e.atEnd(); e.moveNext())
+	{
+		x = e.item();
+		s += x.DriveLetter + " - ";
+
+		if (x.DriveType == 3)
+			n = x.ShareName;
+		else if (x.IsReady)
+			n = x.VolumeName;
+		else
+			n = "[Drive not ready]";
+
+		s += n + "\n";
+	}
+
+	return s;
+}
+
 /* Namespaces */
 
 package Deutschland
@@ -1141,6 +1167,10 @@ proof(France.Paris.Landmark.Tower,                     "Eiffel Tower");
 proof(Units.distance,                                         "meter");
 proof(France.Units.distance,                                  "meter");
 proof(function(a,b){return a+b;},        "function(a,b){return a+b;}");
+
+print("\n" + testEnumerator());
+
+
 
 @set @myvar1 = (6 * 2)
 @if (@myvar1 == 12)
