@@ -1,0 +1,4 @@
+language: csharp
+solution: Turbo.sln
+script:
+  - xbuild Turbo.sln /t:ReBuild /p:TargetFrameworkVersion="v4.5"
