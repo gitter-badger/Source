@@ -996,6 +996,25 @@ var passedTests = 0;
 var failedTests = 0;
 var numberTests = 0;
 
+function pasta(grain, width, shape, hasEgg)
+{
+	this.grain = grain;
+	this.width = width;
+	this.shape = shape;
+	this.hasEgg = hasEgg;
+	this.toString = pastaToString;
+}
+
+function pastaToString()
+{
+	return 	"Grain: " + this.grain + " - " +
+			"Width: " + this.width + " cm - " +
+			"Shape: " + this.shape + " - " +
+			"Egg?:  " + Boolean(this.hasEgg);
+}
+
+var spaghetti = new pasta("wheat", 0.2, "circle", true);
+
 /* Perform tests */
 print("# " + testDate_getDate());
 print("# " + testDate_getDay());
@@ -1142,6 +1161,9 @@ proof(France.Paris.Landmark.Tower,                     "Eiffel Tower");
 proof(Units.distance,                                         "meter");
 proof(France.Units.distance,                                  "meter");
 proof(function(a,b){return a+b;},        "function(a,b){return a+b;}");
+proof(spaghetti.toString(), "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?:  true");
+proof(spaghetti,            "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?:  true");
+
 
 @set @myvar1 = (6 * 2)
 @if (@myvar1 == 12)
