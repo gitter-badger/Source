@@ -1041,6 +1041,20 @@ function pastaToString()
 
 var spaghetti = new pasta("wheat", 0.2, "circle", true);
 
+function Circle(radius)
+{
+	this.r = radius;
+}
+
+Circle.prototype.pi = Math.PI;
+
+function aCirclesArea()
+{
+	return this.pi * this.r * this.r;
+}
+
+Circle.prototype.area = aCirclesArea;
+
 /* Perform tests */
 print("# " + testDate_getDate());
 print("# " + testDate_getDay());
@@ -1189,6 +1203,7 @@ proof(France.Units.distance,                                  "meter");
 proof(function(a,b){return a+b;},        "function(a,b){return a+b;}");
 proof(spaghetti.toString(), "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?:  true");
 proof(spaghetti,            "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?:  true");
+proof(new Circle(2).area(),                      "12.566370614359172");
 
 print("\n" + testEnumerator());
 
