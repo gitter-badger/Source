@@ -295,7 +295,7 @@ namespace TurboCLI {
                 Console.WriteLine(exception);
             }
 
-            return (compileSuccess && engineSuccess) ? 1 : 0;
+            return (compileSuccess && engineSuccess) ? 0 : 1;
         }
 
         private static int PrintInfo(string Message, bool isError = false)
