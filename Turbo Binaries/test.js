@@ -1204,6 +1204,8 @@ proof(function(a,b){return a+b;},        "function(a,b){return a+b;}");
 proof(spaghetti.toString(), "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?:  true");
 proof(spaghetti,            "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?:  true");
 proof(new Circle(2).area(),                      "12.566370614359172");
+proof(new String("Turbo").hasOwnProperty("split"),  false);
+proof(String.prototype.hasOwnProperty("split"),     true);
 
 print("\n" + testEnumerator());
 
