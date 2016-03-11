@@ -9,4 +9,5 @@ packages
 *.dll
 *.exe
 *.xml
+*.config
 .vs
