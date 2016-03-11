@@ -11,6 +11,7 @@
 
 // test
 
+import System;
 
 /* Unit 3: Non-reference features */
 
@@ -1186,6 +1187,8 @@ numberTests = passedTests + failedTests;
 print("> Tests passed: " + passedTests + "/" + numberTests);
 print("> Tests failed: " + failedTests + "/" + numberTests);
 print("> Total time:   " + unitTimer.ElapsedMilliseconds + " ms");
+
+Environment.Exit(failedTests <= 1 ? 0 : 1);
 
 function proof(a, b)
 {
