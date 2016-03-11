@@ -1180,6 +1180,7 @@ proof(spaghetti,            "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?
 proof(new Circle(2).area(),                      "12.566370614359172");
 proof(new String("Turbo").hasOwnProperty("split"),  false);
 proof(String.prototype.hasOwnProperty("split"),     true);
+proof(RegExp.prototype.isPrototypeOf(new RegExp()),    true);
 
 
 @set @myvar1 = (6 * 2)
