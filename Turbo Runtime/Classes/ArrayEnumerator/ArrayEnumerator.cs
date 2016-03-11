@@ -59,56 +59,56 @@ namespace Turbo.Runtime
 {
     internal sealed class ArrayEnumerator : IEnumerator
     {
-        private int curr;
+        private int _curr;
 
-        private bool doDenseEnum;
+        private bool _doDenseEnum;
 
-        private bool didDenseEnum;
+        private bool _didDenseEnum;
 
-        private readonly ArrayObject arrayOb;
+        private readonly ArrayObject _arrayOb;
 
-        private readonly IEnumerator denseEnum;
+        private readonly IEnumerator _denseEnum;
 
         public object Current
-            => doDenseEnum
-                ? denseEnum.Current
-                : (curr >= arrayOb.len || curr >= arrayOb.denseArrayLength
-                    ? denseEnum.Current
-                    : curr.ToString(CultureInfo.InvariantCulture));
+            => _doDenseEnum
+                ? _denseEnum.Current
+                : (_curr >= _arrayOb.len || _curr >= _arrayOb.denseArrayLength
+                    ? _denseEnum.Current
+                    : _curr.ToString(CultureInfo.InvariantCulture));
 
         internal ArrayEnumerator(ArrayObject arrayOb, IEnumerator denseEnum)
         {
-            curr = -1;
-            doDenseEnum = false;
-            didDenseEnum = false;
-            this.arrayOb = arrayOb;
-            this.denseEnum = denseEnum;
+            _curr = -1;
+            _doDenseEnum = false;
+            _didDenseEnum = false;
+            this._arrayOb = arrayOb;
+            this._denseEnum = denseEnum;
         }
 
         public bool MoveNext()
         {
-            if (doDenseEnum)
+            if (_doDenseEnum)
             {
-                if (denseEnum.MoveNext()) return true;
-                doDenseEnum = false;
-                didDenseEnum = true;
+                if (_denseEnum.MoveNext()) return true;
+                _doDenseEnum = false;
+                _didDenseEnum = true;
             }
-            var num = curr + 1;
-            if (num >= arrayOb.len || num >= arrayOb.denseArrayLength)
+            var num = _curr + 1;
+            if (num >= _arrayOb.len || num >= _arrayOb.denseArrayLength)
             {
-                doDenseEnum = !didDenseEnum;
-                return denseEnum.MoveNext();
+                _doDenseEnum = !_didDenseEnum;
+                return _denseEnum.MoveNext();
             }
-            curr = num;
-            return !(arrayOb.GetValueAtIndex((uint) num) is Missing) || MoveNext();
+            _curr = num;
+            return !(_arrayOb.GetValueAtIndex((uint) num) is Missing) || MoveNext();
         }
 
         public void Reset()
         {
-            curr = -1;
-            doDenseEnum = false;
-            didDenseEnum = false;
-            denseEnum.Reset();
+            _curr = -1;
+            _doDenseEnum = false;
+            _didDenseEnum = false;
+            _denseEnum.Reset();
         }
     }
 }
