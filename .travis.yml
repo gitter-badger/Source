@@ -1,7 +1,7 @@
 language: csharp
 solution: Turbo.sln
 script:
-  - xbuild Turbo.sln /t:ReBuild /p:TargetFrameworkVersion="v4.5"
+  - xbuild Turbo.sln /t:ReBuild /p:TargetFrameworkVersion="v4.5" /nologo /verbosity:quiet
   - cd Turbo\ Binaries
   - mono turbo.exe testmono.js -o travis.exe
   - mono travis.exe
