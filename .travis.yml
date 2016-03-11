@@ -4,3 +4,4 @@ script:
   - xbuild Turbo.sln /t:ReBuild /p:TargetFrameworkVersion="v4.5"
   - cd Turbo\ Binaries
   - mono turbo.exe testmono.js -o travis.exe
+  - mono travis.exe
