@@ -86,7 +86,7 @@ namespace Turbo.Runtime
             argValues = null;
             outParameterCount = 0;
             var i = 0;
-            var count = this.args.count;
+            var count = this.args.Count;
             while (i < count)
             {
                 if (this.args[i] is AddressOf)
@@ -115,7 +115,7 @@ namespace Turbo.Runtime
         private bool AllParamsAreMissing()
         {
             var i = 0;
-            var count = args.count;
+            var count = args.Count;
             while (i < count)
             {
                 var aST = args[i];
@@ -130,7 +130,7 @@ namespace Turbo.Runtime
 
         private IReflect[] ArgIRs()
         {
-            var count = args.count;
+            var count = args.Count;
             var array = new IReflect[count];
             for (var i = 0; i < count; i++)
             {
@@ -151,7 +151,7 @@ namespace Turbo.Runtime
             var flag = func is Lookup && outParameterCount == 0;
             if (!flag) return false;
             var i = 0;
-            var count = args.count;
+            var count = args.Count;
             while (i < count)
             {
                 flag = args[i] is Lookup;
@@ -217,7 +217,7 @@ namespace Turbo.Runtime
             {
                 var callableExpression = func as CallableExpression;
                 object obj;
-                if (callableExpression == null || !(callableExpression.expression is Call))
+                if (callableExpression == null || !(callableExpression.Expression is Call))
                 {
                     obj = lateBinding.Call(array, isConstructor, inBrackets, Engine);
                 }
@@ -229,7 +229,7 @@ namespace Turbo.Runtime
                 if (outParameterCount > 0)
                 {
                     var i = 0;
-                    var count = args.count;
+                    var count = args.Count;
                     while (i < count)
                     {
                         if (args[i] is AddressOf)
@@ -286,7 +286,7 @@ namespace Turbo.Runtime
         internal void GetParameters(ArrayList parameters)
         {
             var i = 0;
-            var count = args.count;
+            var count = args.Count;
             while (i < count)
             {
                 var aST = args[i];
@@ -295,11 +295,11 @@ namespace Turbo.Runtime
             }
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
             if (func is Binding)
             {
-                return ((Binding) func).InferTypeOfCall(inference_target, isConstructor);
+                return ((Binding) func).InferTypeOfCall(inferenceTarget, isConstructor);
             }
             if (!(func is ConstantWrapper)) return Typeob.Object;
             var value = ((ConstantWrapper) func).value;
@@ -353,13 +353,13 @@ namespace Turbo.Runtime
                 return
                     new ConstantWrapper(
                         new TypedArray(((TypeExpression) new TypeExpression(func).PartiallyEvaluate()).ToIReflect(),
-                            args.count + 1), context);
+                            args.Count + 1), context);
             }
             func = func.PartiallyEvaluateAsCallable();
             args = (ASTList) args.PartiallyEvaluate();
             var array = ArgIRs();
             func.ResolveCall(args, array, isConstructor, inBrackets);
-            if (isConstructor || inBrackets || !(func is Binding) || args.count != 1) return this;
+            if (isConstructor || inBrackets || !(func is Binding) || args.Count != 1) return this;
             var binding = (Binding) func;
             if (binding.member is Type)
             {
@@ -558,7 +558,7 @@ namespace Turbo.Runtime
                     return;
                 }
             }
-            ConstantWrapper.TranslateToILInt(il, args.count - 1);
+            ConstantWrapper.TranslateToILInt(il, args.Count - 1);
             il.Emit(OpCodes.Ldelem_Ref);
             Convert.Emit(this, il, Typeob.Object, Typeob.String);
             il.Emit(OpCodes.Call, CompilerGlobals.deleteMemberMethod);

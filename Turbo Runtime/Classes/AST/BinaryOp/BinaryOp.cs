@@ -60,56 +60,47 @@ namespace Turbo.Runtime
 {
     public abstract class BinaryOp : AST
     {
-        protected AST operand1;
+        protected AST Operand1;
 
-        protected AST operand2;
+        protected AST Operand2;
 
-        protected readonly TToken operatorTok;
+        protected readonly TToken OperatorTokl;
 
-        protected Type type1;
+        protected Type Type1;
 
-        protected Type loctype;
+        protected Type Loctype;
 
-        protected MethodInfo operatorMeth;
+        protected MethodInfo OperatorMeth;
 
         internal BinaryOp(Context context, AST operand1, AST operand2, TToken operatorTok = TToken.EndOfFile)
             : base(context)
         {
-            this.operand1 = operand1;
-            this.operand2 = operand2;
-            this.operatorTok = operatorTok;
-            type1 = null;
-            loctype = null;
-            operatorMeth = null;
+            Operand1 = operand1;
+            Operand2 = operand2;
+            OperatorTokl = operatorTok;
+            Type1 = null;
+            Loctype = null;
+            OperatorMeth = null;
         }
 
         internal override void CheckIfOKToUseInSuperConstructorCall()
         {
-            operand1.CheckIfOKToUseInSuperConstructorCall();
-            operand2.CheckIfOKToUseInSuperConstructorCall();
+            Operand1.CheckIfOKToUseInSuperConstructorCall();
+            Operand2.CheckIfOKToUseInSuperConstructorCall();
         }
 
         protected MethodInfo GetOperator(IReflect ir1, IReflect ir2)
         {
-            if (ir1 is ClassScope)
-            {
-                ir1 = ((ClassScope) ir1).GetUnderlyingTypeIfEnum();
-            }
-            if (ir2 is ClassScope)
-            {
-                ir2 = ((ClassScope) ir2).GetUnderlyingTypeIfEnum();
-            }
+            if (ir1 is ClassScope) ir1 = ((ClassScope) ir1).GetUnderlyingTypeIfEnum();
+            if (ir2 is ClassScope) ir2 = ((ClassScope) ir2).GetUnderlyingTypeIfEnum();
             var ir3 = ir1 as Type;
             var type = ir3 ?? Typeob.Object;
             var type4 = ir2 as Type;
             var type3 = type4 ?? Typeob.Object;
-            if (type1 == type && loctype == type3)
-            {
-                return operatorMeth;
-            }
-            type1 = type;
-            loctype = type3;
-            operatorMeth = null;
+            if (Type1 == type && Loctype == type3) return OperatorMeth;
+            Type1 = type;
+            Loctype = type3;
+            OperatorMeth = null;
             if (type == Typeob.String || Convert.IsPrimitiveNumericType(ir1) || Typeob.TObject.IsAssignableFrom(type))
             {
                 type = null;
@@ -118,12 +109,9 @@ namespace Turbo.Runtime
             {
                 type3 = null;
             }
-            if (type == null && type3 == null)
-            {
-                return null;
-            }
+            if (type == null && type3 == null) return null;
             var name = "op_NoSuchOp";
-            switch (operatorTok)
+            switch (OperatorTokl)
             {
                 case TToken.FirstBinaryOp:
                     name = "op_Addition";
@@ -414,7 +402,7 @@ namespace Turbo.Runtime
             }
             var types = new[]
             {
-                type1, loctype
+                Type1, Loctype
             };
             if (type == type3)
             {
@@ -423,49 +411,40 @@ namespace Turbo.Runtime
                     (method.Attributes & MethodAttributes.SpecialName) != MethodAttributes.PrivateScope &&
                     method.GetParameters().Length == 2)
                 {
-                    operatorMeth = method;
+                    OperatorMeth = method;
                 }
             }
             else
             {
                 var op = type?.GetMethod(name, BindingFlags.Static | BindingFlags.Public, TBinder.ob, types, null);
                 var op2 = type3?.GetMethod(name, BindingFlags.Static | BindingFlags.Public, TBinder.ob, types, null);
-                operatorMeth = TBinder.SelectOperator(op, op2, type1, loctype);
+                OperatorMeth = TBinder.SelectOperator(op, op2, Type1, Loctype);
             }
-            if (operatorMeth != null)
-            {
-                operatorMeth = new TMethodInfo(operatorMeth);
-            }
-            return operatorMeth;
+            if (OperatorMeth != null) OperatorMeth = new TMethodInfo(OperatorMeth);
+            return OperatorMeth;
         }
 
         internal override AST PartiallyEvaluate()
         {
-            operand1 = operand1.PartiallyEvaluate();
-            operand2 = operand2.PartiallyEvaluate();
+            Operand1 = Operand1.PartiallyEvaluate();
+            Operand2 = Operand2.PartiallyEvaluate();
             try
             {
-                var wrapper = operand1 as ConstantWrapper;
+                var wrapper = Operand1 as ConstantWrapper;
                 if (wrapper != null)
                 {
-                    if (operand2 is ConstantWrapper)
-                    {
-                        return new ConstantWrapper(Evaluate(), context);
-                    }
+                    if (Operand2 is ConstantWrapper) return new ConstantWrapper(Evaluate(), context);
                     var value = wrapper.value;
                     var s = value as string;
-                    if (s != null && s.Length == 1 && ReferenceEquals(operand2.InferType(null), Typeob.Char))
-                    {
-                        wrapper.value = s[0];
-                    }
+                    if (s != null && s.Length == 1 && ReferenceEquals(Operand2.InferType(null), Typeob.Char)) wrapper.value = s[0];
                 }
-                else if (operand2 is ConstantWrapper)
+                else if (Operand2 is ConstantWrapper)
                 {
-                    var value2 = ((ConstantWrapper) operand2).value;
+                    var value2 = ((ConstantWrapper) Operand2).value;
                     var s = value2 as string;
-                    if (s != null && s.Length == 1 && ReferenceEquals(operand1.InferType(null), Typeob.Char))
+                    if (s != null && s.Length == 1 && ReferenceEquals(Operand1.InferType(null), Typeob.Char))
                     {
-                        ((ConstantWrapper) operand2).value = s[0];
+                        ((ConstantWrapper) Operand2).value = s[0];
                     }
                 }
             }
@@ -482,8 +461,8 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            operand1.TranslateToILInitializer(il);
-            operand2.TranslateToILInitializer(il);
+            Operand1.TranslateToILInitializer(il);
+            Operand2.TranslateToILInitializer(il);
         }
     }
 }

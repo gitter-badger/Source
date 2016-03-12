@@ -79,9 +79,9 @@ namespace Turbo.Runtime
             return member as FieldInfo;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
-            return operand.InferType(inference_target);
+            return operand.InferType(inferenceTarget);
         }
 
         internal override AST PartiallyEvaluate()

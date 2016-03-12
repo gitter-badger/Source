@@ -60,45 +60,45 @@ namespace Turbo.Runtime
 {
     internal sealed class Member : Binding
     {
-        private readonly bool fast;
+        private readonly bool _fast;
 
-        private bool isImplicitWrapper;
+        private bool _isImplicitWrapper;
 
-        private LateBinding lateBinding;
+        private LateBinding _lateBinding;
 
-        private readonly Context memberNameContext;
+        private readonly Context _memberNameContext;
 
-        internal AST rootObject;
+        internal AST RootObject;
 
-        private IReflect rootObjectInferredType;
+        private IReflect _rootObjectInferredType;
 
-        private LocalBuilder refLoc;
+        private LocalBuilder _refLoc;
 
-        private LocalBuilder temp;
+        private LocalBuilder _temp;
 
         internal Member(Context context, AST rootObject, AST memberName) : base(context, memberName.context.GetCode())
         {
-            fast = Engine.doFast;
-            isImplicitWrapper = false;
+            _fast = Engine.doFast;
+            _isImplicitWrapper = false;
             isNonVirtual = (rootObject is ThisLiteral && ((ThisLiteral) rootObject).isSuper);
-            lateBinding = null;
-            memberNameContext = memberName.context;
-            this.rootObject = rootObject;
-            rootObjectInferredType = null;
-            refLoc = null;
-            temp = null;
+            _lateBinding = null;
+            _memberNameContext = memberName.context;
+            RootObject = rootObject;
+            _rootObjectInferredType = null;
+            _refLoc = null;
+            _temp = null;
         }
 
         private void BindName(TField inferenceTarget)
         {
-            rootObject = rootObject.PartiallyEvaluate();
-            var reflect = rootObjectInferredType = rootObject.InferType(inferenceTarget);
-            if (rootObject is ConstantWrapper)
+            RootObject = RootObject.PartiallyEvaluate();
+            var reflect = _rootObjectInferredType = RootObject.InferType(inferenceTarget);
+            if (RootObject is ConstantWrapper)
             {
-                var obj = Convert.ToObject2(rootObject.Evaluate(), Engine);
+                var obj = Convert.ToObject2(RootObject.Evaluate(), Engine);
                 if (obj == null)
                 {
-                    rootObject.context.HandleError(TError.ObjectExpected);
+                    RootObject.context.HandleError(TError.ObjectExpected);
                     return;
                 }
                 var classScope = obj as ClassScope;
@@ -122,10 +122,7 @@ namespace Turbo.Runtime
                                     BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Public |
                                     BindingFlags.NonPublic));
                     }
-                    if (array.Length != 0)
-                    {
-                        return;
-                    }
+                    if (array.Length != 0) return;
                     members = Typeob.Type.GetMember(name, BindingFlags.Instance | BindingFlags.Public);
                     return;
                 }
@@ -141,10 +138,7 @@ namespace Turbo.Runtime
                         {
                             fieldAttributes |= FieldAttributes.Private;
                         }
-                        members = new MemberInfo[]
-                        {
-                            new TGlobalField(null, name, classScope, fieldAttributes)
-                        };
+                        members = new MemberInfo[]{new TGlobalField(null, name, classScope, fieldAttributes)};
                         return;
                     }
                     type = Engine.GetType(text);
@@ -231,40 +225,30 @@ namespace Turbo.Runtime
         internal override object Evaluate()
         {
             var obj = base.Evaluate();
-            if (obj is Missing)
-            {
-                obj = null;
-            }
-            return obj;
+            return obj is Missing ? null : obj;
         }
 
         internal override LateBinding EvaluateAsLateBinding()
         {
-            var binding = lateBinding;
+            var binding = _lateBinding;
             if (binding == null)
             {
-                if (member != null && !rootObjectInferredType.Equals(rootObject.InferType(null)))
+                if (member != null && !_rootObjectInferredType.Equals(RootObject.InferType(null)))
                 {
                     InvalidateBinding();
                 }
-                binding = (lateBinding = new LateBinding(name, null, THPMainEngine.executeForJSEE));
+                binding = (_lateBinding = new LateBinding(name, null, THPMainEngine.executeForJSEE));
                 binding.last_member = member;
             }
-            var obj = rootObject.Evaluate();
+            var obj = RootObject.Evaluate();
             try
             {
                 obj = (binding.obj = Convert.ToObject(obj, Engine));
-                if (defaultMember == null && member != null)
-                {
-                    binding.last_object = obj;
-                }
+                if (defaultMember == null && member != null) binding.last_object = obj;
             }
             catch (TurboException ex)
             {
-                if (ex.context == null)
-                {
-                    ex.context = rootObject.context;
-                }
+                if (ex.context == null) ex.context = RootObject.context;
                 throw;
             }
             return binding;
@@ -272,20 +256,14 @@ namespace Turbo.Runtime
 
         internal object EvaluateAsType()
         {
-            var memberValue = rootObject.EvaluateAsWrappedNamespace(false).GetMemberValue(name);
-            if (memberValue != null && !(memberValue is Missing))
-            {
-                return memberValue;
-            }
-            var member1 = rootObject as Member;
+            var memberValue = RootObject.EvaluateAsWrappedNamespace(false).GetMemberValue(name);
+            if (memberValue != null && !(memberValue is Missing)) return memberValue;
+            var member1 = RootObject as Member;
             object obj;
             if (member1 == null)
             {
-                var lookup = rootObject as Lookup;
-                if (lookup == null)
-                {
-                    return null;
-                }
+                var lookup = RootObject as Lookup;
+                if (lookup == null) return null;
                 obj = lookup.PartiallyEvaluate();
                 var constantWrapper = obj as ConstantWrapper;
                 if (constantWrapper != null)
@@ -294,12 +272,9 @@ namespace Turbo.Runtime
                 }
                 else
                 {
-                    var jSGlobalField = lookup.member as TGlobalField;
-                    if (!(jSGlobalField != null) || !jSGlobalField.IsLiteral)
-                    {
-                        return null;
-                    }
-                    obj = jSGlobalField.value;
+                    var globalField = lookup.member as TGlobalField;
+                    if (!(globalField != null) || !globalField.IsLiteral) return null;
+                    obj = globalField.value;
                 }
             }
             else
@@ -311,41 +286,34 @@ namespace Turbo.Runtime
             {
                 var member2 = classScope.GetMember(name,
                     BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                if (member2.Length == 0)
+                if (member2.Length == 0) return null;
+                var memberField = member2[0] as TMemberField;
+                if (memberField == null || !memberField.IsLiteral || !(memberField.value is ClassScope) ||
+                    (!memberField.IsPublic && !memberField.IsAccessibleFrom(Engine.ScriptObjectStackTop())))
                 {
                     return null;
                 }
-                var jSMemberField = member2[0] as TMemberField;
-                if (jSMemberField == null || !jSMemberField.IsLiteral || !(jSMemberField.value is ClassScope) ||
-                    (!jSMemberField.IsPublic && !jSMemberField.IsAccessibleFrom(Engine.ScriptObjectStackTop())))
-                {
-                    return null;
-                }
-                return jSMemberField.value;
+                return memberField.value;
             }
-            var type = obj as Type;
-            return type?.GetNestedType(name);
+            return (obj as Type)?.GetNestedType(name);
         }
 
         internal override WrappedNamespace EvaluateAsWrappedNamespace(bool giveErrorIfNameInUse)
         {
-            var wrappedNamespace = rootObject.EvaluateAsWrappedNamespace(giveErrorIfNameInUse);
+            var wrappedNamespace = RootObject.EvaluateAsWrappedNamespace(giveErrorIfNameInUse);
             var s = name;
             wrappedNamespace.AddFieldOrUseExistingField(s, Namespace.GetNamespace(wrappedNamespace + "." + s, Engine),
                 FieldAttributes.Literal);
             return new WrappedNamespace(wrappedNamespace + "." + s, Engine);
         }
 
-        protected override object GetObject() => Convert.ToObject(rootObject.Evaluate(), Engine);
+        protected override object GetObject() => Convert.ToObject(RootObject.Evaluate(), Engine);
 
         protected override void HandleNoSuchMemberError()
         {
-            var reflect = rootObject.InferType(null);
+            var reflect = RootObject.InferType(null);
             object obj = null;
-            if (rootObject is ConstantWrapper)
-            {
-                obj = rootObject.Evaluate();
-            }
+            if (RootObject is ConstantWrapper) obj = RootObject.Evaluate();
             if ((ReferenceEquals(reflect, Typeob.Object) && !isNonVirtual) ||
                 (reflect is TObject && !((TObject) reflect).noDynamicElement) ||
                 (reflect is GlobalScope && !((GlobalScope) reflect).isKnownAtCompileTime))
@@ -357,14 +325,11 @@ namespace Turbo.Runtime
                 var type = (Type) reflect;
                 if (Typeob.ScriptFunction.IsAssignableFrom(type) || type == Typeob.MathObject)
                 {
-                    memberNameContext.HandleError(TError.OLENoPropOrMethod);
+                    _memberNameContext.HandleError(TError.OLENoPropOrMethod);
                     return;
                 }
-                if (Typeob.IDynamicElement.IsAssignableFrom(type))
-                {
-                    return;
-                }
-                if (!fast && (type == Typeob.Boolean || type == Typeob.String || Convert.IsPrimitiveNumericType(type)))
+                if (Typeob.IDynamicElement.IsAssignableFrom(type)) return;
+                if (!_fast && (type == Typeob.Boolean || type == Typeob.String || Convert.IsPrimitiveNumericType(type)))
                 {
                     return;
                 }
@@ -372,65 +337,56 @@ namespace Turbo.Runtime
                     ((ClassScope) obj).GetMember(name,
                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length != 0)
                 {
-                    memberNameContext.HandleError(TError.NonStaticWithTypeName);
+                    _memberNameContext.HandleError(TError.NonStaticWithTypeName);
                     return;
                 }
             }
             if (obj is FunctionObject)
             {
-                rootObject = new ConstantWrapper(((FunctionObject) obj).name, rootObject.context);
-                memberNameContext.HandleError(TError.OLENoPropOrMethod);
+                RootObject = new ConstantWrapper(((FunctionObject) obj).name, RootObject.context);
+                _memberNameContext.HandleError(TError.OLENoPropOrMethod);
                 return;
             }
             if (reflect is ClassScope &&
                 ((ClassScope) reflect).GetMember(name,
                     BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Length != 0)
             {
-                memberNameContext.HandleError(TError.StaticRequiresTypeName);
+                _memberNameContext.HandleError(TError.StaticRequiresTypeName);
                 return;
             }
             if (obj is Type)
             {
-                memberNameContext.HandleError(TError.NoSuchStaticMember, Convert.ToTypeName((Type) obj));
+                _memberNameContext.HandleError(TError.NoSuchStaticMember, Convert.ToTypeName((Type) obj));
                 return;
             }
             if (obj is ClassScope)
             {
-                memberNameContext.HandleError(TError.NoSuchStaticMember, Convert.ToTypeName((ClassScope) obj));
+                _memberNameContext.HandleError(TError.NoSuchStaticMember, Convert.ToTypeName((ClassScope) obj));
                 return;
             }
             if (obj is Namespace)
             {
-                memberNameContext.HandleError(TError.NoSuchType, ((Namespace) obj).Name + "." + name);
+                _memberNameContext.HandleError(TError.NoSuchType, ((Namespace) obj).Name + "." + name);
                 return;
             }
             if (reflect == FunctionPrototype.ob &&
-                ((rootObject as Binding)?.member as TVariableField)?.value is FunctionObject)
+                ((RootObject as Binding)?.member as TVariableField)?.value is FunctionObject)
             {
                 return;
             }
-            memberNameContext.HandleError(TError.NoSuchMember, Convert.ToTypeName(reflect));
+            _memberNameContext.HandleError(TError.NoSuchMember, Convert.ToTypeName(reflect));
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
-            if (members == null)
-            {
-                BindName(inference_target);
-            }
-            else if (!rootObjectInferredType.Equals(rootObject.InferType(inference_target)))
-            {
-                InvalidateBinding();
-            }
+            if (members == null) BindName(inferenceTarget);
+            else if (!_rootObjectInferredType.Equals(RootObject.InferType(inferenceTarget))) InvalidateBinding();
             return base.InferType(null);
         }
 
-        internal override IReflect InferTypeOfCall(TField inference_target, bool isConstructor)
+        internal override IReflect InferTypeOfCall(TField inferenceTarget, bool isConstructor)
         {
-            if (!rootObjectInferredType.Equals(rootObject.InferType(inference_target)))
-            {
-                InvalidateBinding();
-            }
+            if (!_rootObjectInferredType.Equals(RootObject.InferType(inferenceTarget))) InvalidateBinding();
             return base.InferTypeOfCall(null, isConstructor);
         }
 
@@ -439,9 +395,9 @@ namespace Turbo.Runtime
             BindName(null);
             if (members == null || members.Length == 0)
             {
-                if (rootObject is ConstantWrapper)
+                if (RootObject is ConstantWrapper)
                 {
-                    var obj = rootObject.Evaluate();
+                    var obj = RootObject.Evaluate();
                     if (obj is Namespace)
                     {
                         return new ConstantWrapper(Namespace.GetNamespace(((Namespace) obj).Name + "." + name, Engine),
@@ -459,11 +415,8 @@ namespace Turbo.Runtime
                     : TypeReferences.GetConstantValue((FieldInfo) member);
                 if (obj2 is AST)
                 {
-                    var aST = ((AST) obj2).PartiallyEvaluate();
-                    if (aST is ConstantWrapper)
-                    {
-                        return aST;
-                    }
+                    var aSt = ((AST) obj2).PartiallyEvaluate();
+                    if (aSt is ConstantWrapper) return aSt;
                     obj2 = null;
                 }
                 if (!(obj2 is FunctionObject) && (!(obj2 is ClassScope) || ((ClassScope) obj2).owner.IsStatic))
@@ -489,18 +442,14 @@ namespace Turbo.Runtime
             BindName(null);
             if (members == null || members.Length == 0)
             {
-                if (isImplicitWrapper && !Convert.IsArray(rootObjectInferredType))
-                {
+                if (_isImplicitWrapper && !Convert.IsArray(_rootObjectInferredType))
                     context.HandleError(TError.UselessAssignment);
-                }
                 else
-                {
                     HandleNoSuchMemberError();
-                }
                 return this;
             }
             ResolveLHValue();
-            if (isImplicitWrapper &&
+            if (_isImplicitWrapper &&
                 (member == null || (!(member is TField) && Typeob.TObject.IsAssignableFrom(member.DeclaringType))))
             {
                 context.HandleError(TError.UselessAssignment);
@@ -513,28 +462,28 @@ namespace Turbo.Runtime
             if (ReferenceEquals(obType, Typeob.String))
             {
                 obType = Globals.globalObject.originalString.Construct();
-                ((TObject) obType).noDynamicElement = fast;
-                isImplicitWrapper = true;
+                ((TObject) obType).noDynamicElement = _fast;
+                _isImplicitWrapper = true;
             }
             else if ((obType is Type && Typeob.Array.IsAssignableFrom((Type) obType)) || obType is TypedArray)
             {
                 obType = Globals.globalObject.originalArray.ConstructWrapper();
-                ((TObject) obType).noDynamicElement = fast;
-                isImplicitWrapper = true;
+                ((TObject) obType).noDynamicElement = _fast;
+                _isImplicitWrapper = true;
             }
             else if (ReferenceEquals(obType, Typeob.Boolean))
             {
                 obType = Globals.globalObject.originalBoolean.Construct();
-                ((TObject) obType).noDynamicElement = fast;
-                isImplicitWrapper = true;
+                ((TObject) obType).noDynamicElement = _fast;
+                _isImplicitWrapper = true;
             }
             else if (Convert.IsPrimitiveNumericType(obType))
             {
                 var baseType = (Type) obType;
                 obType = Globals.globalObject.originalNumber.Construct();
-                ((TObject) obType).noDynamicElement = fast;
+                ((TObject) obType).noDynamicElement = _fast;
                 ((NumberObject) obType).baseType = baseType;
-                isImplicitWrapper = true;
+                _isImplicitWrapper = true;
             }
             else if (obType is Type)
             {
@@ -553,19 +502,13 @@ namespace Turbo.Runtime
             return base.ResolveCustomAttribute(args, argIRs);
         }
 
-        public override string ToString() => rootObject + "." + name;
+        public override string ToString() => RootObject + "." + name;
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            rootObject.TranslateToILInitializer(il);
-            if (!rootObjectInferredType.Equals(rootObject.InferType(null)))
-            {
-                InvalidateBinding();
-            }
-            if (defaultMember != null)
-            {
-                return;
-            }
+            RootObject.TranslateToILInitializer(il);
+            if (!_rootObjectInferredType.Equals(RootObject.InferType(null))) InvalidateBinding();
+            if (defaultMember != null) return;
             if (member != null)
             {
                 var memberType = member.MemberType;
@@ -574,10 +517,7 @@ namespace Turbo.Runtime
                     if (memberType == MemberTypes.Constructor) return;
                     if (memberType != MemberTypes.Field)
                     {
-                        if (memberType != MemberTypes.Method)
-                        {
-                            goto IL_90;
-                        }
+                        if (memberType != MemberTypes.Method) goto IL_90;
                     }
                     else
                     {
@@ -594,49 +534,49 @@ namespace Turbo.Runtime
                 return;
             }
             IL_90:
-            refLoc = il.DeclareLocal(Typeob.LateBinding);
+            _refLoc = il.DeclareLocal(Typeob.LateBinding);
             il.Emit(OpCodes.Ldstr, name);
             il.Emit(OpCodes.Newobj, CompilerGlobals.lateBindingConstructor);
-            il.Emit(OpCodes.Stloc, refLoc);
+            il.Emit(OpCodes.Stloc, _refLoc);
         }
 
         protected override void TranslateToILObject(ILGenerator il, Type obType, bool noValue)
         {
             if (noValue && obType.IsValueType && obType != Typeob.Enum)
             {
-                if (temp == null)
+                if (_temp == null)
                 {
-                    rootObject.TranslateToILReference(il, obType);
+                    RootObject.TranslateToILReference(il, obType);
                     return;
                 }
-                var type = Convert.ToType(rootObject.InferType(null));
+                var type = Convert.ToType(RootObject.InferType(null));
                 if (type == obType)
                 {
-                    il.Emit(OpCodes.Ldloca, temp);
+                    il.Emit(OpCodes.Ldloca, _temp);
                     return;
                 }
-                il.Emit(OpCodes.Ldloc, temp);
+                il.Emit(OpCodes.Ldloc, _temp);
                 Convert.Emit(this, il, type, obType);
                 Convert.EmitLdloca(il, obType);
             }
             else
             {
-                if (temp == null || rootObject is ThisLiteral)
+                if (_temp == null || RootObject is ThisLiteral)
                 {
-                    rootObject.TranslateToIL(il, obType);
+                    RootObject.TranslateToIL(il, obType);
                     return;
                 }
-                il.Emit(OpCodes.Ldloc, temp);
-                var source_type = Convert.ToType(rootObject.InferType(null));
-                Convert.Emit(this, il, source_type, obType);
+                il.Emit(OpCodes.Ldloc, _temp);
+                var sourceType = Convert.ToType(RootObject.InferType(null));
+                Convert.Emit(this, il, sourceType, obType);
             }
         }
 
         protected override void TranslateToILWithDupOfThisOb(ILGenerator il)
         {
-            var reflect = rootObject.InferType(null);
+            var reflect = RootObject.InferType(null);
             var type = Convert.ToType(reflect);
-            rootObject.TranslateToIL(il, type);
+            RootObject.TranslateToIL(il, type);
             if (ReferenceEquals(reflect, Typeob.Object) || ReferenceEquals(reflect, Typeob.String) ||
                 reflect is TypedArray ||
                 (reflect is Type && (Type) reflect == type && Typeob.Array.IsAssignableFrom(type)))
@@ -646,8 +586,8 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Call, CompilerGlobals.toObjectMethod);
             }
             il.Emit(OpCodes.Dup);
-            temp = il.DeclareLocal(type);
-            il.Emit(OpCodes.Stloc, temp);
+            _temp = il.DeclareLocal(type);
+            il.Emit(OpCodes.Stloc, _temp);
             Convert.Emit(this, il, type, Typeob.Object);
             TranslateToIL(il, Typeob.Object);
         }
@@ -658,17 +598,17 @@ namespace Turbo.Runtime
             {
                 var local = il.DeclareLocal(Typeob.Object);
                 il.Emit(OpCodes.Stloc, local);
-                il.Emit(OpCodes.Ldloc, refLoc);
+                il.Emit(OpCodes.Ldloc, _refLoc);
                 il.Emit(OpCodes.Dup);
                 il.Emit(OpCodes.Ldloc, local);
             }
             else
             {
-                il.Emit(OpCodes.Ldloc, refLoc);
+                il.Emit(OpCodes.Ldloc, _refLoc);
                 il.Emit(OpCodes.Dup);
                 TranslateToILObject(il, Typeob.Object, false);
             }
-            var reflect = rootObject.InferType(null);
+            var reflect = RootObject.InferType(null);
             if (ReferenceEquals(reflect, Typeob.Object) || ReferenceEquals(reflect, Typeob.String) ||
                 reflect is TypedArray || (reflect is Type && ((Type) reflect).IsPrimitive) ||
                 (reflect is Type && Typeob.Array.IsAssignableFrom((Type) reflect)))

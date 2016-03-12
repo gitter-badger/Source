@@ -59,32 +59,32 @@ namespace Turbo.Runtime
 {
     public sealed class ASTList : AST
     {
-        internal int count;
+        internal int Count;
 
-        private AST[] list;
+        private AST[] _list;
 
-        private object[] array;
+        private object[] _array;
 
         internal AST this[int i]
         {
-            get { return list[i]; }
-            set { list[i] = value; }
+            get { return _list[i]; }
+            set { _list[i] = value; }
         }
 
         internal ASTList(Context context) : base(context)
         {
-            count = 0;
-            list = new AST[16];
-            array = null;
+            Count = 0;
+            _list = new AST[16];
+            _array = null;
         }
 
         internal void Append(AST elem)
         {
-            var num = count;
-            count = num + 1;
+            var num = Count;
+            Count = num + 1;
             var num2 = num;
-            if (list.Length == num2) Grow();
-            list[num2] = elem;
+            if (_list.Length == num2) Grow();
+            _list[num2] = elem;
             context.UpdateWith(elem.context);
         }
 
@@ -92,26 +92,26 @@ namespace Turbo.Runtime
 
         internal object[] EvaluateAsArray()
         {
-            var num = count;
-            var asArray = array ?? (array = new object[num]);
-            var array2 = list;
+            var num = Count;
+            var asArray = _array ?? (_array = new object[num]);
+            var array2 = _list;
             for (var i = 0; i < num; i++) asArray[i] = array2[i].Evaluate();
             return asArray;
         }
 
         private void Grow()
         {
-            var asts = list;
+            var asts = _list;
             var num = asts.Length;
-            var array2 = list = new AST[num + 16];
+            var array2 = _list = new AST[num + 16];
             for (var i = 0; i < num; i++) array2[i] = asts[i];
         }
 
         internal override AST PartiallyEvaluate()
         {
-            var asts = list;
+            var asts = _list;
             var i = 0;
-            var num = count;
+            var num = Count;
             while (i < num)
             {
                 asts[i] = asts[i].PartiallyEvaluate();
@@ -123,11 +123,11 @@ namespace Turbo.Runtime
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
             var elementType = rtype.GetElementType();
-            var num = count;
+            var num = Count;
             ConstantWrapper.TranslateToILInt(il, num);
             il.Emit(OpCodes.Newarr, elementType);
             var flag = elementType.IsValueType && !elementType.IsPrimitive;
-            var asts = list;
+            var asts = _list;
             for (var i = 0; i < num; i++)
             {
                 il.Emit(OpCodes.Dup);
@@ -140,9 +140,9 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            var asts = list;
+            var asts = _list;
             var i = 0;
-            var num = count;
+            var num = Count;
             while (i < num)
             {
                 asts[i].TranslateToILInitializer(il);

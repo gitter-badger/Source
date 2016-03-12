@@ -996,6 +996,39 @@ var passedTests = 0;
 var failedTests = 0;
 var numberTests = 0;
 
+function pasta(grain, width, shape, hasEgg)
+{
+	this.grain = grain;
+	this.width = width;
+	this.shape = shape;
+	this.hasEgg = hasEgg;
+	this.toString = pastaToString;
+}
+
+function pastaToString()
+{
+	return 	"Grain: " + this.grain + " - " +
+			"Width: " + this.width + " cm - " +
+			"Shape: " + this.shape + " - " +
+			"Egg?:  " + Boolean(this.hasEgg);
+}
+
+var spaghetti = new pasta("wheat", 0.2, "circle", true);
+
+function Circle(radius)
+{
+	this.r = radius;
+}
+
+Circle.prototype.pi = Math.PI;
+
+function aCirclesArea()
+{
+	return this.pi * this.r * this.r;
+}
+
+Circle.prototype.area = aCirclesArea;
+
 /* Perform tests */
 print("# " + testDate_getDate());
 print("# " + testDate_getDay());
@@ -1142,6 +1175,13 @@ proof(France.Paris.Landmark.Tower,                     "Eiffel Tower");
 proof(Units.distance,                                         "meter");
 proof(France.Units.distance,                                  "meter");
 proof(function(a,b){return a+b;},        "function(a,b){return a+b;}");
+proof(spaghetti.toString(), "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?:  true");
+proof(spaghetti,            "Grain: wheat - Width: 0.2 cm - Shape: circle - Egg?:  true");
+proof(new Circle(2).area(),                      "12.566370614359172");
+proof(new String("Turbo").hasOwnProperty("split"),  false);
+proof(String.prototype.hasOwnProperty("split"),     true);
+proof(RegExp.prototype.isPrototypeOf(new RegExp()),    true);
+
 
 @set @myvar1 = (6 * 2)
 @if (@myvar1 == 12)

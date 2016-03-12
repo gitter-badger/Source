@@ -60,85 +60,82 @@ namespace Turbo.Runtime
 {
     internal sealed class PlusAssign : BinaryOp
     {
-        private Plus binOp;
+        private Plus _binOp;
 
-        private object metaData;
+        private object _metaData;
 
         internal PlusAssign(Context context, AST operand1, AST operand2)
             : base(context, operand1, operand2, TToken.FirstBinaryOp)
         {
-            binOp = new Plus(context, operand1, operand2);
-            metaData = null;
+            _binOp = new Plus(context, operand1, operand2);
+            _metaData = null;
         }
 
         internal override object Evaluate()
         {
-            var v = operand1.Evaluate();
-            var v2 = operand2.Evaluate();
-            var obj = binOp.EvaluatePlus(v, v2);
+            var v = Operand1.Evaluate();
+            var v2 = Operand2.Evaluate();
+            var obj = _binOp.EvaluatePlus(v, v2);
             object result;
             try
             {
-                operand1.SetValue(obj);
+                Operand1.SetValue(obj);
                 result = obj;
             }
             catch (TurboException ex)
             {
-                if (ex.context == null)
-                {
-                    ex.context = context;
-                }
+                if (ex.context == null) ex.context = context;
                 throw;
             }
-            catch (Exception arg_57_0)
+            catch (Exception arg570)
             {
-                throw new TurboException(arg_57_0, context);
+                throw new TurboException(arg570, context);
             }
             return result;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
-            var @operator = type1 == null || inference_target != null
-                ? GetOperator(operand1.InferType(inference_target), operand2.InferType(inference_target))
-                : GetOperator(type1, loctype);
+            var @operator = Type1 == null || inferenceTarget != null
+                ? GetOperator(Operand1.InferType(inferenceTarget), Operand2.InferType(inferenceTarget))
+                : GetOperator(Type1, Loctype);
             if (@operator == null)
-                return type1 == Typeob.String || loctype == Typeob.String
+                return Type1 == Typeob.String || Loctype == Typeob.String
                     ? Typeob.String
-                    : (!Convert.IsPrimitiveNumericType(type1)
+                    : (!Convert.IsPrimitiveNumericType(Type1)
                         ? Typeob.Object
-                        : (Convert.IsPromotableTo(loctype, type1) ||
-                           (operand2 is ConstantWrapper && ((ConstantWrapper) operand2).IsAssignableTo(type1))
-                            ? type1
-                            : (Convert.IsPrimitiveNumericType(type1) &&
-                               Convert.IsPrimitiveNumericTypeFitForDouble(loctype)
+                        : (Convert.IsPromotableTo(Loctype, Type1) ||
+                           (Operand2 is ConstantWrapper && ((ConstantWrapper) Operand2).IsAssignableTo(Type1))
+                            ? Type1
+                            : (Convert.IsPrimitiveNumericType(Type1) &&
+                               Convert.IsPrimitiveNumericTypeFitForDouble(Loctype)
                                 ? Typeob.Double
                                 : Typeob.Object)));
-            metaData = @operator;
+            _metaData = @operator;
             return @operator.ReturnType;
         }
 
         internal override AST PartiallyEvaluate()
         {
-            operand1 = operand1.PartiallyEvaluateAsReference();
-            operand2 = operand2.PartiallyEvaluate();
-            binOp = new Plus(context, operand1, operand2);
-            operand1.SetPartialValue(binOp);
+            Operand1 = Operand1.PartiallyEvaluateAsReference();
+            Operand2 = Operand2.PartiallyEvaluate();
+            _binOp = new Plus(context, Operand1, Operand2);
+            Operand1.SetPartialValue(_binOp);
             if (!Engine.doFast) return this;
-            var binding = operand1 as Binding;
+            var binding = Operand1 as Binding;
             if (binding == null || !(binding.member is TVariableField)) return this;
             var type = ((TVariableField) binding.member).type;
             if (type != null && ReferenceEquals(type.InferType(null), Typeob.String))
             {
-                operand1.context.HandleError(TError.StringConcatIsSlow);
+                Operand1.context.HandleError(TError.StringConcatIsSlow);
             }
             return this;
         }
 
-        private void TranslateToILForNoOverloadCase(ILGenerator il, Type rtype)
+        private void TranslateToIlForNoOverloadCase(ILGenerator il, Type rtype)
         {
-            var type = Convert.ToType(operand1.InferType(null));
-            var type2 = Convert.ToType(operand2.InferType(null));
+            var type = Convert.ToType(Operand1.InferType(null));
+            var type2 = Convert.ToType(Operand2.InferType(null));
             var type3 = Typeob.Object;
             if (type == Typeob.String || type2 == Typeob.String)
             {
@@ -147,33 +144,26 @@ namespace Turbo.Runtime
             else if (rtype == Typeob.Void || rtype == type ||
                      (Convert.IsPrimitiveNumericType(type) &&
                       (Convert.IsPromotableTo(type2, type) ||
-                       (operand2 is ConstantWrapper && ((ConstantWrapper) operand2).IsAssignableTo(type)))))
+                       (Operand2 is ConstantWrapper && ((ConstantWrapper) Operand2).IsAssignableTo(type)))))
             {
                 type3 = type;
             }
-            if (type3 == Typeob.SByte || type3 == Typeob.Int16)
+
+            if (type3 == Typeob.SByte || type3 == Typeob.Int16) type3 = Typeob.Int32;
+            else if (type3 == Typeob.Byte || type3 == Typeob.UInt16) type3 = Typeob.UInt32;
+
+            if (Operand2 is ConstantWrapper)
             {
-                type3 = Typeob.Int32;
-            }
-            else if (type3 == Typeob.Byte || type3 == Typeob.UInt16)
-            {
-                type3 = Typeob.UInt32;
-            }
-            if (operand2 is ConstantWrapper)
-            {
-                if (!((ConstantWrapper) operand2).IsAssignableTo(type3))
-                {
-                    type3 = Typeob.Object;
-                }
+                if (!((ConstantWrapper) Operand2).IsAssignableTo(type3)) type3 = Typeob.Object;
             }
             else if ((Convert.IsPrimitiveSignedNumericType(type2) && Convert.IsPrimitiveUnsignedIntegerType(type)) ||
                      (Convert.IsPrimitiveUnsignedIntegerType(type2) && Convert.IsPrimitiveSignedIntegerType(type)))
             {
                 type3 = Typeob.Object;
             }
-            operand1.TranslateToILPreSetPlusGet(il);
+            Operand1.TranslateToILPreSetPlusGet(il);
             Convert.Emit(this, il, type, type3);
-            operand2.TranslateToIL(il, type3);
+            Operand2.TranslateToIL(il, type3);
             if (type3 == Typeob.Object || type3 == Typeob.String)
             {
                 il.Emit(OpCodes.Call, CompilerGlobals.plusDoOpMethod);
@@ -197,31 +187,31 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Dup);
                 il.Emit(OpCodes.Stloc, local);
                 Convert.Emit(this, il, type3, type);
-                operand1.TranslateToILSet(il);
+                Operand1.TranslateToILSet(il);
                 il.Emit(OpCodes.Ldloc, local);
                 Convert.Emit(this, il, type3, rtype);
                 return;
             }
             Convert.Emit(this, il, type3, type);
-            operand1.TranslateToILSet(il);
+            Operand1.TranslateToILSet(il);
         }
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            if (metaData == null)
+            if (_metaData == null)
             {
-                TranslateToILForNoOverloadCase(il, rtype);
+                TranslateToIlForNoOverloadCase(il, rtype);
                 return;
             }
-            if (metaData is MethodInfo)
+            if (_metaData is MethodInfo)
             {
                 object obj = null;
-                var methodInfo = (MethodInfo) metaData;
-                var type = Convert.ToType(operand1.InferType(null));
+                var methodInfo = (MethodInfo) _metaData;
+                var type = Convert.ToType(Operand1.InferType(null));
                 var parameters = methodInfo.GetParameters();
-                operand1.TranslateToILPreSetPlusGet(il);
+                Operand1.TranslateToILPreSetPlusGet(il);
                 Convert.Emit(this, il, type, parameters[0].ParameterType);
-                operand2.TranslateToIL(il, parameters[1].ParameterType);
+                Operand2.TranslateToIL(il, parameters[1].ParameterType);
                 il.Emit(OpCodes.Call, methodInfo);
                 if (rtype != Typeob.Void)
                 {
@@ -231,22 +221,19 @@ namespace Turbo.Runtime
                     il.Emit(OpCodes.Stloc, (LocalBuilder) obj);
                 }
                 Convert.Emit(this, il, methodInfo.ReturnType, type);
-                operand1.TranslateToILSet(il);
-                if (rtype != Typeob.Void)
-                {
-                    il.Emit(OpCodes.Ldloc, (LocalBuilder) obj);
-                }
+                Operand1.TranslateToILSet(il);
+                if (rtype != Typeob.Void) il.Emit(OpCodes.Ldloc, (LocalBuilder) obj);
             }
             else
             {
-                var type2 = Convert.ToType(operand1.InferType(null));
+                var type2 = Convert.ToType(Operand1.InferType(null));
                 var local = il.DeclareLocal(Typeob.Object);
-                operand1.TranslateToILPreSetPlusGet(il);
+                Operand1.TranslateToILPreSetPlusGet(il);
                 Convert.Emit(this, il, type2, Typeob.Object);
                 il.Emit(OpCodes.Stloc, local);
-                il.Emit(OpCodes.Ldloc, (LocalBuilder) metaData);
+                il.Emit(OpCodes.Ldloc, (LocalBuilder) _metaData);
                 il.Emit(OpCodes.Ldloc, local);
-                operand2.TranslateToIL(il, Typeob.Object);
+                Operand2.TranslateToIL(il, Typeob.Object);
                 il.Emit(OpCodes.Call, CompilerGlobals.evaluatePlusMethod);
                 if (rtype != Typeob.Void)
                 {
@@ -254,7 +241,7 @@ namespace Turbo.Runtime
                     il.Emit(OpCodes.Stloc, local);
                 }
                 Convert.Emit(this, il, Typeob.Object, type2);
-                operand1.TranslateToILSet(il);
+                Operand1.TranslateToILSet(il);
                 if (rtype == Typeob.Void) return;
                 il.Emit(OpCodes.Ldloc, local);
                 Convert.Emit(this, il, Typeob.Object, rtype);
@@ -263,16 +250,12 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            var arg_24_0 = (Type) InferType(null);
-            operand1.TranslateToILInitializer(il);
-            operand2.TranslateToILInitializer(il);
-            if (arg_24_0 != Typeob.Object)
-            {
-                return;
-            }
-            metaData = il.DeclareLocal(Typeob.Plus);
+            Operand1.TranslateToILInitializer(il);
+            Operand2.TranslateToILInitializer(il);
+            if ((Type)InferType(null) != Typeob.Object) return;
+            _metaData = il.DeclareLocal(Typeob.Plus);
             il.Emit(OpCodes.Newobj, CompilerGlobals.plusConstructor);
-            il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
+            il.Emit(OpCodes.Stloc, (LocalBuilder) _metaData);
         }
     }
 }

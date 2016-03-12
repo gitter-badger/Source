@@ -87,7 +87,7 @@ namespace Turbo.Runtime
                 return this;
             }
             var i = 0;
-            var count = arguments.count;
+            var count = arguments.Count;
             while (i < count)
             {
                 arguments[i] = arguments[i].PartiallyEvaluate();

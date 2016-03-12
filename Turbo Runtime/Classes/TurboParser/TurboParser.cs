@@ -4689,11 +4689,11 @@ namespace Turbo.Runtime
                                 if (text.Equals("eval"))
                                 {
                                     expression.context.UpdateWith(aStList.context);
-                                    if (aStList.count == 1)
+                                    if (aStList.Count == 1)
                                     {
                                         expression = new Eval(expression.context, aStList[0], null);
                                     }
-                                    else if (aStList.count > 1)
+                                    else if (aStList.Count > 1)
                                     {
                                         expression = new Eval(expression.context, aStList[0], aStList[1]);
                                     }
@@ -4947,9 +4947,9 @@ namespace Turbo.Runtime
                 case TToken.Minus:
                     return new NumericBinary(context, operand1, operand2, TToken.Minus);
                 case TToken.LogicalOr:
-                    return new Logical_or(context, operand1, operand2);
+                    return new LogicalOr(context, operand1, operand2);
                 case TToken.LogicalAnd:
-                    return new Logical_and(context, operand1, operand2);
+                    return new LogicalAnd(context, operand1, operand2);
                 case TToken.BitwiseOr:
                     return new BitwiseBinary(context, operand1, operand2, TToken.BitwiseOr);
                 case TToken.BitwiseXor:

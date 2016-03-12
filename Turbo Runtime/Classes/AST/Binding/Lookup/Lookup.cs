@@ -61,28 +61,28 @@ namespace Turbo.Runtime
 {
     internal sealed class Lookup : Binding
     {
-        private int lexLevel;
+        private int _lexLevel;
 
-        private int evalLexLevel;
+        private int _evalLexLevel;
 
-        private LocalBuilder fieldLoc;
+        private LocalBuilder _fieldLoc;
 
-        private LocalBuilder refLoc;
+        private LocalBuilder _refLoc;
 
-        private LateBinding lateBinding;
+        private LateBinding _lateBinding;
 
-        private bool thereIsAnObjectOnTheStack;
+        private bool _thereIsAnObjectOnTheStack;
 
         internal string Name => name;
 
         internal Lookup(Context context) : base(context, context.GetCode())
         {
-            lexLevel = 0;
-            evalLexLevel = 0;
-            fieldLoc = null;
-            refLoc = null;
-            lateBinding = null;
-            thereIsAnObjectOnTheStack = false;
+            _lexLevel = 0;
+            _evalLexLevel = 0;
+            _fieldLoc = null;
+            _refLoc = null;
+            _lateBinding = null;
+            _thereIsAnObjectOnTheStack = false;
         }
 
         internal Lookup(string name, Context context) : this(context)
@@ -102,20 +102,11 @@ namespace Turbo.Runtime
             while (scriptObject != null)
             {
                 var withObject = scriptObject as WithObject;
-                MemberInfo[] getMember;
-                if (withObject != null & flag2)
-                {
-                    getMember = withObject.GetMember(name, bindingFlags, false);
-                }
-                else
-                {
-                    getMember = scriptObject.GetMember(name, bindingFlags);
-                }
+                var getMember = withObject != null & flag2
+                    ? withObject.GetMember(name, bindingFlags, false)
+                    : scriptObject.GetMember(name, bindingFlags);
                 members = getMember;
-                if (getMember.Length != 0)
-                {
-                    break;
-                }
+                if (getMember.Length != 0) break;
                 if (scriptObject is WithObject)
                 {
                     isFullyResolved = (isFullyResolved && ((WithObject) scriptObject).isKnownAtCompileTime);
@@ -131,10 +122,7 @@ namespace Turbo.Runtime
                     }
                     if (scriptObject is ClassScope)
                     {
-                        if (flag)
-                        {
-                            flag2 = true;
-                        }
+                        if (flag) flag2 = true;
                         if (((ClassScope) scriptObject).owner.isStatic)
                         {
                             bindingFlags &= ~BindingFlags.Instance;
@@ -150,24 +138,18 @@ namespace Turbo.Runtime
                 scriptObject = scriptObject.GetParent();
             }
             if (members.Length == 0) return;
-            lexLevel = num;
-            evalLexLevel = num2;
+            _lexLevel = num;
+            _evalLexLevel = num2;
         }
 
         internal bool CanPlaceAppropriateObjectOnStack(object ob)
         {
-            if (ob is LenientGlobalObject)
-            {
-                return true;
-            }
+            if (ob is LenientGlobalObject) return true;
             var scriptObject = Globals.ScopeStack.Peek();
-            var num = lexLevel;
+            var num = _lexLevel;
             while (num > 0 && (scriptObject is WithObject || scriptObject is BlockScope))
             {
-                if (scriptObject is WithObject)
-                {
-                    num--;
-                }
+                if (scriptObject is WithObject) num--;
                 scriptObject = scriptObject.GetParent();
             }
             return scriptObject is WithObject || scriptObject is GlobalScope;
@@ -178,19 +160,13 @@ namespace Turbo.Runtime
             var fieldInfo = member as FieldInfo;
             if (fieldInfo != null)
             {
-                if (!fieldInfo.IsStatic)
-                {
-                    context.HandleError(TError.NotAllowedInSuperConstructorCall);
-                }
+                if (!fieldInfo.IsStatic) context.HandleError(TError.NotAllowedInSuperConstructorCall);
                 return;
             }
             var methodInfo = member as MethodInfo;
             if (methodInfo != null)
             {
-                if (!methodInfo.IsStatic)
-                {
-                    context.HandleError(TError.NotAllowedInSuperConstructorCall);
-                }
+                if (!methodInfo.IsStatic) context.HandleError(TError.NotAllowedInSuperConstructorCall);
                 return;
             }
             var propertyInfo = member as PropertyInfo;
@@ -202,10 +178,7 @@ namespace Turbo.Runtime
                 return;
             }
             methodInfo = TProperty.GetSetMethod(propertyInfo, true);
-            if (methodInfo != null && !methodInfo.IsStatic)
-            {
-                context.HandleError(TError.NotAllowedInSuperConstructorCall);
-            }
+            if (methodInfo != null && !methodInfo.IsStatic) context.HandleError(TError.NotAllowedInSuperConstructorCall);
         }
 
         internal override object Evaluate()
@@ -214,11 +187,8 @@ namespace Turbo.Runtime
             object obj;
             if (!isFullyResolved)
             {
-                obj = ((IActivationObject) scriptObject).GetMemberValue(name, evalLexLevel);
-                if (!(obj is Missing))
-                {
-                    return obj;
-                }
+                obj = ((IActivationObject) scriptObject).GetMemberValue(name, _evalLexLevel);
+                if (!(obj is Missing)) return obj;
             }
             if (members == null && !THPMainEngine.executeForJSEE)
             {
@@ -226,10 +196,7 @@ namespace Turbo.Runtime
                 ResolveRHValue();
             }
             obj = base.Evaluate();
-            if (obj is Missing)
-            {
-                throw new TurboException(TError.UndefinedIdentifier, context);
-            }
+            if (obj is Missing) throw new TurboException(TError.UndefinedIdentifier, context);
             return obj;
         }
 
@@ -240,20 +207,14 @@ namespace Turbo.Runtime
                 BindName();
                 isFullyResolved = false;
             }
-            if (defaultMember == member)
-            {
-                defaultMember = null;
-            }
+            if (defaultMember == member) defaultMember = null;
             var @object = GetObject();
-            var binding = lateBinding ?? (lateBinding = new LateBinding(name, @object, THPMainEngine.executeForJSEE));
+            var binding = _lateBinding ?? (_lateBinding = new LateBinding(name, @object, THPMainEngine.executeForJSEE));
             binding.obj = @object;
             binding.last_object = @object;
             binding.last_members = members;
             binding.last_member = member;
-            if (!isFullyResolved)
-            {
-                members = null;
-            }
+            if (!isFullyResolved) members = null;
             return binding;
         }
 
@@ -299,70 +260,43 @@ namespace Turbo.Runtime
                 }
                 return null;
             }
-            for (var i = evalLexLevel; i > 0; i--)
-            {
-                scriptObject = scriptObject.GetParent();
-            }
+            for (var i = _evalLexLevel; i > 0; i--) scriptObject = scriptObject.GetParent();
             obj = scriptObject;
             IL_59:
             if (defaultMember == null) return obj;
             var memberType = defaultMember.MemberType;
             if (memberType <= MemberTypes.Field)
             {
-                if (memberType == MemberTypes.Event)
-                {
-                    return null;
-                }
-                if (memberType == MemberTypes.Field)
-                {
-                    return ((FieldInfo) defaultMember).GetValue(obj);
-                }
+                if (memberType == MemberTypes.Event) return null;
+                if (memberType == MemberTypes.Field) return ((FieldInfo) defaultMember).GetValue(obj);
             }
             else
             {
-                if (memberType == MemberTypes.Method)
-                {
-                    return ((MethodInfo) defaultMember).Invoke(obj, new object[0]);
-                }
-                if (memberType == MemberTypes.Property)
-                {
-                    return ((PropertyInfo) defaultMember).GetValue(obj, null);
-                }
-                if (memberType == MemberTypes.NestedType)
-                {
-                    return member;
-                }
+                if (memberType == MemberTypes.Method) return ((MethodInfo) defaultMember).Invoke(obj, new object[0]);
+                if (memberType == MemberTypes.Property) return ((PropertyInfo) defaultMember).GetValue(obj, null);
+                if (memberType == MemberTypes.NestedType) return member;
             }
             return obj;
         }
 
         protected override void HandleNoSuchMemberError()
         {
-            if (!isFullyResolved)
-            {
-                return;
-            }
+            if (!isFullyResolved) return;
             context.HandleError(TError.UndeclaredVariable, Engine.doFast);
         }
 
-        internal override IReflect InferType(TField inference_target)
-            => !isFullyResolved ? Typeob.Object : base.InferType(inference_target);
+        internal override IReflect InferType(TField inferenceTarget)
+            => !isFullyResolved ? Typeob.Object : base.InferType(inferenceTarget);
 
         internal bool InFunctionNestedInsideInstanceMethod()
         {
             var scriptObject = Globals.ScopeStack.Peek();
-            while (scriptObject is WithObject || scriptObject is BlockScope)
-            {
-                scriptObject = scriptObject.GetParent();
-            }
+            while (scriptObject is WithObject || scriptObject is BlockScope) scriptObject = scriptObject.GetParent();
             for (var functionScope = scriptObject as FunctionScope;
                 functionScope != null;
                 functionScope = (scriptObject as FunctionScope))
             {
-                if (functionScope.owner.isMethod)
-                {
-                    return !functionScope.owner.isStatic;
-                }
+                if (functionScope.owner.isMethod) return !functionScope.owner.isStatic;
                 scriptObject = functionScope.owner.enclosing_scope;
                 while (scriptObject is WithObject || scriptObject is BlockScope)
                 {
@@ -375,20 +309,11 @@ namespace Turbo.Runtime
         internal bool InStaticCode()
         {
             var scriptObject = Globals.ScopeStack.Peek();
-            while (scriptObject is WithObject || scriptObject is BlockScope)
-            {
-                scriptObject = scriptObject.GetParent();
-            }
+            while (scriptObject is WithObject || scriptObject is BlockScope) scriptObject = scriptObject.GetParent();
             var functionScope = scriptObject as FunctionScope;
-            if (functionScope != null)
-            {
-                return functionScope.isStatic;
-            }
+            if (functionScope != null) return functionScope.isStatic;
             var stackFrame = scriptObject as StackFrame;
-            if (stackFrame != null)
-            {
-                return stackFrame.thisObject is Type;
-            }
+            if (stackFrame != null) return stackFrame.thisObject is Type;
             var classScope = scriptObject as ClassScope;
             return classScope == null || classScope.inStaticInitializerCode;
         }
@@ -399,10 +324,7 @@ namespace Turbo.Runtime
             if (members == null || members.Length == 0)
             {
                 var scriptObject = Globals.ScopeStack.Peek();
-                while (scriptObject is FunctionScope)
-                {
-                    scriptObject = scriptObject.GetParent();
-                }
+                while (scriptObject is FunctionScope) scriptObject = scriptObject.GetParent();
                 if (!(scriptObject is WithObject) || isFullyResolved)
                 {
                     context.HandleError(TError.UndeclaredVariable, isFullyResolved && Engine.doFast);
@@ -427,17 +349,11 @@ namespace Turbo.Runtime
                             : TypeReferences.GetConstantValue(fieldInfo);
                         if (obj is AST)
                         {
-                            var aST = ((AST) obj).PartiallyEvaluate();
-                            if (aST is ConstantWrapper && isFullyResolved)
-                            {
-                                return aST;
-                            }
+                            var aSt = ((AST) obj).PartiallyEvaluate();
+                            if (aSt is ConstantWrapper && isFullyResolved) return aSt;
                             obj = null;
                         }
-                        if (!(obj is FunctionObject) && isFullyResolved)
-                        {
-                            return new ConstantWrapper(obj, context);
-                        }
+                        if (!(obj is FunctionObject) && isFullyResolved) return new ConstantWrapper(obj, context);
                     }
                     else if (fieldInfo.IsInitOnly && fieldInfo.IsStatic && fieldInfo.DeclaringType == Typeob.GlobalObject &&
                              isFullyResolved)
@@ -454,10 +370,7 @@ namespace Turbo.Runtime
                         return new ConstantWrapper(propertyInfo.GetValue(null, null), context);
                     }
                 }
-                if (memberInfo is Type && isFullyResolved)
-                {
-                    return new ConstantWrapper(memberInfo, context);
-                }
+                if (memberInfo is Type && isFullyResolved) return new ConstantWrapper(memberInfo, context);
             }
             return this;
         }
@@ -474,69 +387,59 @@ namespace Turbo.Runtime
             if (members == null || members.Length == 0)
             {
                 if (!(Globals.ScopeStack.Peek() is WithObject) || isFullyResolved)
-                {
                     context.HandleError(TError.UndeclaredVariable, isFullyResolved && Engine.doFast);
-                }
             }
-            else
-            {
-                ResolveLHValue();
-            }
+            else ResolveLHValue();
             return this;
         }
 
         internal override object ResolveCustomAttribute(ASTList args, IReflect[] argIRs)
         {
-            if (name == "dynamic")
+            switch (name)
             {
-                members = Typeob.DynamicElement.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
-            }
-            else if (name == "override")
-            {
-                members = Typeob.Override.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
-            }
-            else if (name == "hide")
-            {
-                members = Typeob.Hide.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
-            }
-            else if (name == "...")
-            {
-                members = Typeob.ParamArrayAttribute.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
-            }
-            else
-            {
-                name += "Attribute";
-                BindName();
-                if (members != null && members.Length != 0) return base.ResolveCustomAttribute(args, argIRs);
-                name = name.Substring(0, name.Length - 9);
-                BindName();
+                case "dynamic":
+                    members = Typeob.DynamicElement.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+                    break;
+                case "override":
+                    members = Typeob.Override.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+                    break;
+                case "hide":
+                    members = Typeob.Hide.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+                    break;
+                case "...":
+                    members = Typeob.ParamArrayAttribute.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+                    break;
+                default:
+                    name += "Attribute";
+                    BindName();
+                    if (members != null && members.Length != 0) return base.ResolveCustomAttribute(args, argIRs);
+                    name = name.Substring(0, name.Length - 9);
+                    BindName();
+                    break;
             }
             return base.ResolveCustomAttribute(args, argIRs);
         }
 
-        internal override void SetPartialValue(AST partial_value)
+        internal override void SetPartialValue(AST partialValue)
         {
-            if (members == null || members.Length == 0)
-            {
-                return;
-            }
+            if (members == null || members.Length == 0) return;
             if (member is TLocalField)
             {
-                var jSLocalField = (TLocalField) member;
-                if (jSLocalField.type == null)
+                var localField = (TLocalField) member;
+                if (localField.type == null)
                 {
-                    var reflect = partial_value.InferType(jSLocalField);
-                    if (ReferenceEquals(reflect, Typeob.String) && partial_value is Plus)
+                    var reflect = partialValue.InferType(localField);
+                    if (ReferenceEquals(reflect, Typeob.String) && partialValue is Plus)
                     {
-                        jSLocalField.SetInferredType(Typeob.Object);
+                        localField.SetInferredType(Typeob.Object);
                         return;
                     }
-                    jSLocalField.SetInferredType(reflect);
+                    localField.SetInferredType(reflect);
                     return;
                 }
-                jSLocalField.isDefined = true;
+                localField.isDefined = true;
             }
-            AssignmentCompatible(InferType(null), partial_value, partial_value.InferType(null), isFullyResolved);
+            AssignmentCompatible(InferType(null), partialValue, partialValue.InferType(null), isFullyResolved);
         }
 
         internal override void SetValue(object value)
@@ -551,11 +454,7 @@ namespace Turbo.Runtime
 
         internal void SetWithValue(WithObject scope, object value)
         {
-            var field = scope.GetField(name, lexLevel);
-            if (field != null)
-            {
-                field.SetValue(scope, value);
-            }
+            scope.GetField(name, _lexLevel)?.SetValue(scope, value);
         }
 
         public override string ToString() => name;
@@ -572,7 +471,7 @@ namespace Turbo.Runtime
             il.Emit(OpCodes.Call, CompilerGlobals.scriptObjectStackTopMethod);
             il.Emit(OpCodes.Castclass, Typeob.IActivationObject);
             il.Emit(OpCodes.Ldstr, name);
-            ConstantWrapper.TranslateToILInt(il, lexLevel);
+            ConstantWrapper.TranslateToILInt(il, _lexLevel);
             il.Emit(OpCodes.Callvirt, CompilerGlobals.getMemberValueMethod);
             il.Emit(OpCodes.Dup);
             il.Emit(OpCodes.Call, CompilerGlobals.isMissingMethod);
@@ -597,7 +496,7 @@ namespace Turbo.Runtime
             il.Emit(OpCodes.Call, CompilerGlobals.scriptObjectStackTopMethod);
             il.Emit(OpCodes.Castclass, Typeob.IActivationObject);
             il.Emit(OpCodes.Ldstr, name);
-            ConstantWrapper.TranslateToILInt(il, lexLevel);
+            ConstantWrapper.TranslateToILInt(il, _lexLevel);
             il.Emit(OpCodes.Callvirt, CompilerGlobals.getMemberValueMethod);
             il.Emit(OpCodes.Dup);
             il.Emit(OpCodes.Call, CompilerGlobals.isMissingMethod);
@@ -625,20 +524,14 @@ namespace Turbo.Runtime
         {
             EmitILToLoadEngine(il);
             il.Emit(OpCodes.Call, CompilerGlobals.scriptObjectStackTopMethod);
-            while (lexLevel-- > 0)
-            {
-                il.Emit(OpCodes.Call, CompilerGlobals.getParentMethod);
-            }
+            while (lexLevel --> 0) il.Emit(OpCodes.Call, CompilerGlobals.getParentMethod);
             il.Emit(OpCodes.Castclass, Typeob.IActivationObject);
             il.Emit(OpCodes.Callvirt, CompilerGlobals.getDefaultThisObjectMethod);
         }
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            if (defaultMember != null)
-            {
-                return;
-            }
+            if (defaultMember != null) return;
             if (member != null)
             {
                 var memberType = member.MemberType;
@@ -647,10 +540,7 @@ namespace Turbo.Runtime
                     if (memberType == MemberTypes.Constructor) return;
                     if (memberType != MemberTypes.Field)
                     {
-                        if (memberType != MemberTypes.Method)
-                        {
-                            goto IL_65;
-                        }
+                        if (memberType != MemberTypes.Method) goto IL_65;
                     }
                     else
                     {
@@ -667,7 +557,7 @@ namespace Turbo.Runtime
                 return;
             }
             IL_65:
-            refLoc = il.DeclareLocal(Typeob.LateBinding);
+            _refLoc = il.DeclareLocal(Typeob.LateBinding);
             il.Emit(OpCodes.Ldstr, name);
             if (isFullyResolved && member == null && IsBoundToMethodInfos())
             {
@@ -679,7 +569,7 @@ namespace Turbo.Runtime
                 }
                 else
                 {
-                    TranslateToILObjectForMember(il, methodInfo.DeclaringType, methodInfo);
+                    TranslateToIlObjectForMember(il, methodInfo.DeclaringType, methodInfo);
                 }
             }
             else
@@ -688,7 +578,7 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Call, CompilerGlobals.scriptObjectStackTopMethod);
             }
             il.Emit(OpCodes.Newobj, CompilerGlobals.lateBindingConstructor2);
-            il.Emit(OpCodes.Stloc, refLoc);
+            il.Emit(OpCodes.Stloc, _refLoc);
         }
 
         private bool IsBoundToMethodInfos()
@@ -696,12 +586,12 @@ namespace Turbo.Runtime
 
         protected override void TranslateToILObject(ILGenerator il, Type obType, bool noValue)
         {
-            TranslateToILObjectForMember(il, obType, member);
+            TranslateToIlObjectForMember(il, obType, member);
         }
 
-        private void TranslateToILObjectForMember(ILGenerator il, Type obType, MemberInfo mem)
+        private void TranslateToIlObjectForMember(ILGenerator il, Type obType, MemberInfo mem)
         {
-            thereIsAnObjectOnTheStack = true;
+            _thereIsAnObjectOnTheStack = true;
             if (mem is IWrappedMember)
             {
                 var wrappedObject = ((IWrappedMember) mem).GetWrappedObject();
@@ -713,7 +603,7 @@ namespace Turbo.Runtime
                 }
                 if (!(wrappedObject is Type) && !(wrappedObject is ClassScope))
                 {
-                    TranslateToILDefaultThisObject(il, lexLevel);
+                    TranslateToILDefaultThisObject(il, _lexLevel);
                     Convert.Emit(this, il, Typeob.Object, obType);
                     return;
                 }
@@ -788,10 +678,7 @@ namespace Turbo.Runtime
                         if (scriptObject2 is ClassScope)
                         {
                             var classScope2 = (ClassScope) scriptObject2;
-                            if (classScope2.IsSameOrDerivedFrom(obType))
-                            {
-                                break;
-                            }
+                            if (classScope2.IsSameOrDerivedFrom(obType)) break;
                             il.Emit(OpCodes.Castclass, classScope2.GetTypeBuilder());
                             il.Emit(OpCodes.Ldfld, classScope2.outerClassField);
                         }
@@ -806,10 +693,7 @@ namespace Turbo.Runtime
                     if (scriptObject2 is ClassScope)
                     {
                         var classScope3 = (ClassScope) scriptObject2;
-                        if (classScope3.IsSameOrDerivedFrom(obType))
-                        {
-                            break;
-                        }
+                        if (classScope3.IsSameOrDerivedFrom(obType)) break;
                         il.Emit(OpCodes.Ldfld, classScope3.outerClassField);
                     }
                     scriptObject2 = scriptObject2.GetParent();
@@ -830,12 +714,12 @@ namespace Turbo.Runtime
                 return;
             }
             var label = il.DefineLabel();
-            var local = fieldLoc = il.DeclareLocal(Typeob.FieldInfo);
+            var local = _fieldLoc = il.DeclareLocal(Typeob.FieldInfo);
             EmitILToLoadEngine(il);
             il.Emit(OpCodes.Call, CompilerGlobals.scriptObjectStackTopMethod);
             il.Emit(OpCodes.Castclass, Typeob.IActivationObject);
             il.Emit(OpCodes.Ldstr, name);
-            ConstantWrapper.TranslateToILInt(il, lexLevel);
+            ConstantWrapper.TranslateToILInt(il, _lexLevel);
             il.Emit(OpCodes.Callvirt, CompilerGlobals.getFieldMethod);
             il.Emit(OpCodes.Stloc, local);
             if (!doBoth)
@@ -845,7 +729,7 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Bne_Un_S, label);
             }
             base.TranslateToILPreSet(il);
-            if (thereIsAnObjectOnTheStack)
+            if (_thereIsAnObjectOnTheStack)
             {
                 var label2 = il.DefineLabel();
                 il.Emit(OpCodes.Br_S, label2);
@@ -866,12 +750,12 @@ namespace Turbo.Runtime
             }
             var label = il.DefineLabel();
             var label2 = il.DefineLabel();
-            var local = fieldLoc = il.DeclareLocal(Typeob.FieldInfo);
+            var local = _fieldLoc = il.DeclareLocal(Typeob.FieldInfo);
             EmitILToLoadEngine(il);
             il.Emit(OpCodes.Call, CompilerGlobals.scriptObjectStackTopMethod);
             il.Emit(OpCodes.Castclass, Typeob.IActivationObject);
             il.Emit(OpCodes.Ldstr, name);
-            ConstantWrapper.TranslateToILInt(il, lexLevel);
+            ConstantWrapper.TranslateToILInt(il, _lexLevel);
             il.Emit(OpCodes.Callvirt, CompilerGlobals.getFieldMethod);
             il.Emit(OpCodes.Stloc, local);
             il.Emit(OpCodes.Ldloc, local);
@@ -880,11 +764,8 @@ namespace Turbo.Runtime
             base.TranslateToILPreSetPlusGet(il);
             il.Emit(OpCodes.Br_S, label);
             il.MarkLabel(label2);
-            if (thereIsAnObjectOnTheStack)
-            {
-                il.Emit(OpCodes.Ldnull);
-            }
-            il.Emit(OpCodes.Ldloc, fieldLoc);
+            if (_thereIsAnObjectOnTheStack) il.Emit(OpCodes.Ldnull);
+            il.Emit(OpCodes.Ldloc, _fieldLoc);
             il.Emit(OpCodes.Ldnull);
             il.Emit(OpCodes.Callvirt, CompilerGlobals.getFieldValueMethod);
             il.MarkLabel(label);
@@ -902,11 +783,8 @@ namespace Turbo.Runtime
                 base.TranslateToILSet(il, rhvalue);
                 return;
             }
-            if (rhvalue != null)
-            {
-                rhvalue.TranslateToIL(il, Typeob.Object);
-            }
-            if (fieldLoc == null)
+            rhvalue?.TranslateToIL(il, Typeob.Object);
+            if (_fieldLoc == null)
             {
                 il.Emit(OpCodes.Call, CompilerGlobals.setIndexedPropertyValueStaticMethod);
                 return;
@@ -921,19 +799,16 @@ namespace Turbo.Runtime
                 base.TranslateToILSet(il, null);
             }
             var label = il.DefineLabel();
-            il.Emit(OpCodes.Ldloc, fieldLoc);
+            il.Emit(OpCodes.Ldloc, _fieldLoc);
             il.Emit(OpCodes.Ldnull);
             il.Emit(OpCodes.Beq_S, label);
             var label2 = il.DefineLabel();
             if (!doBoth)
             {
                 il.Emit(OpCodes.Stloc, local);
-                if (thereIsAnObjectOnTheStack)
-                {
-                    il.Emit(OpCodes.Pop);
-                }
+                if (_thereIsAnObjectOnTheStack) il.Emit(OpCodes.Pop);
             }
-            il.Emit(OpCodes.Ldloc, fieldLoc);
+            il.Emit(OpCodes.Ldloc, _fieldLoc);
             il.Emit(OpCodes.Ldnull);
             il.Emit(OpCodes.Ldloc, local);
             il.Emit(OpCodes.Callvirt, CompilerGlobals.setFieldValueMethod);
@@ -956,8 +831,8 @@ namespace Turbo.Runtime
 
         internal void TranslateToLateBinding(ILGenerator il)
         {
-            thereIsAnObjectOnTheStack = true;
-            il.Emit(OpCodes.Ldloc, refLoc);
+            _thereIsAnObjectOnTheStack = true;
+            il.Emit(OpCodes.Ldloc, _refLoc);
         }
     }
 }

@@ -59,34 +59,34 @@ namespace Turbo.Runtime
 {
     public sealed class AssemblyCustomAttributeList : AST
     {
-        private readonly CustomAttributeList list;
+        private readonly CustomAttributeList _list;
 
-        private bool okToUse;
+        private bool _okToUse;
 
         internal AssemblyCustomAttributeList(CustomAttributeList list) : base(list.context)
         {
-            this.list = list;
-            okToUse = false;
+            _list = list;
+            _okToUse = false;
         }
 
         internal override object Evaluate() => null;
 
         internal void Process()
         {
-            okToUse = true;
-            list.SetTarget(this);
-            list.PartiallyEvaluate();
+            _okToUse = true;
+            _list.SetTarget(this);
+            _list.PartiallyEvaluate();
         }
 
         internal override AST PartiallyEvaluate()
         {
-            if (!okToUse) context.HandleError(TError.AssemblyAttributesMustBeGlobal);
+            if (!_okToUse) context.HandleError(TError.AssemblyAttributesMustBeGlobal);
             return this;
         }
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            foreach (var customAttribute in list.GetCustomAttributeBuilders(false))
+            foreach (var customAttribute in _list.GetCustomAttributeBuilders(false))
                 compilerGlobals.assemblyBuilder.SetCustomAttribute(customAttribute);
             if (rtype == Typeob.Void) return;
             il.Emit(OpCodes.Ldnull);

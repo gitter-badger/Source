@@ -61,7 +61,7 @@ namespace Turbo.Runtime
 {
     public class Equality : BinaryOp
     {
-        private object metaData;
+        private object _metaData;
 
         internal Equality(Context context, AST operand1, AST operand2, TToken operatorTok)
             : base(context, operand1, operand2, operatorTok)
@@ -73,9 +73,9 @@ namespace Turbo.Runtime
         }
 
         internal override object Evaluate()
-            => operatorTok == TToken.Equal
-                ? EvaluateEquality(operand1.Evaluate(), operand2.Evaluate(), THPMainEngine.executeForJSEE)
-                : !EvaluateEquality(operand1.Evaluate(), operand2.Evaluate(), THPMainEngine.executeForJSEE);
+            => OperatorTokl == TToken.Equal
+                ? EvaluateEquality(Operand1.Evaluate(), Operand2.Evaluate(), THPMainEngine.executeForJSEE)
+                : !EvaluateEquality(Operand1.Evaluate(), Operand2.Evaluate(), THPMainEngine.executeForJSEE);
 
         [DebuggerHidden, DebuggerStepThrough]
         public bool EvaluateEquality(object v1, object v2) => EvaluateEquality(v1, v2, false);
@@ -108,7 +108,7 @@ namespace Turbo.Runtime
                                 v1,
                                 v2
                             }, null);
-                            return operatorTok == TToken.NotEqual ? !flag : flag;
+                            return OperatorTokl == TToken.NotEqual ? !flag : flag;
                         }
                     }
                     break;
@@ -123,7 +123,7 @@ namespace Turbo.Runtime
                                 v1,
                                 v2
                             }, null);
-                            return operatorTok == TToken.NotEqual ? !flag2 : flag2;
+                            return OperatorTokl == TToken.NotEqual ? !flag2 : flag2;
                         }
                     }
                     break;
@@ -269,15 +269,15 @@ namespace Turbo.Runtime
             }
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.Boolean;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.Boolean;
 
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,
             bool shortForm)
         {
-            if (metaData == null)
+            if (_metaData == null)
             {
-                var type = type1;
-                var type2 = loctype;
+                var type = Type1;
+                var type2 = Loctype;
                 var type3 = Typeob.Object;
                 var flag = true;
 
@@ -313,17 +313,17 @@ namespace Turbo.Runtime
 
                 if (flag)
                 {
-                    operand1.TranslateToIL(il, type3);
-                    operand2.TranslateToIL(il, type3);
+                    Operand1.TranslateToIL(il, type3);
+                    Operand2.TranslateToIL(il, type3);
                     if (type3 == Typeob.Object) il.Emit(OpCodes.Call, CompilerGlobals.TurboEqualsMethod);
                     else if (type3 == Typeob.String) il.Emit(OpCodes.Call, CompilerGlobals.stringEqualsMethod);
                 }
-                else if (type == Typeob.String) operand1.TranslateToIL(il, type3);
-                else if (type2 == Typeob.String) operand2.TranslateToIL(il, type3);
+                else if (type == Typeob.String) Operand1.TranslateToIL(il, type3);
+                else if (type2 == Typeob.String) Operand2.TranslateToIL(il, type3);
 
                 if (branchIfTrue)
                 {
-                    if (operatorTok == TToken.Equal)
+                    if (OperatorTokl == TToken.Equal)
                     {
                         if (type3 == Typeob.String || type3 == Typeob.Object)
                         {
@@ -344,7 +344,7 @@ namespace Turbo.Runtime
                     il.Emit(shortForm ? OpCodes.Bne_Un_S : OpCodes.Bne_Un, label);
                     return;
                 }
-                if (operatorTok == TToken.Equal)
+                if (OperatorTokl == TToken.Equal)
                 {
                     if (type3 == Typeob.String || type3 == Typeob.Object)
                     {
@@ -362,12 +362,12 @@ namespace Turbo.Runtime
                 il.Emit(shortForm ? OpCodes.Beq_S : OpCodes.Beq, label);
                 return;
             }
-            if (metaData is MethodInfo)
+            if (_metaData is MethodInfo)
             {
-                var methodInfo = (MethodInfo) metaData;
+                var methodInfo = (MethodInfo) _metaData;
                 var parameters = methodInfo.GetParameters();
-                operand1.TranslateToIL(il, parameters[0].ParameterType);
-                operand2.TranslateToIL(il, parameters[1].ParameterType);
+                Operand1.TranslateToIL(il, parameters[0].ParameterType);
+                Operand2.TranslateToIL(il, parameters[1].ParameterType);
                 il.Emit(OpCodes.Call, methodInfo);
                 if (branchIfTrue)
                 {
@@ -377,13 +377,13 @@ namespace Turbo.Runtime
                 il.Emit(shortForm ? OpCodes.Brfalse_S : OpCodes.Brfalse, label);
                 return;
             }
-            il.Emit(OpCodes.Ldloc, (LocalBuilder) metaData);
-            operand1.TranslateToIL(il, Typeob.Object);
-            operand2.TranslateToIL(il, Typeob.Object);
+            il.Emit(OpCodes.Ldloc, (LocalBuilder) _metaData);
+            Operand1.TranslateToIL(il, Typeob.Object);
+            Operand2.TranslateToIL(il, Typeob.Object);
             il.Emit(OpCodes.Call, CompilerGlobals.evaluateEqualityMethod);
             if (branchIfTrue)
             {
-                if (operatorTok == TToken.Equal)
+                if (OperatorTokl == TToken.Equal)
                 {
                     il.Emit(shortForm ? OpCodes.Brtrue_S : OpCodes.Brtrue, label);
                     return;
@@ -391,7 +391,7 @@ namespace Turbo.Runtime
                 il.Emit(shortForm ? OpCodes.Brfalse_S : OpCodes.Brfalse, label);
                 return;
             }
-            if (operatorTok == TToken.Equal)
+            if (OperatorTokl == TToken.Equal)
             {
                 il.Emit(shortForm ? OpCodes.Brfalse_S : OpCodes.Brfalse, label);
                 return;
@@ -414,51 +414,51 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            operand1.TranslateToILInitializer(il);
-            operand2.TranslateToILInitializer(il);
-            var @operator = GetOperator(operand1.InferType(null), operand2.InferType(null));
+            Operand1.TranslateToILInitializer(il);
+            Operand2.TranslateToILInitializer(il);
+            var @operator = GetOperator(Operand1.InferType(null), Operand2.InferType(null));
             if (@operator != null)
             {
-                metaData = @operator;
+                _metaData = @operator;
                 return;
             }
-            if (operand1 is ConstantWrapper)
+            if (Operand1 is ConstantWrapper)
             {
-                var obj = operand1.Evaluate();
+                var obj = Operand1.Evaluate();
                 if (obj == null)
                 {
-                    type1 = Typeob.Empty;
+                    Type1 = Typeob.Empty;
                 }
                 else if (obj is DBNull)
                 {
-                    type1 = Typeob.Null;
+                    Type1 = Typeob.Null;
                 }
             }
-            if (operand2 is ConstantWrapper)
+            if (Operand2 is ConstantWrapper)
             {
-                var obj2 = operand2.Evaluate();
+                var obj2 = Operand2.Evaluate();
                 if (obj2 == null)
                 {
-                    loctype = Typeob.Empty;
+                    Loctype = Typeob.Empty;
                 }
                 else if (obj2 is DBNull)
                 {
-                    loctype = Typeob.Null;
+                    Loctype = Typeob.Null;
                 }
             }
-            if (type1 == Typeob.Empty || type1 == Typeob.Null || loctype == Typeob.Empty || loctype == Typeob.Null)
+            if (Type1 == Typeob.Empty || Type1 == Typeob.Null || Loctype == Typeob.Empty || Loctype == Typeob.Null)
             {
                 return;
             }
-            if ((type1.IsPrimitive || type1 == Typeob.String || Typeob.TObject.IsAssignableFrom(type1)) &&
-                (loctype.IsPrimitive || loctype == Typeob.String || Typeob.TObject.IsAssignableFrom(loctype)))
+            if ((Type1.IsPrimitive || Type1 == Typeob.String || Typeob.TObject.IsAssignableFrom(Type1)) &&
+                (Loctype.IsPrimitive || Loctype == Typeob.String || Typeob.TObject.IsAssignableFrom(Loctype)))
             {
                 return;
             }
-            metaData = il.DeclareLocal(Typeob.Equality);
-            ConstantWrapper.TranslateToILInt(il, (int) operatorTok);
+            _metaData = il.DeclareLocal(Typeob.Equality);
+            ConstantWrapper.TranslateToILInt(il, (int) OperatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.equalityConstructor);
-            il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
+            il.Emit(OpCodes.Stloc, (LocalBuilder) _metaData);
         }
     }
 }

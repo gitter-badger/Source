@@ -67,8 +67,8 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            var v = operand1.Evaluate();
-            var v2 = operand2.Evaluate();
+            var v = Operand1.Evaluate();
+            var v2 = Operand2.Evaluate();
             object result;
             try
             {
@@ -76,23 +76,17 @@ namespace Turbo.Runtime
             }
             catch (TurboException ex)
             {
-                if (ex.context == null)
-                {
-                    ex.context = operand2.context;
-                }
+                if (ex.context == null) ex.context = Operand2.context;
                 throw;
             }
             return result;
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.Boolean;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.Boolean;
 
         public static bool TurboIn(object v1, object v2)
         {
-            if (v2 is ScriptObject)
-            {
-                return !(((ScriptObject) v2).GetMemberValue(Convert.ToString(v1)) is Missing);
-            }
+            if (v2 is ScriptObject) return !(((ScriptObject) v2).GetMemberValue(Convert.ToString(v1)) is Missing);
             if (v2 is Array)
             {
                 var array = (Array) v2;
@@ -102,14 +96,8 @@ namespace Turbo.Runtime
             }
             if (v2 is IEnumerable)
             {
-                if (v1 == null)
-                {
-                    return false;
-                }
-                if (v2 is IDictionary)
-                {
-                    return ((IDictionary) v2).Contains(v1);
-                }
+                if (v1 == null) return false;
+                if (v2 is IDictionary) return ((IDictionary) v2).Contains(v1);
                 if (v2 is IDynamicElement)
                 {
                     return
@@ -119,33 +107,18 @@ namespace Turbo.Runtime
                 var enumerator = ((IEnumerable) v2).GetEnumerator();
                 while (true)
                 {
-                    if (!enumerator.MoveNext())
-                    {
-                        break;
-                    }
-                    if (v1.Equals(enumerator.Current))
-                    {
-                        return true;
-                    }
+                    if (!enumerator.MoveNext()) break;
+                    if (v1.Equals(enumerator.Current)) return true;
                 }
             }
             else if (v2 is IEnumerator)
             {
-                if (v1 == null)
-                {
-                    return false;
-                }
+                if (v1 == null) return false;
                 var enumerator2 = (IEnumerator) v2;
                 while (true)
                 {
-                    if (!enumerator2.MoveNext())
-                    {
-                        break;
-                    }
-                    if (v1.Equals(enumerator2.Current))
-                    {
-                        return true;
-                    }
+                    if (!enumerator2.MoveNext()) break;
+                    if (v1.Equals(enumerator2.Current)) return true;
                 }
             }
             else if (v2 is IDebuggerObject)
@@ -157,8 +130,8 @@ namespace Turbo.Runtime
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            operand1.TranslateToIL(il, Typeob.Object);
-            operand2.TranslateToIL(il, Typeob.Object);
+            Operand1.TranslateToIL(il, Typeob.Object);
+            Operand2.TranslateToIL(il, Typeob.Object);
             il.Emit(OpCodes.Call, CompilerGlobals.TurboInMethod);
             Convert.Emit(this, il, Typeob.Boolean, rtype);
         }

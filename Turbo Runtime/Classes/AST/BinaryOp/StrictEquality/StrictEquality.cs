@@ -67,8 +67,8 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            var flag = TurboStrictEquals(operand1.Evaluate(), operand2.Evaluate(), THPMainEngine.executeForJSEE);
-            return operatorTok == TToken.StrictEqual ? flag : !flag;
+            var flag = TurboStrictEquals(Operand1.Evaluate(), Operand2.Evaluate(), THPMainEngine.executeForJSEE);
+            return OperatorTokl == TToken.StrictEqual ? flag : !flag;
         }
 
         public static bool TurboStrictEquals(object v1, object v2) => TurboStrictEquals(v1, v2, false);
@@ -90,31 +90,16 @@ namespace Turbo.Runtime
                 case TypeCode.Empty:
                     return t2 == TypeCode.Empty;
                 case TypeCode.Object:
-                    if (v1 == v2)
-                    {
-                        return true;
-                    }
-                    if (v1 is Missing || v1 is System.Reflection.Missing)
-                    {
-                        v1 = null;
-                    }
-                    if (v1 == v2)
-                    {
-                        return true;
-                    }
-                    if (v2 is Missing || v2 is System.Reflection.Missing)
-                    {
-                        v2 = null;
-                    }
+                    if (v1 == v2) return true;
+                    if (v1 is Missing || v1 is System.Reflection.Missing) v1 = null;
+                    if (v1 == v2) return true;
+                    if (v2 is Missing || v2 is System.Reflection.Missing) v2 = null;
                     if (checkForDebuggerObjects)
                     {
                         var debuggerObject = v1 as IDebuggerObject;
                         if (debuggerObject == null) return v1 == v2;
                         var debuggerObject2 = v2 as IDebuggerObject;
-                        if (debuggerObject2 != null)
-                        {
-                            return debuggerObject.IsEqual(debuggerObject2);
-                        }
+                        if (debuggerObject2 != null) return debuggerObject.IsEqual(debuggerObject2);
                     }
                     return v1 == v2;
                 case TypeCode.DBNull:
@@ -462,82 +447,52 @@ namespace Turbo.Runtime
             return false;
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.Boolean;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.Boolean;
 
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,
             bool shortForm)
         {
-            var type = Convert.ToType(operand1.InferType(null));
-            var type2 = Convert.ToType(operand2.InferType(null));
-            if (operand1 is ConstantWrapper && operand1.Evaluate() == null)
-            {
-                type = Typeob.Empty;
-            }
-            if (operand2 is ConstantWrapper && operand2.Evaluate() == null)
-            {
-                type2 = Typeob.Empty;
-            }
+            var type = Convert.ToType(Operand1.InferType(null));
+            var type2 = Convert.ToType(Operand2.InferType(null));
+            if (Operand1 is ConstantWrapper && Operand1.Evaluate() == null) type = Typeob.Empty;
+            if (Operand2 is ConstantWrapper && Operand2.Evaluate() == null) type2 = Typeob.Empty;
             if (type != type2 && type.IsPrimitive && type2.IsPrimitive)
             {
-                if (type == Typeob.Single)
-                {
-                    type2 = type;
-                }
-                else if (type2 == Typeob.Single)
-                {
-                    type = type2;
-                }
-                else if (Convert.IsPromotableTo(type2, type))
-                {
-                    type2 = type;
-                }
-                else if (Convert.IsPromotableTo(type, type2))
-                {
-                    type = type2;
-                }
+                if (type == Typeob.Single) type2 = type;
+                else if (type2 == Typeob.Single) type = type2;
+                else if (Convert.IsPromotableTo(type2, type)) type2 = type;
+                else if (Convert.IsPromotableTo(type, type2)) type = type2;
             }
             var flag = true;
             if (type == type2 && type != Typeob.Object)
             {
                 var rtype = type;
-                if (!type.IsPrimitive)
-                {
-                    rtype = Typeob.Object;
-                }
-                operand1.TranslateToIL(il, rtype);
-                operand2.TranslateToIL(il, rtype);
-                if (type == Typeob.String)
-                {
-                    il.Emit(OpCodes.Call, CompilerGlobals.stringEqualsMethod);
-                }
-                else if (!type.IsPrimitive)
-                {
-                    il.Emit(OpCodes.Callvirt, CompilerGlobals.equalsMethod);
-                }
-                else
-                {
-                    flag = false;
-                }
+                if (!type.IsPrimitive) rtype = Typeob.Object;
+                Operand1.TranslateToIL(il, rtype);
+                Operand2.TranslateToIL(il, rtype);
+                if (type == Typeob.String) il.Emit(OpCodes.Call, CompilerGlobals.stringEqualsMethod);
+                else if (!type.IsPrimitive) il.Emit(OpCodes.Callvirt, CompilerGlobals.equalsMethod);
+                else flag = false;
             }
             else if (type == Typeob.Empty)
             {
-                operand2.TranslateToIL(il, Typeob.Object);
+                Operand2.TranslateToIL(il, Typeob.Object);
                 branchIfTrue = !branchIfTrue;
             }
             else if (type2 == Typeob.Empty)
             {
-                operand1.TranslateToIL(il, Typeob.Object);
+                Operand1.TranslateToIL(il, Typeob.Object);
                 branchIfTrue = !branchIfTrue;
             }
             else
             {
-                operand1.TranslateToIL(il, Typeob.Object);
-                operand2.TranslateToIL(il, Typeob.Object);
+                Operand1.TranslateToIL(il, Typeob.Object);
+                Operand2.TranslateToIL(il, Typeob.Object);
                 il.Emit(OpCodes.Call, CompilerGlobals.TurboStrictEqualsMethod);
             }
             if (branchIfTrue)
             {
-                if (operatorTok == TToken.StrictEqual)
+                if (OperatorTokl == TToken.StrictEqual)
                 {
                     if (flag)
                     {
@@ -556,7 +511,7 @@ namespace Turbo.Runtime
                     il.Emit(shortForm ? OpCodes.Bne_Un_S : OpCodes.Bne_Un, label);
                 }
             }
-            else if (operatorTok == TToken.StrictEqual)
+            else if (OperatorTokl == TToken.StrictEqual)
             {
                 if (flag)
                 {

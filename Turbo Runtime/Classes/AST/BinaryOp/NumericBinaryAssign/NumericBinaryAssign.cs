@@ -60,130 +60,118 @@ namespace Turbo.Runtime
 {
     internal class NumericBinaryAssign : BinaryOp
     {
-        private NumericBinary binOp;
+        private NumericBinary _binOp;
 
-        private object metaData;
+        private object _metaData;
 
         internal NumericBinaryAssign(Context context, AST operand1, AST operand2, TToken operatorTok)
             : base(context, operand1, operand2, operatorTok)
         {
-            binOp = new NumericBinary(context, operand1, operand2, operatorTok);
-            metaData = null;
+            _binOp = new NumericBinary(context, operand1, operand2, operatorTok);
+            _metaData = null;
         }
 
         internal override object Evaluate()
         {
-            var v = operand1.Evaluate();
-            var v2 = operand2.Evaluate();
-            var obj = binOp.EvaluateNumericBinary(v, v2);
+            var v = Operand1.Evaluate();
+            var v2 = Operand2.Evaluate();
+            var obj = _binOp.EvaluateNumericBinary(v, v2);
             object result;
             try
             {
-                operand1.SetValue(obj);
+                Operand1.SetValue(obj);
                 result = obj;
             }
             catch (TurboException ex)
             {
-                if (ex.context == null)
-                {
-                    ex.context = context;
-                }
+                if (ex.context == null) ex.context = context;
                 throw;
             }
-            catch (Exception arg_57_0)
+            catch (Exception arg570)
             {
-                throw new TurboException(arg_57_0, context);
+                throw new TurboException(arg570, context);
             }
             return result;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
-            var @operator = type1 == null || inference_target != null
-                ? GetOperator(operand1.InferType(inference_target), operand2.InferType(inference_target))
-                : GetOperator(type1, loctype);
+            var @operator = Type1 == null || inferenceTarget != null
+                ? GetOperator(Operand1.InferType(inferenceTarget), Operand2.InferType(inferenceTarget))
+                : GetOperator(Type1, Loctype);
             if (@operator != null)
             {
-                metaData = @operator;
+                _metaData = @operator;
                 return @operator.ReturnType;
             }
-            if (type1 != Typeob.Char || operatorTok != TToken.Minus)
-                return !Convert.IsPrimitiveNumericType(type1)
+            if (Type1 != Typeob.Char || OperatorTokl != TToken.Minus)
+                return !Convert.IsPrimitiveNumericType(Type1)
                     ? Typeob.Object
-                    : (Convert.IsPromotableTo(loctype, type1) ||
-                       (operand2 is ConstantWrapper && ((ConstantWrapper) operand2).IsAssignableTo(type1))
-                        ? type1
-                        : (Convert.IsPrimitiveNumericType(type1) && Convert.IsPrimitiveNumericTypeFitForDouble(loctype)
+                    : (Convert.IsPromotableTo(Loctype, Type1) ||
+                       (Operand2 is ConstantWrapper && ((ConstantWrapper) Operand2).IsAssignableTo(Type1))
+                        ? Type1
+                        : (Convert.IsPrimitiveNumericType(Type1) && Convert.IsPrimitiveNumericTypeFitForDouble(Loctype)
                             ? Typeob.Double
                             : Typeob.Object));
-            var typeCode = Type.GetTypeCode(loctype);
+            var typeCode = Type.GetTypeCode(Loctype);
             return Convert.IsPrimitiveNumericTypeCode(typeCode) || typeCode == TypeCode.Boolean
                 ? Typeob.Char
                 : (typeCode == TypeCode.Char
                     ? Typeob.Int32
-                    : (!Convert.IsPrimitiveNumericType(type1)
+                    : (!Convert.IsPrimitiveNumericType(Type1)
                         ? Typeob.Object
-                        : (Convert.IsPromotableTo(loctype, type1) ||
-                           (operand2 is ConstantWrapper && ((ConstantWrapper) operand2).IsAssignableTo(type1))
-                            ? type1
-                            : (Convert.IsPrimitiveNumericType(type1) &&
-                               Convert.IsPrimitiveNumericTypeFitForDouble(loctype)
+                        : (Convert.IsPromotableTo(Loctype, Type1) ||
+                           (Operand2 is ConstantWrapper && ((ConstantWrapper) Operand2).IsAssignableTo(Type1))
+                            ? Type1
+                            : (Convert.IsPrimitiveNumericType(Type1) &&
+                               Convert.IsPrimitiveNumericTypeFitForDouble(Loctype)
                                 ? Typeob.Double
                                 : Typeob.Object))));
         }
 
         internal override AST PartiallyEvaluate()
         {
-            operand1 = operand1.PartiallyEvaluateAsReference();
-            operand2 = operand2.PartiallyEvaluate();
-            binOp = new NumericBinary(context, operand1, operand2, operatorTok);
-            operand1.SetPartialValue(binOp);
+            Operand1 = Operand1.PartiallyEvaluateAsReference();
+            Operand2 = Operand2.PartiallyEvaluate();
+            _binOp = new NumericBinary(context, Operand1, Operand2, OperatorTokl);
+            Operand1.SetPartialValue(_binOp);
             return this;
         }
 
-        private void TranslateToILForNoOverloadCase(ILGenerator il, Type rtype)
+        private void TranslateToIlForNoOverloadCase(ILGenerator il, Type rtype)
         {
-            var type = Convert.ToType(operand1.InferType(null));
-            var type2 = Convert.ToType(operand2.InferType(null));
+            var type = Convert.ToType(Operand1.InferType(null));
+            var type2 = Convert.ToType(Operand2.InferType(null));
             var type3 = Typeob.Double;
-            if (operatorTok != TToken.Divide &&
+            if (OperatorTokl != TToken.Divide &&
                 (rtype == Typeob.Void || rtype == type || Convert.IsPrimitiveNumericType(type)) &&
                 (Convert.IsPromotableTo(type2, type) ||
-                 (operand2 is ConstantWrapper && ((ConstantWrapper) operand2).IsAssignableTo(type))))
+                 (Operand2 is ConstantWrapper && ((ConstantWrapper) Operand2).IsAssignableTo(type))))
             {
                 type3 = type;
             }
-            if (type3 == Typeob.SByte || type3 == Typeob.Int16)
+            if (type3 == Typeob.SByte || type3 == Typeob.Int16) type3 = Typeob.Int32;
+            else if (type3 == Typeob.Byte || type3 == Typeob.UInt16 || type3 == Typeob.Char) type3 = Typeob.UInt32;
+            if (Operand2 is ConstantWrapper)
             {
-                type3 = Typeob.Int32;
-            }
-            else if (type3 == Typeob.Byte || type3 == Typeob.UInt16 || type3 == Typeob.Char)
-            {
-                type3 = Typeob.UInt32;
-            }
-            if (operand2 is ConstantWrapper)
-            {
-                if (!((ConstantWrapper) operand2).IsAssignableTo(type3))
-                {
-                    type3 = Typeob.Object;
-                }
+                if (!((ConstantWrapper) Operand2).IsAssignableTo(type3)) type3 = Typeob.Object;
             }
             else if ((Convert.IsPrimitiveSignedNumericType(type2) && Convert.IsPrimitiveUnsignedIntegerType(type)) ||
                      (Convert.IsPrimitiveUnsignedIntegerType(type2) && Convert.IsPrimitiveSignedIntegerType(type)))
             {
                 type3 = Typeob.Object;
             }
-            operand1.TranslateToILPreSetPlusGet(il);
+            Operand1.TranslateToILPreSetPlusGet(il);
             Convert.Emit(this, il, type, type3);
-            operand2.TranslateToIL(il, type3);
+            Operand2.TranslateToIL(il, type3);
             if (type3 == Typeob.Object)
             {
-                il.Emit(OpCodes.Ldc_I4, (int) operatorTok);
+                il.Emit(OpCodes.Ldc_I4, (int) OperatorTokl);
                 il.Emit(OpCodes.Call, CompilerGlobals.numericbinaryDoOpMethod);
             }
             else if (type3 == Typeob.Double || type3 == Typeob.Single)
             {
-                var tok = operatorTok;
+                var tok = OperatorTokl;
                 if (tok != TToken.Minus)
                 {
                     switch (tok)
@@ -208,7 +196,7 @@ namespace Turbo.Runtime
             }
             else if (type3 == Typeob.Int32 || type3 == Typeob.Int64 || type3 == Typeob.Int16 || type3 == Typeob.SByte)
             {
-                var tok = operatorTok;
+                var tok = OperatorTokl;
                 if (tok != TToken.Minus)
                 {
                     switch (tok)
@@ -233,9 +221,9 @@ namespace Turbo.Runtime
             }
             else
             {
-                if (operatorTok != TToken.Minus)
+                if (OperatorTokl != TToken.Minus)
                 {
-                    switch (operatorTok)
+                    switch (OperatorTokl)
                     {
                         case TToken.Multiply:
                             il.Emit(OpCodes.Mul_Ovf_Un);
@@ -261,31 +249,31 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Dup);
                 il.Emit(OpCodes.Stloc, local);
                 Convert.Emit(this, il, type3, type);
-                operand1.TranslateToILSet(il);
+                Operand1.TranslateToILSet(il);
                 il.Emit(OpCodes.Ldloc, local);
                 Convert.Emit(this, il, type3, rtype);
                 return;
             }
             Convert.Emit(this, il, type3, type);
-            operand1.TranslateToILSet(il);
+            Operand1.TranslateToILSet(il);
         }
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            if (metaData == null)
+            if (_metaData == null)
             {
-                TranslateToILForNoOverloadCase(il, rtype);
+                TranslateToIlForNoOverloadCase(il, rtype);
                 return;
             }
-            if (metaData is MethodInfo)
+            if (_metaData is MethodInfo)
             {
                 object obj = null;
-                var methodInfo = (MethodInfo) metaData;
-                var type = Convert.ToType(operand1.InferType(null));
+                var methodInfo = (MethodInfo) _metaData;
+                var type = Convert.ToType(Operand1.InferType(null));
                 var parameters = methodInfo.GetParameters();
-                operand1.TranslateToILPreSetPlusGet(il);
+                Operand1.TranslateToILPreSetPlusGet(il);
                 Convert.Emit(this, il, type, parameters[0].ParameterType);
-                operand2.TranslateToIL(il, parameters[1].ParameterType);
+                Operand2.TranslateToIL(il, parameters[1].ParameterType);
                 il.Emit(OpCodes.Call, methodInfo);
                 if (rtype != Typeob.Void)
                 {
@@ -295,22 +283,19 @@ namespace Turbo.Runtime
                     il.Emit(OpCodes.Stloc, (LocalBuilder) obj);
                 }
                 Convert.Emit(this, il, methodInfo.ReturnType, type);
-                operand1.TranslateToILSet(il);
-                if (rtype != Typeob.Void)
-                {
-                    il.Emit(OpCodes.Ldloc, (LocalBuilder) obj);
-                }
+                Operand1.TranslateToILSet(il);
+                if (rtype != Typeob.Void) il.Emit(OpCodes.Ldloc, (LocalBuilder) obj);
             }
             else
             {
-                var type2 = Convert.ToType(operand1.InferType(null));
+                var type2 = Convert.ToType(Operand1.InferType(null));
                 var local = il.DeclareLocal(Typeob.Object);
-                operand1.TranslateToILPreSetPlusGet(il);
+                Operand1.TranslateToILPreSetPlusGet(il);
                 Convert.Emit(this, il, type2, Typeob.Object);
                 il.Emit(OpCodes.Stloc, local);
-                il.Emit(OpCodes.Ldloc, (LocalBuilder) metaData);
+                il.Emit(OpCodes.Ldloc, (LocalBuilder) _metaData);
                 il.Emit(OpCodes.Ldloc, local);
-                operand2.TranslateToIL(il, Typeob.Object);
+                Operand2.TranslateToIL(il, Typeob.Object);
                 il.Emit(OpCodes.Call, CompilerGlobals.evaluateNumericBinaryMethod);
                 if (rtype != Typeob.Void)
                 {
@@ -318,7 +303,7 @@ namespace Turbo.Runtime
                     il.Emit(OpCodes.Stloc, local);
                 }
                 Convert.Emit(this, il, Typeob.Object, type2);
-                operand1.TranslateToILSet(il);
+                Operand1.TranslateToILSet(il);
                 if (rtype == Typeob.Void) return;
                 il.Emit(OpCodes.Ldloc, local);
                 Convert.Emit(this, il, Typeob.Object, rtype);
@@ -327,17 +312,14 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            var arg_24_0 = (Type) InferType(null);
-            operand1.TranslateToILInitializer(il);
-            operand2.TranslateToILInitializer(il);
-            if (arg_24_0 != Typeob.Object)
-            {
-                return;
-            }
-            metaData = il.DeclareLocal(Typeob.NumericBinary);
-            ConstantWrapper.TranslateToILInt(il, (int) operatorTok);
+            var arg240 = (Type) InferType(null);
+            Operand1.TranslateToILInitializer(il);
+            Operand2.TranslateToILInitializer(il);
+            if (arg240 != Typeob.Object) return;
+            _metaData = il.DeclareLocal(Typeob.NumericBinary);
+            ConstantWrapper.TranslateToILInt(il, (int) OperatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.numericBinaryConstructor);
-            il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
+            il.Emit(OpCodes.Stloc, (LocalBuilder) _metaData);
         }
     }
 }

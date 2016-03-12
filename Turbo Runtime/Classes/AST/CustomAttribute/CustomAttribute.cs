@@ -356,7 +356,7 @@ namespace Turbo.Runtime
             var aSTList = new ASTList(args.context);
             var aSTList2 = new ASTList(args.context);
             var i = 0;
-            var count = args.count;
+            var count = args.Count;
             while (i < count)
             {
                 var aST = args[i];
@@ -364,7 +364,7 @@ namespace Turbo.Runtime
                 if (assign != null)
                 {
                     var expr_63 = assign;
-                    expr_63.rhside = expr_63.rhside.PartiallyEvaluate();
+                    expr_63.Rhside = expr_63.Rhside.PartiallyEvaluate();
                     aSTList2.Append(assign);
                 }
                 else
@@ -373,7 +373,7 @@ namespace Turbo.Runtime
                 }
                 i++;
             }
-            var count2 = aSTList.count;
+            var count2 = aSTList.Count;
             var array = new IReflect[count2];
             var j = 0;
             while (j < count2)
@@ -445,20 +445,20 @@ namespace Turbo.Runtime
                 }
             }
             var l = 0;
-            var count4 = aSTList2.count;
+            var count4 = aSTList2.Count;
             while (l < count4)
             {
                 var assign2 = (Assign) aSTList2[l];
-                if (assign2.lhside is Lookup &&
-                    (assign2.rhside is ConstantWrapper ||
-                     (assign2.rhside is ArrayLiteral && ((ArrayLiteral) assign2.rhside).IsOkToUseInCustomAttribute())))
+                if (assign2.Lhside is Lookup &&
+                    (assign2.Rhside is ConstantWrapper ||
+                     (assign2.Rhside is ArrayLiteral && ((ArrayLiteral) assign2.Rhside).IsOkToUseInCustomAttribute())))
                 {
-                    var obj3 = assign2.rhside.Evaluate();
+                    var obj3 = assign2.Rhside.Evaluate();
                     IReflect reflect3;
                     if (obj3 is ArrayObject ||
                         ((reflect3 = TypeOfArgument(obj3)) != null && !ReferenceEquals(reflect3, Typeob.Object)))
                     {
-                        var name = ((Lookup) assign2.lhside).Name;
+                        var name = ((Lookup) assign2.Lhside).Name;
                         var member = ((IReflect) type).GetMember(name, BindingFlags.Instance | BindingFlags.Public);
                         if (member == null || member.Length == 0)
                         {
@@ -495,7 +495,7 @@ namespace Turbo.Runtime
                                 }
                                 catch (TurboException)
                                 {
-                                    assign2.rhside.context.HandleError(TError.TypeMismatch);
+                                    assign2.Rhside.context.HandleError(TError.TypeMismatch);
                                     AST result = null;
                                     return result;
                                 }
@@ -537,7 +537,7 @@ namespace Turbo.Runtime
                                 }
                                 catch (TurboException)
                                 {
-                                    assign2.rhside.context.HandleError(TError.TypeMismatch);
+                                    assign2.Rhside.context.HandleError(TError.TypeMismatch);
                                     AST result = null;
                                     return result;
                                 }
@@ -646,7 +646,7 @@ namespace Turbo.Runtime
                     }
                     if ((type as Type).FullName == "System.CLSCompliantAttribute")
                     {
-                        Engine.isCLSCompliant = (args == null || args.count == 0 ||
+                        Engine.isCLSCompliant = (args == null || args.Count == 0 ||
                                                  Convert.ToBoolean(positionalArgValues[0], false));
                         AST result = this;
                         return result;

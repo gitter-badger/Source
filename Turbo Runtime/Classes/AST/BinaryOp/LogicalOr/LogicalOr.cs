@@ -58,21 +58,21 @@ using System.Reflection.Emit;
 
 namespace Turbo.Runtime
 {
-    internal sealed class Logical_and : BinaryOp
+    internal sealed class LogicalOr : BinaryOp
     {
-        internal Logical_and(Context context, AST operand1, AST operand2) : base(context, operand1, operand2)
+        internal LogicalOr(Context context, AST operand1, AST operand2) : base(context, operand1, operand2)
         {
         }
 
         internal override object Evaluate()
         {
-            var obj = operand1.Evaluate();
+            var obj = Operand1.Evaluate();
             MethodInfo methodInfo = null;
             Type type = null;
             if (obj != null && !(obj is IConvertible))
             {
                 type = obj.GetType();
-                methodInfo = type.GetMethod("op_False",
+                methodInfo = type.GetMethod("op_True",
                     BindingFlags.Static | BindingFlags.Public | BindingFlags.ExactBinding, null, new[]
                     {
                         type
@@ -84,23 +84,14 @@ namespace Turbo.Runtime
                     methodInfo = null;
                 }
             }
-            if (methodInfo == null)
-            {
-                return !Convert.ToBoolean(obj) ? obj : operand2.Evaluate();
-            }
+            if (methodInfo == null) return Convert.ToBoolean(obj) ? obj : Operand2.Evaluate();
             methodInfo = new TMethodInfo(methodInfo);
-            if ((bool) methodInfo.Invoke(null, BindingFlags.SuppressChangeType, null, new[]
-            {
-                obj
-            }, null))
-            {
-                return obj;
-            }
-            var obj2 = operand2.Evaluate();
+            if ((bool) methodInfo.Invoke(null, BindingFlags.SuppressChangeType, null, new[]{obj}, null)) return obj;
+            var obj2 = Operand2.Evaluate();
             if (obj2 == null || obj2 is IConvertible) return obj2;
             var type2 = obj2.GetType();
             if (type != type2) return obj2;
-            var methodInfo2 = type.GetMethod("op_BitwiseAnd",
+            var methodInfo2 = type.GetMethod("op_BitwiseOr",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.ExactBinding, null, new[]
                 {
                     type,
@@ -116,9 +107,9 @@ namespace Turbo.Runtime
             }, null);
         }
 
-        internal override IReflect InferType(TField inference_target)
-            => operand1.InferType(inference_target) == operand2.InferType(inference_target)
-                ? operand1.InferType(inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
+            => Operand1.InferType(inferenceTarget) == Operand2.InferType(inferenceTarget)
+                ? Operand1.InferType(inferenceTarget)
                 : Typeob.Object;
 
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,
@@ -127,24 +118,21 @@ namespace Turbo.Runtime
             var label2 = il.DefineLabel();
             if (branchIfTrue)
             {
-                operand1.TranslateToConditionalBranch(il, false, label2, shortForm);
-                operand2.TranslateToConditionalBranch(il, true, label, shortForm);
-                il.MarkLabel(label2);
+                Operand1.TranslateToConditionalBranch(il, true, label, shortForm);
+                Operand2.TranslateToConditionalBranch(il, true, label, shortForm);
                 return;
             }
-            operand1.TranslateToConditionalBranch(il, false, label, shortForm);
-            operand2.TranslateToConditionalBranch(il, false, label, shortForm);
+            Operand1.TranslateToConditionalBranch(il, true, label2, shortForm);
+            Operand2.TranslateToConditionalBranch(il, false, label, shortForm);
+            il.MarkLabel(label2);
         }
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            var type = Convert.ToType(operand1.InferType(null));
-            var right = Convert.ToType(operand2.InferType(null));
-            if (type != right)
-            {
-                type = Typeob.Object;
-            }
-            var methodInfo = type.GetMethod("op_False",
+            var type = Convert.ToType(Operand1.InferType(null));
+            var right = Convert.ToType(Operand2.InferType(null));
+            if (type != right) type = Typeob.Object;
+            var methodInfo = type.GetMethod("op_True",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.ExactBinding, null, new[]
                 {
                     type
@@ -158,7 +146,7 @@ namespace Turbo.Runtime
             MethodInfo methodInfo2 = null;
             if (methodInfo != null)
             {
-                methodInfo2 = type.GetMethod("op_BitwiseAnd",
+                methodInfo2 = type.GetMethod("op_BitwiseOr",
                     BindingFlags.Static | BindingFlags.Public | BindingFlags.ExactBinding, null, new[]
                     {
                         type,
@@ -171,26 +159,23 @@ namespace Turbo.Runtime
                 methodInfo = null;
             }
             var label = il.DefineLabel();
-            operand1.TranslateToIL(il, type);
+            Operand1.TranslateToIL(il, type);
             il.Emit(OpCodes.Dup);
             if (methodInfo != null)
             {
-                if (type.IsValueType)
-                {
-                    Convert.EmitLdloca(il, type);
-                }
+                if (type.IsValueType) Convert.EmitLdloca(il, type);
                 il.Emit(OpCodes.Call, methodInfo);
                 il.Emit(OpCodes.Brtrue, label);
-                operand2.TranslateToIL(il, type);
+                Operand2.TranslateToIL(il, type);
                 il.Emit(OpCodes.Call, methodInfo2);
                 il.MarkLabel(label);
                 Convert.Emit(this, il, methodInfo2.ReturnType, rtype);
                 return;
             }
             Convert.Emit(this, il, type, Typeob.Boolean, true);
-            il.Emit(OpCodes.Brfalse, label);
+            il.Emit(OpCodes.Brtrue, label);
             il.Emit(OpCodes.Pop);
-            operand2.TranslateToIL(il, type);
+            Operand2.TranslateToIL(il, type);
             il.MarkLabel(label);
             Convert.Emit(this, il, type, rtype);
         }

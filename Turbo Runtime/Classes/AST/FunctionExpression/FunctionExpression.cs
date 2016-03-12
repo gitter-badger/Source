@@ -140,7 +140,7 @@ namespace Turbo.Runtime
             return closure;
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.ScriptFunction;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.ScriptFunction;
 
         public static FunctionObject TurboFunctionExpression(RuntimeTypeHandle handle,
             string name,

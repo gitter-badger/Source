@@ -60,22 +60,20 @@ namespace Turbo.Runtime
 {
     public sealed class ArrayLiteral : AST
     {
-        private readonly ASTList elements;
+        private readonly ASTList _elements;
 
         public ArrayLiteral(Context context, ASTList elements) : base(context)
         {
-            this.elements = elements;
+            _elements = elements;
         }
 
         internal bool AssignmentCompatible(IReflect lhir, bool reportError)
         {
             if (ReferenceEquals(lhir, Typeob.Object) || ReferenceEquals(lhir, Typeob.Array) || lhir is ArrayObject)
                 return true;
+
             IReflect lhir2;
-            if (ReferenceEquals(lhir, Typeob.Array))
-            {
-                lhir2 = Typeob.Object;
-            }
+            if (ReferenceEquals(lhir, Typeob.Array)) lhir2 = Typeob.Object;
             else if (lhir is TypedArray)
             {
                 var typedArray = (TypedArray) lhir;
@@ -98,10 +96,10 @@ namespace Turbo.Runtime
                 lhir2 = type.GetElementType();
             }
             var i = 0;
-            var count = elements.count;
+            var count = _elements.Count;
             while (i < count)
             {
-                if (!Binding.AssignmentCompatible(lhir2, elements[i], elements[i].InferType(null), reportError))
+                if (!Binding.AssignmentCompatible(lhir2, _elements[i], _elements[i].InferType(null), reportError))
                     return false;
                 i++;
             }
@@ -111,9 +109,9 @@ namespace Turbo.Runtime
         internal override void CheckIfOKToUseInSuperConstructorCall()
         {
             var i = 0;
-            while (i < elements.count)
+            while (i < _elements.Count)
             {
-                elements[i].CheckIfOKToUseInSuperConstructorCall();
+                _elements[i].CheckIfOKToUseInSuperConstructorCall();
                 i++;
             }
         }
@@ -121,42 +119,42 @@ namespace Turbo.Runtime
         internal override object Evaluate()
         {
             if (THPMainEngine.executeForJSEE) throw new TurboException(TError.NonSupportedInDebugger);
-            var array = new object[elements.count];
-            for (var i = 0; i < elements.count; i++) array[i] = elements[i].Evaluate();
+            var array = new object[_elements.Count];
+            for (var i = 0; i < _elements.Count; i++) array[i] = _elements[i].Evaluate();
             return Engine.GetOriginalArrayConstructor().ConstructArray(array);
         }
 
         internal bool IsOkToUseInCustomAttribute()
         {
-            for (var i = 0; i < elements.count; i++)
+            for (var i = 0; i < _elements.Count; i++)
             {
-                if (!(elements[i] is ConstantWrapper)) return false;
-                if (CustomAttribute.TypeOfArgument(((ConstantWrapper) elements[i]).Evaluate()) == null) return false;
+                if (!(_elements[i] is ConstantWrapper)) return false;
+                if (CustomAttribute.TypeOfArgument(((ConstantWrapper) _elements[i]).Evaluate()) == null) return false;
             }
             return true;
         }
 
         internal override AST PartiallyEvaluate()
         {
-            for (var i = 0; i < elements.count; i++) elements[i] = elements[i].PartiallyEvaluate();
+            for (var i = 0; i < _elements.Count; i++) _elements[i] = _elements[i].PartiallyEvaluate();
             return this;
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.ArrayObject;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.ArrayObject;
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
             if (rtype == Typeob.Array)
             {
-                TranslateToILArray(il, Typeob.Object);
+                TranslateToIlArray(il, Typeob.Object);
                 return;
             }
             if (rtype.IsArray && rtype.GetArrayRank() == 1)
             {
-                TranslateToILArray(il, rtype.GetElementType());
+                TranslateToIlArray(il, rtype.GetElementType());
                 return;
             }
-            var count = elements.count;
+            var count = _elements.Count;
             MethodInfo meth;
             if (Engine.Globals.globalObject is LenientGlobalObject)
             {
@@ -171,16 +169,16 @@ namespace Turbo.Runtime
             {
                 il.Emit(OpCodes.Dup);
                 ConstantWrapper.TranslateToILInt(il, i);
-                elements[i].TranslateToIL(il, Typeob.Object);
+                _elements[i].TranslateToIL(il, Typeob.Object);
                 il.Emit(OpCodes.Stelem_Ref);
             }
             il.Emit(OpCodes.Call, meth);
             Convert.Emit(this, il, Typeob.ArrayObject, rtype);
         }
 
-        private void TranslateToILArray(ILGenerator il, Type etype)
+        private void TranslateToIlArray(ILGenerator il, Type etype)
         {
-            var count = elements.count;
+            var count = _elements.Count;
             ConstantWrapper.TranslateToILInt(il, count);
             il.Emit(OpCodes.Newarr, etype);
             for (var i = 0; i < count; i++)
@@ -188,7 +186,7 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Dup);
                 ConstantWrapper.TranslateToILInt(il, i);
                 if (etype.IsValueType && !etype.IsPrimitive) il.Emit(OpCodes.Ldelema, etype);
-                elements[i].TranslateToIL(il, etype);
+                _elements[i].TranslateToIL(il, etype);
                 Binding.TranslateToStelem(il, etype);
             }
         }
@@ -196,9 +194,9 @@ namespace Turbo.Runtime
         internal override void TranslateToILInitializer(ILGenerator il)
         {
             var i = 0;
-            while (i < elements.count)
+            while (i < _elements.Count)
             {
-                elements[i].TranslateToILInitializer(il);
+                _elements[i].TranslateToILInitializer(il);
                 i++;
             }
         }

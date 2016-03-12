@@ -60,41 +60,31 @@ namespace Turbo.Runtime
 {
     internal sealed class CallableExpression : Binding
     {
-        internal readonly AST expression;
+        internal readonly AST Expression;
 
-        private readonly IReflect expressionInferredType;
+        private readonly IReflect _expressionInferredType;
 
         internal CallableExpression(AST expression) : base(expression.context, "")
         {
-            this.expression = expression;
-            var jSLocalField = new TLocalField("", null, 0, Missing.Value);
-            expressionInferredType = expression.InferType(jSLocalField);
-            jSLocalField.inferred_type = expressionInferredType;
-            member = jSLocalField;
-            members = new MemberInfo[]
-            {
-                jSLocalField
-            };
+            Expression = expression;
+            var localField = new TLocalField("", null, 0, Missing.Value);
+            _expressionInferredType = expression.InferType(localField);
+            localField.inferred_type = _expressionInferredType;
+            member = localField;
+            members = new MemberInfo[]{ localField };
         }
 
-        internal override LateBinding EvaluateAsLateBinding()
-        {
-            return new LateBinding(null, expression.Evaluate(), THPMainEngine.executeForJSEE);
-        }
+        internal override LateBinding EvaluateAsLateBinding() 
+            => new LateBinding(null, Expression.Evaluate(), THPMainEngine.executeForJSEE);
 
-        protected override object GetObject()
-        {
-            return GetObject2();
-        }
+        protected override object GetObject() => GetObject2();
 
         internal object GetObject2()
         {
-            var call = expression as Call;
-            if (call == null || !call.inBrackets)
-            {
-                return Convert.ToObject(expression.Evaluate(), Engine);
-            }
-            return Convert.ToObject(call.func.Evaluate(), Engine);
+            var call = Expression as Call;
+            return call == null || !call.inBrackets
+                ? Convert.ToObject(Expression.Evaluate(), Engine)
+                : Convert.ToObject(call.func.Evaluate(), Engine);
         }
 
         protected override void HandleNoSuchMemberError()
@@ -102,14 +92,11 @@ namespace Turbo.Runtime
             throw new TurboException(TError.InternalError, context);
         }
 
-        internal override AST PartiallyEvaluate()
-        {
-            return this;
-        }
+        internal override AST PartiallyEvaluate() => this;
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            expression.TranslateToIL(il, rtype);
+            Expression.TranslateToIL(il, rtype);
         }
 
         internal override void TranslateToILCall(ILGenerator il, Type rtype, ASTList argList, bool construct,
@@ -120,10 +107,10 @@ namespace Turbo.Runtime
                 base.TranslateToILCall(il, rtype, argList, true, true);
                 return;
             }
-            var jSGlobalField = member as TGlobalField;
-            if (jSGlobalField != null && jSGlobalField.IsLiteral && argList.count == 1)
+            var globalField = member as TGlobalField;
+            if (globalField != null && globalField.IsLiteral && argList.Count == 1)
             {
-                var type = Convert.ToType((IReflect) jSGlobalField.value);
+                var type = Convert.ToType((IReflect) globalField.value);
                 argList[0].TranslateToIL(il, type);
                 Convert.Emit(this, il, type, rtype);
                 return;
@@ -147,7 +134,7 @@ namespace Turbo.Runtime
 
         protected override void TranslateToILWithDupOfThisOb(ILGenerator il)
         {
-            var call = expression as Call;
+            var call = Expression as Call;
             if (call == null || !call.inBrackets)
             {
                 TranslateToILObject(il, null, false);
@@ -162,13 +149,13 @@ namespace Turbo.Runtime
                 }
                 call.func.TranslateToIL(il, Typeob.Object);
             }
-            expression.TranslateToIL(il, Typeob.Object);
+            Expression.TranslateToIL(il, Typeob.Object);
         }
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            expression.TranslateToILInitializer(il);
-            if (expressionInferredType.Equals(expression.InferType(null))) return;
+            Expression.TranslateToILInitializer(il);
+            if (_expressionInferredType.Equals(Expression.InferType(null))) return;
             var memberInfos = members;
             InvalidateBinding();
             members = memberInfos;

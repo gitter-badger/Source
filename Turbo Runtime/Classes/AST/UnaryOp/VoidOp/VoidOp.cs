@@ -70,7 +70,7 @@ namespace Turbo.Runtime
             return null;
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.Empty;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.Empty;
 
         internal override AST PartiallyEvaluate() => new ConstantWrapper(null, context);
 

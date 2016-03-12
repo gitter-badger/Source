@@ -73,7 +73,7 @@ namespace Turbo.Runtime
             this.cases = cases;
             default_case = -1;
             var i = 0;
-            var count = this.cases.count;
+            var count = this.cases.Count;
             while (i < count)
             {
                 if (((SwitchCase) this.cases[i]).IsDefault())
@@ -93,7 +93,7 @@ namespace Turbo.Runtime
             completion.value = null;
             var obj = expression.Evaluate();
             Completion evaluate = null;
-            var count = cases.count;
+            var count = cases.Count;
             int i;
             for (i = 0; i < count; i++)
             {
@@ -161,7 +161,7 @@ namespace Turbo.Runtime
                 var functionScope = (FunctionScope) scriptObject;
                 var definedFlags = functionScope.DefinedFlags;
                 var i = 0;
-                var count = cases.count;
+                var count = cases.Count;
                 while (i < count)
                 {
                     cases[i] = cases[i].PartiallyEvaluate();
@@ -172,7 +172,7 @@ namespace Turbo.Runtime
             else
             {
                 var j = 0;
-                var count2 = cases.count;
+                var count2 = cases.Count;
                 while (j < count2)
                 {
                     cases[j] = cases[j].PartiallyEvaluate();
@@ -189,8 +189,8 @@ namespace Turbo.Runtime
             expression.TranslateToIL(il, type);
             var local = il.DeclareLocal(type);
             il.Emit(OpCodes.Stloc, local);
-            var count = cases.count;
-            var array = new Label[cases.count];
+            var count = cases.Count;
+            var array = new Label[cases.Count];
             for (var i = 0; i < count; i++)
             {
                 array[i] = il.DefineLabel();
@@ -216,7 +216,7 @@ namespace Turbo.Runtime
         {
             expression.TranslateToILInitializer(il);
             var i = 0;
-            var count = cases.count;
+            var count = cases.Count;
             while (i < count)
             {
                 cases[i].TranslateToILInitializer(il);

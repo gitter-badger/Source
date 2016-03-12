@@ -65,7 +65,7 @@ namespace Turbo.Runtime
 
         internal ObjectLiteral(Context context, ASTList propertyList) : base(context)
         {
-            var count = propertyList.count;
+            var count = propertyList.Count;
             keys = new AST[count];
             values = new AST[count];
             for (var i = 0; i < count; i++)
