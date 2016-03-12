@@ -59,37 +59,31 @@ namespace Turbo.Runtime
 {
     internal sealed class Break : AST
     {
-        private readonly Completion completion;
+        private readonly Completion _completion;
 
-        private readonly bool leavesFinally;
+        private readonly bool _leavesFinally;
 
         internal Break(Context context, int count, bool leavesFinally) : base(context)
         {
-            completion = new Completion {Exit = count};
-            this.leavesFinally = leavesFinally;
+            _completion = new Completion {Exit = count};
+            _leavesFinally = leavesFinally;
         }
 
-        internal override object Evaluate()
-        {
-            return completion;
-        }
+        internal override object Evaluate() => _completion;
 
         internal override AST PartiallyEvaluate()
         {
-            if (leavesFinally)
-            {
-                context.HandleError(TError.BadWayToLeaveFinally);
-            }
+            if (_leavesFinally) context.HandleError(TError.BadWayToLeaveFinally);
             return this;
         }
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            var label = (Label) compilerGlobals.BreakLabelStack.Peek(completion.Exit - 1);
+            var label = (Label) compilerGlobals.BreakLabelStack.Peek(_completion.Exit - 1);
             context.EmitLineInfo(il);
-            if (leavesFinally)
+            if (_leavesFinally)
             {
-                ConstantWrapper.TranslateToILInt(il, compilerGlobals.BreakLabelStack.Size() - completion.Exit);
+                ConstantWrapper.TranslateToILInt(il, compilerGlobals.BreakLabelStack.Size() - _completion.Exit);
                 il.Emit(OpCodes.Newobj, CompilerGlobals.breakOutOfFinallyConstructor);
                 il.Emit(OpCodes.Throw);
                 return;
