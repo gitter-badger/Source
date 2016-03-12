@@ -75,10 +75,7 @@ namespace Turbo.Runtime
             }
             catch (TurboException ex)
             {
-                if (ex.context == null)
-                {
-                    ex.context = operand2.context;
-                }
+                if (ex.context == null) ex.context = operand2.context;
                 throw;
             }
             return result;
@@ -88,18 +85,9 @@ namespace Turbo.Runtime
 
         public static bool TurboInstanceof(object v1, object v2)
         {
-            if (v2 is ClassScope)
-            {
-                return ((ClassScope) v2).HasInstance(v1);
-            }
-            if (v2 is ScriptFunction)
-            {
-                return ((ScriptFunction) v2).HasInstance(v1);
-            }
-            if (v1 == null)
-            {
-                return false;
-            }
+            if (v2 is ClassScope) return ((ClassScope) v2).HasInstance(v1);
+            if (v2 is ScriptFunction) return ((ScriptFunction) v2).HasInstance(v1);
+            if (v1 == null) return false;
             if (v2 is Type)
             {
                 var type = v1.GetType();
@@ -114,10 +102,7 @@ namespace Turbo.Runtime
                     return false;
                 }
             }
-            if (v2 is IDebugType)
-            {
-                return ((IDebugType) v2).HasInstance(v1);
-            }
+            if (v2 is IDebugType) return ((IDebugType) v2).HasInstance(v1);
             throw new TurboException(TError.NeedType);
         }
 
