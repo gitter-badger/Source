@@ -81,22 +81,19 @@ namespace Turbo.Runtime
 
         internal Call(Context context, AST func, ASTList args, bool inBrackets) : base(context)
         {
-            this.Func = func;
-            this._args = args ?? new ASTList(context);
+            Func = func;
+            _args = args ?? new ASTList(context);
             _argValues = null;
             _outParameterCount = 0;
             var i = 0;
-            var count = this._args.Count;
+            var count = _args.Count;
             while (i < count)
             {
-                if (this._args[i] is AddressOf)
-                {
-                    _outParameterCount++;
-                }
+                if (_args[i] is AddressOf) _outParameterCount++;
                 i++;
             }
             IsConstructor = false;
-            this.InBrackets = inBrackets;
+            InBrackets = inBrackets;
             _enclosingFunctionScope = null;
             _alreadyPartiallyEvaluated = false;
             _isAssignmentToDefaultIndexedProperty = false;
@@ -104,10 +101,7 @@ namespace Turbo.Runtime
             while (!(scriptObject is FunctionScope))
             {
                 scriptObject = scriptObject.GetParent();
-                if (scriptObject == null)
-                {
-                    return;
-                }
+                if (scriptObject == null) return;
             }
             _enclosingFunctionScope = (FunctionScope) scriptObject;
         }
@@ -119,10 +113,7 @@ namespace Turbo.Runtime
             while (i < count)
             {
                 var aSt = _args[i];
-                if (!(aSt is ConstantWrapper) || ((ConstantWrapper) aSt).value != System.Reflection.Missing.Value)
-                {
-                    return false;
-                }
+                if (!(aSt is ConstantWrapper) || ((ConstantWrapper) aSt).value != System.Reflection.Missing.Value) return false;
                 i++;
             }
             return true;
@@ -137,10 +128,7 @@ namespace Turbo.Runtime
                 var aSt = _args[i];
                 var reflect = array[i] = aSt.InferType(null);
                 if (!(aSt is AddressOf)) continue;
-                if (reflect is ClassScope)
-                {
-                    reflect = ((ClassScope) reflect).GetBakedSuperType();
-                }
+                if (reflect is ClassScope) reflect = ((ClassScope) reflect).GetBakedSuperType();
                 array[i] = Convert.ToType("&", Convert.ToType(reflect));
             }
             return array;
@@ -155,10 +143,7 @@ namespace Turbo.Runtime
             while (i < count)
             {
                 flag = _args[i] is Lookup;
-                if (!flag)
-                {
-                    break;
-                }
+                if (!flag) break;
                 i++;
             }
             return flag;
@@ -174,14 +159,8 @@ namespace Turbo.Runtime
             var array = _args?.EvaluateAsArray();
             var num = array.Length;
             var obj = Func.Evaluate();
-            if (obj == null)
-            {
-                return true;
-            }
-            if (num == 0)
-            {
-                return true;
-            }
+            if (obj == null) return true;
+            if (num == 0) return true;
             var type = obj.GetType();
             var methodInfo = type.GetMethod("op_Delete",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.ExactBinding, null, new[]
@@ -216,26 +195,17 @@ namespace Turbo.Runtime
             try
             {
                 var callableExpression = Func as CallableExpression;
-                object obj;
-                if (callableExpression == null || !(callableExpression.Expression is Call))
-                {
-                    obj = lateBinding.Call(array, IsConstructor, InBrackets, Engine);
-                }
-                else
-                {
-                    obj = LateBinding.CallValue(lateBinding.obj, array, IsConstructor, InBrackets, Engine,
+                var obj = callableExpression == null || !(callableExpression.Expression is Call)
+                    ? lateBinding.Call(array, IsConstructor, InBrackets, Engine)
+                    : LateBinding.CallValue(lateBinding.obj, array, IsConstructor, InBrackets, Engine,
                         callableExpression.GetObject2(), TBinder.ob, null, null);
-                }
                 if (_outParameterCount > 0)
                 {
                     var i = 0;
                     var count = _args.Count;
                     while (i < count)
                     {
-                        if (_args[i] is AddressOf)
-                        {
-                            _args[i].SetValue(array[i]);
-                        }
+                        if (_args[i] is AddressOf) _args[i].SetValue(array[i]);
                         i++;
                     }
                 }
@@ -278,10 +248,7 @@ namespace Turbo.Runtime
             _argValues = _args.EvaluateAsArray();
         }
 
-        internal IdentifierLiteral GetName()
-        {
-            return new IdentifierLiteral(Func.ToString(), Func.context);
-        }
+        internal IdentifierLiteral GetName() => new IdentifierLiteral(Func.ToString(), Func.context);
 
         internal void GetParameters(ArrayList parameters)
         {
@@ -297,10 +264,7 @@ namespace Turbo.Runtime
 
         internal override IReflect InferType(TField inferenceTarget)
         {
-            if (Func is Binding)
-            {
-                return ((Binding) Func).InferTypeOfCall(inferenceTarget, IsConstructor);
-            }
+            if (Func is Binding) return ((Binding) Func).InferTypeOfCall(inferenceTarget, IsConstructor);
             if (!(Func is ConstantWrapper)) return Typeob.Object;
             var value = ((ConstantWrapper) Func).value;
             return value is Type || value is ClassScope || value is TypedArray ? (IReflect) value : Typeob.Object;
@@ -309,21 +273,14 @@ namespace Turbo.Runtime
         private TLocalField[] LocalsThatWereOutParameters()
         {
             var num = _outParameterCount;
-            if (num == 0)
-            {
-                return null;
-            }
+            if (num == 0) return null;
             var array = new TLocalField[num];
             var num2 = 0;
             for (var i = 0; i < num; i++)
             {
                 var aSt = _args[i];
-                if (!(aSt is AddressOf)) continue;
-                var field = ((AddressOf) aSt).GetField();
-                if (field is TLocalField)
-                {
-                    array[num2++] = (TLocalField) field;
-                }
+                var field = (aSt as AddressOf)?.GetField();
+                if (field is TLocalField) array[num2++] = (TLocalField) field;
             }
             return array;
         }
@@ -331,25 +288,19 @@ namespace Turbo.Runtime
         internal void MakeDeletable()
         {
             if (!(Func is Binding)) return;
-            var expr18 = (Binding) Func;
-            expr18.InvalidateBinding();
-            expr18.PartiallyEvaluateAsCallable();
-            expr18.ResolveLHValue();
+            var func = (Binding) Func;
+            func.InvalidateBinding();
+            func.PartiallyEvaluateAsCallable();
+            func.ResolveLHValue();
         }
 
         internal override AST PartiallyEvaluate()
         {
-            if (_alreadyPartiallyEvaluated)
-            {
-                return this;
-            }
+            if (_alreadyPartiallyEvaluated) return this;
             _alreadyPartiallyEvaluated = true;
             if (InBrackets && AllParamsAreMissing())
             {
-                if (IsConstructor)
-                {
-                    _args.context.HandleError(TError.TypeMismatch);
-                }
+                if (IsConstructor) _args.context.HandleError(TError.TypeMismatch);
                 return
                     new ConstantWrapper(
                         new TypedArray(((TypeExpression) new TypeExpression(Func).PartiallyEvaluate()).ToIReflect(),
@@ -370,11 +321,7 @@ namespace Turbo.Runtime
                     try
                     {
                         AST result;
-                        if (constantWrapper.value == null || constantWrapper.value is DBNull)
-                        {
-                            result = this;
-                            return result;
-                        }
+                        if (constantWrapper.value == null || constantWrapper.value is DBNull) return this;
                         if (constantWrapper.isNumericLiteral &&
                             (type == Typeob.Decimal || type == Typeob.Int64 || type == Typeob.UInt64 ||
                              type == Typeob.Single))
@@ -399,11 +346,11 @@ namespace Turbo.Runtime
             }
             else if (binding.member is TVariableField)
             {
-                var jSVariableField = (TVariableField) binding.member;
-                if (!jSVariableField.IsLiteral) return this;
-                if (jSVariableField.value is ClassScope)
+                var variableField = (TVariableField) binding.member;
+                if (!variableField.IsLiteral) return this;
+                if (variableField.value is ClassScope)
                 {
-                    var classScope = (ClassScope) jSVariableField.value;
+                    var classScope = (ClassScope) variableField.value;
                     var underlyingTypeIfEnum = classScope.GetUnderlyingTypeIfEnum();
                     if (underlyingTypeIfEnum != null)
                     {
@@ -420,9 +367,9 @@ namespace Turbo.Runtime
                         _args[0].context.HandleError(TError.ImpossibleConversion);
                     }
                 }
-                else if (jSVariableField.value is TypedArray)
+                else if (variableField.value is TypedArray)
                 {
-                    var typedArray = (TypedArray) jSVariableField.value;
+                    var typedArray = (TypedArray) variableField.value;
                     if (!Convert.IsPromotableTo(array[0], typedArray) && !Convert.IsPromotableTo(typedArray, array[0]))
                     {
                         _args[0].context.HandleError(TError.ImpossibleConversion);
@@ -451,10 +398,7 @@ namespace Turbo.Runtime
                 ((Binding) Func).SetPartialValue(_args, ArgIRs(), partialValue, InBrackets);
                 return;
             }
-            if (Func is ThisLiteral)
-            {
-                ((ThisLiteral) Func).ResolveAssignmentToDefaultIndexedProperty(_args, ArgIRs());
-            }
+            (Func as ThisLiteral)?.ResolveAssignmentToDefaultIndexedProperty(_args, ArgIRs());
         }
 
         internal override void SetValue(object value)
@@ -466,10 +410,7 @@ namespace Turbo.Runtime
             }
             catch (TurboException ex)
             {
-                if (ex.context == null)
-                {
-                    ex.context = Func.context;
-                }
+                if (ex.context == null) ex.context = Func.context;
                 throw;
             }
             catch (Exception arg570)
@@ -480,10 +421,7 @@ namespace Turbo.Runtime
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            if (context.document.debugOn)
-            {
-                il.Emit(OpCodes.Nop);
-            }
+            if (context.document.debugOn) il.Emit(OpCodes.Nop);
             var flag = true;
             if (_enclosingFunctionScope?.owner != null)
             {
@@ -516,16 +454,10 @@ namespace Turbo.Runtime
                     _enclosingFunctionScope.owner.TranslateToILToRestoreLocals(il, LocalsThatWereOutParameters());
                 }
             }
-            if (context.document.debugOn)
-            {
-                il.Emit(OpCodes.Nop);
-            }
+            if (context.document.debugOn) il.Emit(OpCodes.Nop);
         }
 
-        internal CustomAttribute ToCustomAttribute()
-        {
-            return new CustomAttribute(context, Func, _args);
-        }
+        internal CustomAttribute ToCustomAttribute() => new CustomAttribute(context, Func, _args);
 
         internal override void TranslateToILDelete(ILGenerator il, Type rtype)
         {
