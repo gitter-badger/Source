@@ -1407,7 +1407,7 @@ namespace Turbo.Runtime
             var callableExpression = this as CallableExpression;
             if (callableExpression != null)
             {
-                var constantWrapper = callableExpression.expression as ConstantWrapper;
+                var constantWrapper = callableExpression.Expression as ConstantWrapper;
                 if (constantWrapper?.InferType(null) is Type)
                 {
                     memberInfo2 = new TGlobalField(null, null, constantWrapper.value,
