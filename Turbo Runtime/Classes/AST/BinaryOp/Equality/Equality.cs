@@ -73,7 +73,7 @@ namespace Turbo.Runtime
         }
 
         internal override object Evaluate()
-            => operatorTok == TToken.Equal
+            => operatorTokl == TToken.Equal
                 ? EvaluateEquality(operand1.Evaluate(), operand2.Evaluate(), THPMainEngine.executeForJSEE)
                 : !EvaluateEquality(operand1.Evaluate(), operand2.Evaluate(), THPMainEngine.executeForJSEE);
 
@@ -108,7 +108,7 @@ namespace Turbo.Runtime
                                 v1,
                                 v2
                             }, null);
-                            return operatorTok == TToken.NotEqual ? !flag : flag;
+                            return operatorTokl == TToken.NotEqual ? !flag : flag;
                         }
                     }
                     break;
@@ -123,7 +123,7 @@ namespace Turbo.Runtime
                                 v1,
                                 v2
                             }, null);
-                            return operatorTok == TToken.NotEqual ? !flag2 : flag2;
+                            return operatorTokl == TToken.NotEqual ? !flag2 : flag2;
                         }
                     }
                     break;
@@ -323,7 +323,7 @@ namespace Turbo.Runtime
 
                 if (branchIfTrue)
                 {
-                    if (operatorTok == TToken.Equal)
+                    if (operatorTokl == TToken.Equal)
                     {
                         if (type3 == Typeob.String || type3 == Typeob.Object)
                         {
@@ -344,7 +344,7 @@ namespace Turbo.Runtime
                     il.Emit(shortForm ? OpCodes.Bne_Un_S : OpCodes.Bne_Un, label);
                     return;
                 }
-                if (operatorTok == TToken.Equal)
+                if (operatorTokl == TToken.Equal)
                 {
                     if (type3 == Typeob.String || type3 == Typeob.Object)
                     {
@@ -383,7 +383,7 @@ namespace Turbo.Runtime
             il.Emit(OpCodes.Call, CompilerGlobals.evaluateEqualityMethod);
             if (branchIfTrue)
             {
-                if (operatorTok == TToken.Equal)
+                if (operatorTokl == TToken.Equal)
                 {
                     il.Emit(shortForm ? OpCodes.Brtrue_S : OpCodes.Brtrue, label);
                     return;
@@ -391,7 +391,7 @@ namespace Turbo.Runtime
                 il.Emit(shortForm ? OpCodes.Brfalse_S : OpCodes.Brfalse, label);
                 return;
             }
-            if (operatorTok == TToken.Equal)
+            if (operatorTokl == TToken.Equal)
             {
                 il.Emit(shortForm ? OpCodes.Brfalse_S : OpCodes.Brfalse, label);
                 return;
@@ -456,7 +456,7 @@ namespace Turbo.Runtime
                 return;
             }
             metaData = il.DeclareLocal(Typeob.Equality);
-            ConstantWrapper.TranslateToILInt(il, (int) operatorTok);
+            ConstantWrapper.TranslateToILInt(il, (int) operatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.equalityConstructor);
             il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
         }

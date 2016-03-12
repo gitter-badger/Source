@@ -77,7 +77,7 @@ namespace Turbo.Runtime
             var v = operand1.Evaluate();
             var v2 = operand2.Evaluate();
             var num = EvaluateRelational(v, v2);
-            switch (operatorTok)
+            switch (operatorTokl)
             {
                 case TToken.GreaterThan:
                     return num > 0.0;
@@ -136,7 +136,7 @@ namespace Turbo.Runtime
                 v1,
                 v2
             }, null));
-            switch (operatorTok)
+            switch (operatorTokl)
             {
                 case TToken.GreaterThan:
                 case TToken.GreaterThanEqual:
@@ -420,7 +420,7 @@ namespace Turbo.Runtime
             {
                 if (type3 == Typeob.UInt32 || type3 == Typeob.UInt64)
                 {
-                    switch (operatorTok)
+                    switch (operatorTokl)
                     {
                         case TToken.GreaterThan:
                             il.Emit(shortForm ? OpCodes.Bgt_Un_S : OpCodes.Bgt_Un, label);
@@ -438,7 +438,7 @@ namespace Turbo.Runtime
                             throw new TurboException(TError.InternalError, context);
                     }
                 }
-                switch (operatorTok)
+                switch (operatorTokl)
                 {
                     case TToken.GreaterThan:
                         il.Emit(shortForm ? OpCodes.Bgt_S : OpCodes.Bgt, label);
@@ -458,7 +458,7 @@ namespace Turbo.Runtime
             }
             if (type3 == Typeob.Int32 || type3 == Typeob.Int64)
             {
-                switch (operatorTok)
+                switch (operatorTokl)
                 {
                     case TToken.GreaterThan:
                         il.Emit(shortForm ? OpCodes.Ble_S : OpCodes.Ble, label);
@@ -476,7 +476,7 @@ namespace Turbo.Runtime
                         throw new TurboException(TError.InternalError, context);
                 }
             }
-            switch (operatorTok)
+            switch (operatorTokl)
             {
                 case TToken.GreaterThan:
                     il.Emit(shortForm ? OpCodes.Ble_Un_S : OpCodes.Ble_Un, label);
@@ -524,7 +524,7 @@ namespace Turbo.Runtime
                 return;
             }
             metaData = il.DeclareLocal(Typeob.Relational);
-            ConstantWrapper.TranslateToILInt(il, (int) operatorTok);
+            ConstantWrapper.TranslateToILInt(il, (int) operatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.relationalConstructor);
             il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
         }

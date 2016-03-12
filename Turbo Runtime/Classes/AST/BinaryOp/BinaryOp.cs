@@ -64,7 +64,7 @@ namespace Turbo.Runtime
 
         protected AST operand2;
 
-        protected readonly TToken operatorTok;
+        protected readonly TToken operatorTokl;
 
         protected Type type1;
 
@@ -77,7 +77,7 @@ namespace Turbo.Runtime
         {
             this.operand1 = operand1;
             this.operand2 = operand2;
-            this.operatorTok = operatorTok;
+            this.operatorTokl = operatorTok;
             type1 = null;
             loctype = null;
             operatorMeth = null;
@@ -123,7 +123,7 @@ namespace Turbo.Runtime
                 return null;
             }
             var name = "op_NoSuchOp";
-            switch (operatorTok)
+            switch (operatorTokl)
             {
                 case TToken.FirstBinaryOp:
                     name = "op_Addition";

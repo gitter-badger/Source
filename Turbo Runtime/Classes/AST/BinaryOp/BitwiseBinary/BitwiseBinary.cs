@@ -61,7 +61,7 @@ namespace Turbo.Runtime
 {
     public sealed class BitwiseBinary : BinaryOp
     {
-        private object metaData;
+        private object _metaData;
 
         internal BitwiseBinary(Context context, AST operand1, AST operand2, TToken operatorTok)
             : base(context, operand1, operand2, operatorTok)
@@ -77,8 +77,8 @@ namespace Turbo.Runtime
         [DebuggerHidden, DebuggerStepThrough]
         public object EvaluateBitwiseBinary(object v1, object v2)
             => v1 is int && v2 is int
-                ? DoOp((int) v1, (int) v2, operatorTok)
-                : EvaluateBitwiseBinary(v1, v2, operatorTok);
+                ? DoOp((int) v1, (int) v2, operatorTokl)
+                : EvaluateBitwiseBinary(v1, v2, operatorTokl);
 
         [DebuggerHidden, DebuggerStepThrough]
         private object EvaluateBitwiseBinary(object v1, object v2, TToken operatorTok)
@@ -156,14 +156,14 @@ namespace Turbo.Runtime
                         break;
                     }
                 }
-                if (v2 == null) return DoOp(Convert.ToInt32(v1), 0, this.operatorTok);
+                if (v2 == null) return DoOp(Convert.ToInt32(v1), 0, operatorTokl);
                 var @operator = GetOperator(v1.GetType(), v2.GetType());
                 return @operator != null
                     ? @operator.Invoke(null, BindingFlags.Default, TBinder.ob, new[]
                     {
                         v1, v2
                     }, null)
-                    : DoOp(Convert.ToInt32(v1), Convert.ToInt32(v2), this.operatorTok);
+                    : DoOp(Convert.ToInt32(v1), Convert.ToInt32(v2), operatorTokl);
             }
         }
 
@@ -192,13 +192,13 @@ namespace Turbo.Runtime
             }
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
-            var @operator = type1 == null || inference_target != null
-                ? GetOperator(operand1.InferType(inference_target), operand2.InferType(inference_target))
+            var @operator = type1 == null || inferenceTarget != null
+                ? GetOperator(operand1.InferType(inferenceTarget), operand2.InferType(inferenceTarget))
                 : GetOperator(type1, loctype);
-            if (@operator == null) return ResultType(type1, loctype, operatorTok);
-            metaData = @operator;
+            if (@operator == null) return ResultType(type1, loctype, operatorTokl);
+            _metaData = @operator;
             return @operator.ReturnType;
         }
 
@@ -560,9 +560,9 @@ namespace Turbo.Runtime
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            if (metaData == null)
+            if (_metaData == null)
             {
-                var type = ResultType(type1, loctype, operatorTok);
+                var type = ResultType(type1, loctype, operatorTokl);
                 if (Convert.IsPrimitiveNumericType(type1))
                 {
                     operand1.TranslateToIL(il, type1);
@@ -573,18 +573,18 @@ namespace Turbo.Runtime
                     operand1.TranslateToIL(il, Typeob.Double);
                     Convert.Emit(this, il, Typeob.Double, type, true);
                 }
-                var target_type = Operand2Type(operatorTok, type);
+                var targetType = Operand2Type(operatorTokl, type);
                 if (Convert.IsPrimitiveNumericType(loctype))
                 {
                     operand2.TranslateToIL(il, loctype);
-                    Convert.Emit(this, il, loctype, target_type, true);
+                    Convert.Emit(this, il, loctype, targetType, true);
                 }
                 else
                 {
                     operand2.TranslateToIL(il, Typeob.Double);
-                    Convert.Emit(this, il, Typeob.Double, target_type, true);
+                    Convert.Emit(this, il, Typeob.Double, targetType, true);
                 }
-                switch (operatorTok)
+                switch (operatorTokl)
                 {
                     case TToken.BitwiseOr:
                         il.Emit(OpCodes.Or);
@@ -596,7 +596,7 @@ namespace Turbo.Runtime
                         il.Emit(OpCodes.And);
                         break;
                     default:
-                        switch (operatorTok)
+                        switch (operatorTokl)
                         {
                             case TToken.LeftShift:
                                 TranslateToBitCountMask(il, type, operand2);
@@ -618,9 +618,9 @@ namespace Turbo.Runtime
                 Convert.Emit(this, il, type, rtype);
                 return;
             }
-            if (metaData is MethodInfo)
+            if (_metaData is MethodInfo)
             {
-                var methodInfo = (MethodInfo) metaData;
+                var methodInfo = (MethodInfo) _metaData;
                 var parameters = methodInfo.GetParameters();
                 operand1.TranslateToIL(il, parameters[0].ParameterType);
                 operand2.TranslateToIL(il, parameters[1].ParameterType);
@@ -628,7 +628,7 @@ namespace Turbo.Runtime
                 Convert.Emit(this, il, methodInfo.ReturnType, rtype);
                 return;
             }
-            il.Emit(OpCodes.Ldloc, (LocalBuilder) metaData);
+            il.Emit(OpCodes.Ldloc, (LocalBuilder) _metaData);
             operand1.TranslateToIL(il, Typeob.Object);
             operand2.TranslateToIL(il, Typeob.Object);
             il.Emit(OpCodes.Call, CompilerGlobals.evaluateBitwiseBinaryMethod);
@@ -637,14 +637,14 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            var arg_24_0 = (Type) InferType(null);
+            var arg240 = (Type) InferType(null);
             operand1.TranslateToILInitializer(il);
             operand2.TranslateToILInitializer(il);
-            if (arg_24_0 != Typeob.Object) return;
-            metaData = il.DeclareLocal(Typeob.BitwiseBinary);
-            ConstantWrapper.TranslateToILInt(il, (int) operatorTok);
+            if (arg240 != Typeob.Object) return;
+            _metaData = il.DeclareLocal(Typeob.BitwiseBinary);
+            ConstantWrapper.TranslateToILInt(il, (int) operatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.bitwiseBinaryConstructor);
-            il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
+            il.Emit(OpCodes.Stloc, (LocalBuilder) _metaData);
         }
     }
 }

@@ -77,10 +77,10 @@ namespace Turbo.Runtime
         [DebuggerHidden, DebuggerStepThrough]
         public object EvaluateNumericBinary(object v1, object v2)
             => v1 is int && v2 is int
-                ? DoOp((int) v1, (int) v2, operatorTok)
+                ? DoOp((int) v1, (int) v2, operatorTokl)
                 : (v1 is double && v2 is double
-                    ? DoOp((double) v1, (double) v2, operatorTok)
-                    : EvaluateNumericBinary(v1, v2, operatorTok));
+                    ? DoOp((double) v1, (double) v2, operatorTokl)
+                    : EvaluateNumericBinary(v1, v2, operatorTokl));
 
         [DebuggerHidden, DebuggerStepThrough]
         private object EvaluateNumericBinary(object v1, object v2, TToken operatorTok)
@@ -166,7 +166,7 @@ namespace Turbo.Runtime
                     }
                     obj = null;
                     IL_177:
-                    if (this.operatorTok == TToken.Minus && obj != null && typeCode2 != TypeCode.Char)
+                    if (this.operatorTokl == TToken.Minus && obj != null && typeCode2 != TypeCode.Char)
                     {
                         return Convert.Coerce2(obj, TypeCode.Char, false);
                     }
@@ -494,7 +494,7 @@ namespace Turbo.Runtime
                 metaData = @operator;
                 return @operator.ReturnType;
             }
-            if (type1 == Typeob.Char && operatorTok == TToken.Minus)
+            if (type1 == Typeob.Char && operatorTokl == TToken.Minus)
             {
                 var typeCode = Type.GetTypeCode(loctype);
                 if (Convert.IsPrimitiveNumericTypeCode(typeCode) || typeCode == TypeCode.Boolean)
@@ -524,7 +524,7 @@ namespace Turbo.Runtime
                 {
                     type = rtype;
                 }
-                if (operatorTok == TToken.Divide)
+                if (operatorTokl == TToken.Divide)
                 {
                     type = Typeob.Double;
                 }
@@ -540,7 +540,7 @@ namespace Turbo.Runtime
                 operand2.TranslateToIL(il, type);
                 if (type == Typeob.Double || type == Typeob.Single)
                 {
-                    var tok = operatorTok;
+                    var tok = operatorTokl;
                     if (tok != TToken.Minus)
                     {
                         switch (tok)
@@ -565,7 +565,7 @@ namespace Turbo.Runtime
                 }
                 else if (type == Typeob.Int32 || type == Typeob.Int64)
                 {
-                    var tok = operatorTok;
+                    var tok = operatorTokl;
                     if (tok != TToken.Minus)
                     {
                         switch (tok)
@@ -590,7 +590,7 @@ namespace Turbo.Runtime
                 }
                 else
                 {
-                    var tok = operatorTok;
+                    var tok = operatorTokl;
                     if (tok != TToken.Minus)
                     {
                         switch (tok)
@@ -651,7 +651,7 @@ namespace Turbo.Runtime
                 return;
             }
             metaData = il.DeclareLocal(Typeob.NumericBinary);
-            ConstantWrapper.TranslateToILInt(il, (int) operatorTok);
+            ConstantWrapper.TranslateToILInt(il, (int) operatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.numericBinaryConstructor);
             il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
         }

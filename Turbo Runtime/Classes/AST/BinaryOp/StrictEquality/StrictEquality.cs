@@ -68,7 +68,7 @@ namespace Turbo.Runtime
         internal override object Evaluate()
         {
             var flag = TurboStrictEquals(operand1.Evaluate(), operand2.Evaluate(), THPMainEngine.executeForJSEE);
-            return operatorTok == TToken.StrictEqual ? flag : !flag;
+            return operatorTokl == TToken.StrictEqual ? flag : !flag;
         }
 
         public static bool TurboStrictEquals(object v1, object v2) => TurboStrictEquals(v1, v2, false);
@@ -537,7 +537,7 @@ namespace Turbo.Runtime
             }
             if (branchIfTrue)
             {
-                if (operatorTok == TToken.StrictEqual)
+                if (operatorTokl == TToken.StrictEqual)
                 {
                     if (flag)
                     {
@@ -556,7 +556,7 @@ namespace Turbo.Runtime
                     il.Emit(shortForm ? OpCodes.Bne_Un_S : OpCodes.Bne_Un, label);
                 }
             }
-            else if (operatorTok == TToken.StrictEqual)
+            else if (operatorTokl == TToken.StrictEqual)
             {
                 if (flag)
                 {
