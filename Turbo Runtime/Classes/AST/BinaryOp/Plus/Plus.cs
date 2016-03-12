@@ -551,10 +551,9 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            var arg240 = (Type) InferType(null);
             operand1.TranslateToILInitializer(il);
             operand2.TranslateToILInitializer(il);
-            if (arg240 != Typeob.Object) return;
+            if ((Type)InferType(null) != Typeob.Object) return;
             _metaData = il.DeclareLocal(Typeob.Plus);
             il.Emit(OpCodes.Newobj, CompilerGlobals.plusConstructor);
             il.Emit(OpCodes.Stloc, (LocalBuilder) _metaData);
