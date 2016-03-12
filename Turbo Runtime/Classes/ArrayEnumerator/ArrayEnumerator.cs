@@ -81,8 +81,8 @@ namespace Turbo.Runtime
             _curr = -1;
             _doDenseEnum = false;
             _didDenseEnum = false;
-            this._arrayOb = arrayOb;
-            this._denseEnum = denseEnum;
+            _arrayOb = arrayOb;
+            _denseEnum = denseEnum;
         }
 
         public bool MoveNext()
