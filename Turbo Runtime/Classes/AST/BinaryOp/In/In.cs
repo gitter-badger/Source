@@ -76,10 +76,7 @@ namespace Turbo.Runtime
             }
             catch (TurboException ex)
             {
-                if (ex.context == null)
-                {
-                    ex.context = operand2.context;
-                }
+                if (ex.context == null) ex.context = operand2.context;
                 throw;
             }
             return result;
@@ -89,10 +86,7 @@ namespace Turbo.Runtime
 
         public static bool TurboIn(object v1, object v2)
         {
-            if (v2 is ScriptObject)
-            {
-                return !(((ScriptObject) v2).GetMemberValue(Convert.ToString(v1)) is Missing);
-            }
+            if (v2 is ScriptObject) return !(((ScriptObject) v2).GetMemberValue(Convert.ToString(v1)) is Missing);
             if (v2 is Array)
             {
                 var array = (Array) v2;
@@ -102,14 +96,8 @@ namespace Turbo.Runtime
             }
             if (v2 is IEnumerable)
             {
-                if (v1 == null)
-                {
-                    return false;
-                }
-                if (v2 is IDictionary)
-                {
-                    return ((IDictionary) v2).Contains(v1);
-                }
+                if (v1 == null) return false;
+                if (v2 is IDictionary) return ((IDictionary) v2).Contains(v1);
                 if (v2 is IDynamicElement)
                 {
                     return
@@ -119,33 +107,18 @@ namespace Turbo.Runtime
                 var enumerator = ((IEnumerable) v2).GetEnumerator();
                 while (true)
                 {
-                    if (!enumerator.MoveNext())
-                    {
-                        break;
-                    }
-                    if (v1.Equals(enumerator.Current))
-                    {
-                        return true;
-                    }
+                    if (!enumerator.MoveNext()) break;
+                    if (v1.Equals(enumerator.Current)) return true;
                 }
             }
             else if (v2 is IEnumerator)
             {
-                if (v1 == null)
-                {
-                    return false;
-                }
+                if (v1 == null) return false;
                 var enumerator2 = (IEnumerator) v2;
                 while (true)
                 {
-                    if (!enumerator2.MoveNext())
-                    {
-                        break;
-                    }
-                    if (v1.Equals(enumerator2.Current))
-                    {
-                        return true;
-                    }
+                    if (!enumerator2.MoveNext()) break;
+                    if (v1.Equals(enumerator2.Current)) return true;
                 }
             }
             else if (v2 is IDebuggerObject)
