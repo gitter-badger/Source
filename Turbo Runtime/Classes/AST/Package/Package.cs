@@ -93,7 +93,7 @@ namespace Turbo.Runtime
             try
             {
                 var i = 0;
-                var count = classList.count;
+                var count = classList.Count;
                 while (i < count)
                 {
                     classList[i].Evaluate();
@@ -121,7 +121,7 @@ namespace Turbo.Runtime
         internal void MergeWith(Package p)
         {
             var i = 0;
-            var count = p.classList.count;
+            var count = p.classList.Count;
             while (i < count)
             {
                 classList.Append(p.classList[i]);
@@ -137,7 +137,7 @@ namespace Turbo.Runtime
             try
             {
                 var i = 0;
-                var count = classList.count;
+                var count = classList.Count;
                 while (i < count)
                 {
                     classList[i].PartiallyEvaluate();
@@ -155,7 +155,7 @@ namespace Turbo.Runtime
         {
             Globals.ScopeStack.Push(scope);
             var i = 0;
-            var count = classList.count;
+            var count = classList.Count;
             while (i < count)
             {
                 classList[i].TranslateToIL(il, Typeob.Void);
@@ -177,7 +177,7 @@ namespace Turbo.Runtime
             il.Emit(OpCodes.Call, CompilerGlobals.TurboPackageMethod);
             Globals.ScopeStack.Push(scope);
             var i = 0;
-            var count = classList.count;
+            var count = classList.Count;
             while (i < count)
             {
                 classList[i].TranslateToILInitializer(il);

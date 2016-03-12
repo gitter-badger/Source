@@ -1086,7 +1086,7 @@ namespace Turbo.Runtime
         internal static void PlaceArgumentsOnStack(ILGenerator il, ParameterInfo[] pars, ASTList args, int offset,
             int rhoffset, AST missing)
         {
-            var count = args.count;
+            var count = args.Count;
             var num = count + offset;
             var num2 = pars.Length - rhoffset;
             var flag = num2 > 0 && CustomAttribute.IsDefined(pars[num2 - 1], typeof (ParamArrayAttribute), false) &&
@@ -2104,7 +2104,7 @@ namespace Turbo.Runtime
                             array[i] = Typeob.Int32;
                         }
                         var j = 0;
-                        var count = argList.count;
+                        var count = argList.Count;
                         while (j < count)
                         {
                             argList[j].TranslateToIL(il, Typeob.Int32);
@@ -2132,7 +2132,7 @@ namespace Turbo.Runtime
                 if (isArrayElementAccess)
                 {
                     var k = 0;
-                    var count2 = argList.count;
+                    var count2 = argList.Count;
                     while (k < count2)
                     {
                         argList[k].TranslateToIL(il, Typeob.Int32);
@@ -2186,7 +2186,7 @@ namespace Turbo.Runtime
                 {
                     constantWrapper = ReflectionMissingCW;
                 }
-                if (argList.count == 1 && constantWrapper == TurboMissingCW && defaultMember is PropertyInfo)
+                if (argList.Count == 1 && constantWrapper == TurboMissingCW && defaultMember is PropertyInfo)
                 {
                     il.Emit(OpCodes.Ldc_I4_1);
                     il.Emit(OpCodes.Newarr, Typeob.Object);
@@ -2323,7 +2323,7 @@ namespace Turbo.Runtime
                 }
                 LocalBuilder localBuilder = null;
                 var m = 0;
-                var count3 = argList.count;
+                var count3 = argList.Count;
                 while (m < count3)
                 {
                     if (argList[m] is AddressOf)
@@ -2359,7 +2359,7 @@ namespace Turbo.Runtime
                     if (localBuilder != null)
                     {
                         var n = 0;
-                        var count4 = argList.count;
+                        var count4 = argList.Count;
                         while (n < count4)
                         {
                             var addressOf = argList[n] as AddressOf;
@@ -2395,7 +2395,7 @@ namespace Turbo.Runtime
                 Convert.Emit(this, il, Typeob.Object, rtype);
                 if (localBuilder == null) return;
                 var num = 0;
-                var count5 = argList.count;
+                var count5 = argList.Count;
                 while (num < count5)
                 {
                     var addressOf2 = argList[num] as AddressOf;
@@ -2443,7 +2443,7 @@ namespace Turbo.Runtime
                 var type = reflect is Type ? (Type) reflect : Convert.ToType(reflect);
                 TranslateToIL(il, type);
                 var i = 0;
-                var count = argList.count;
+                var count = argList.Count;
                 while (i < count)
                 {
                     argList[i].TranslateToIL(il, Typeob.Int32);
@@ -2486,7 +2486,7 @@ namespace Turbo.Runtime
                 var arrayRank = type.GetArrayRank();
                 var array = new LocalBuilder[arrayRank];
                 var i = 0;
-                var count = argList.count;
+                var count = argList.Count;
                 while (i < count)
                 {
                     argList[i].TranslateToIL(il, Typeob.Int32);

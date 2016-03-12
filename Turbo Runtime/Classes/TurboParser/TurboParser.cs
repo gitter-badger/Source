@@ -4689,11 +4689,11 @@ namespace Turbo.Runtime
                                 if (text.Equals("eval"))
                                 {
                                     expression.context.UpdateWith(aStList.context);
-                                    if (aStList.count == 1)
+                                    if (aStList.Count == 1)
                                     {
                                         expression = new Eval(expression.context, aStList[0], null);
                                     }
-                                    else if (aStList.count > 1)
+                                    else if (aStList.Count > 1)
                                     {
                                         expression = new Eval(expression.context, aStList[0], aStList[1]);
                                     }

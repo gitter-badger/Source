@@ -96,7 +96,7 @@ namespace Turbo.Runtime
                 lhir2 = type.GetElementType();
             }
             var i = 0;
-            var count = _elements.count;
+            var count = _elements.Count;
             while (i < count)
             {
                 if (!Binding.AssignmentCompatible(lhir2, _elements[i], _elements[i].InferType(null), reportError))
@@ -109,7 +109,7 @@ namespace Turbo.Runtime
         internal override void CheckIfOKToUseInSuperConstructorCall()
         {
             var i = 0;
-            while (i < _elements.count)
+            while (i < _elements.Count)
             {
                 _elements[i].CheckIfOKToUseInSuperConstructorCall();
                 i++;
@@ -119,14 +119,14 @@ namespace Turbo.Runtime
         internal override object Evaluate()
         {
             if (THPMainEngine.executeForJSEE) throw new TurboException(TError.NonSupportedInDebugger);
-            var array = new object[_elements.count];
-            for (var i = 0; i < _elements.count; i++) array[i] = _elements[i].Evaluate();
+            var array = new object[_elements.Count];
+            for (var i = 0; i < _elements.Count; i++) array[i] = _elements[i].Evaluate();
             return Engine.GetOriginalArrayConstructor().ConstructArray(array);
         }
 
         internal bool IsOkToUseInCustomAttribute()
         {
-            for (var i = 0; i < _elements.count; i++)
+            for (var i = 0; i < _elements.Count; i++)
             {
                 if (!(_elements[i] is ConstantWrapper)) return false;
                 if (CustomAttribute.TypeOfArgument(((ConstantWrapper) _elements[i]).Evaluate()) == null) return false;
@@ -136,7 +136,7 @@ namespace Turbo.Runtime
 
         internal override AST PartiallyEvaluate()
         {
-            for (var i = 0; i < _elements.count; i++) _elements[i] = _elements[i].PartiallyEvaluate();
+            for (var i = 0; i < _elements.Count; i++) _elements[i] = _elements[i].PartiallyEvaluate();
             return this;
         }
 
@@ -154,7 +154,7 @@ namespace Turbo.Runtime
                 TranslateToIlArray(il, rtype.GetElementType());
                 return;
             }
-            var count = _elements.count;
+            var count = _elements.Count;
             MethodInfo meth;
             if (Engine.Globals.globalObject is LenientGlobalObject)
             {
@@ -178,7 +178,7 @@ namespace Turbo.Runtime
 
         private void TranslateToIlArray(ILGenerator il, Type etype)
         {
-            var count = _elements.count;
+            var count = _elements.Count;
             ConstantWrapper.TranslateToILInt(il, count);
             il.Emit(OpCodes.Newarr, etype);
             for (var i = 0; i < count; i++)
@@ -194,7 +194,7 @@ namespace Turbo.Runtime
         internal override void TranslateToILInitializer(ILGenerator il)
         {
             var i = 0;
-            while (i < _elements.count)
+            while (i < _elements.Count)
             {
                 _elements[i].TranslateToILInitializer(il);
                 i++;

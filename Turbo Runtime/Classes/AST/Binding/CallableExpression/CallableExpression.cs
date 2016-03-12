@@ -121,7 +121,7 @@ namespace Turbo.Runtime
                 return;
             }
             var jSGlobalField = member as TGlobalField;
-            if (jSGlobalField != null && jSGlobalField.IsLiteral && argList.count == 1)
+            if (jSGlobalField != null && jSGlobalField.IsLiteral && argList.Count == 1)
             {
                 var type = Convert.ToType((IReflect) jSGlobalField.value);
                 argList[0].TranslateToIL(il, type);

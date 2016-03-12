@@ -290,7 +290,7 @@ namespace Turbo.Runtime
                     else
                     {
                         var arguments = superConstructorCall.arguments;
-                        var count = arguments.count;
+                        var count = arguments.Count;
                         var array = new object[count];
                         for (var i = 0; i < count; i++)
                         {
@@ -996,7 +996,7 @@ namespace Turbo.Runtime
                 body.MarkSuperOKIfIsFirstStatement();
                 body.PartiallyEvaluate();
                 var classScope2 = (ClassScope) enclosing_scope;
-                var num3 = superConstructorCall?.arguments.count ?? 0;
+                var num3 = superConstructorCall?.arguments.Count ?? 0;
                 var array = new IReflect[num3];
                 for (var k = 0; k < num3; k++)
                 {

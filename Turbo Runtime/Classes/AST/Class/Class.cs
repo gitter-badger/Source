@@ -929,7 +929,7 @@ namespace Turbo.Runtime
             {
                 il.Emit(OpCodes.Ldarg_0);
                 var num = pars.Length;
-                var num2 = argAST?.count ?? 0;
+                var num2 = argAST?.Count ?? 0;
                 var array = new object[num];
                 for (var i = 0; i < num; i++)
                 {

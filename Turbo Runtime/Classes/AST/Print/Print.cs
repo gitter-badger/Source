@@ -104,7 +104,7 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Nop);
             }
             var aSTList = operand;
-            var count = aSTList.count;
+            var count = aSTList.Count;
             for (var i = 0; i < count; i++)
             {
                 var aST = aSTList[i];
@@ -133,7 +133,7 @@ namespace Turbo.Runtime
         internal override void TranslateToILInitializer(ILGenerator il)
         {
             var aSTList = operand;
-            for (var i = 0; i < aSTList.count; i++)
+            for (var i = 0; i < aSTList.Count; i++)
             {
                 aSTList[i].TranslateToILInitializer(il);
             }

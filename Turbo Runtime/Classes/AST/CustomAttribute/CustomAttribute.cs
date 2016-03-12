@@ -356,7 +356,7 @@ namespace Turbo.Runtime
             var aSTList = new ASTList(args.context);
             var aSTList2 = new ASTList(args.context);
             var i = 0;
-            var count = args.count;
+            var count = args.Count;
             while (i < count)
             {
                 var aST = args[i];
@@ -373,7 +373,7 @@ namespace Turbo.Runtime
                 }
                 i++;
             }
-            var count2 = aSTList.count;
+            var count2 = aSTList.Count;
             var array = new IReflect[count2];
             var j = 0;
             while (j < count2)
@@ -445,7 +445,7 @@ namespace Turbo.Runtime
                 }
             }
             var l = 0;
-            var count4 = aSTList2.count;
+            var count4 = aSTList2.Count;
             while (l < count4)
             {
                 var assign2 = (Assign) aSTList2[l];
@@ -646,7 +646,7 @@ namespace Turbo.Runtime
                     }
                     if ((type as Type).FullName == "System.CLSCompliantAttribute")
                     {
-                        Engine.isCLSCompliant = (args == null || args.count == 0 ||
+                        Engine.isCLSCompliant = (args == null || args.Count == 0 ||
                                                  Convert.ToBoolean(positionalArgValues[0], false));
                         AST result = this;
                         return result;
