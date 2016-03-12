@@ -61,7 +61,7 @@ namespace Turbo.Runtime
 {
     public class Relational : BinaryOp
     {
-        private object metaData;
+        private object _metaData;
 
         internal Relational(Context context, AST operand1, AST operand2, TToken operatorTok)
             : base(context, operand1, operand2, operatorTok)
@@ -97,14 +97,8 @@ namespace Turbo.Runtime
         {
             if (v1 is int)
             {
-                if (v2 is int)
-                {
-                    return (int) v1 - (double) ((int) v2);
-                }
-                if (v2 is double)
-                {
-                    return (int) v1 - (double) v2;
-                }
+                if (v2 is int) return (int) v1 - (double) ((int) v2);
+                if (v2 is double) return (int) v1 - (double) v2;
             }
             else if (v1 is double)
             {
@@ -112,16 +106,9 @@ namespace Turbo.Runtime
                 {
                     var num = (double) v1;
                     var num2 = (double) v2;
-                    if (num == num2)
-                    {
-                        return 0.0;
-                    }
-                    return num - num2;
+                    return num == num2 ? 0.0 : num - num2;
                 }
-                if (v2 is int)
-                {
-                    return (double) v1 - (int) v2;
-                }
+                if (v2 is int) return (double) v1 - (int) v2;
             }
             var iConvertible = Convert.GetIConvertible(v1);
             var iConvertible2 = Convert.GetIConvertible(v2);
@@ -155,25 +142,13 @@ namespace Turbo.Runtime
         {
             if (v1 is int)
             {
-                if (v2 is int)
-                {
-                    return (int) v1 - (int) v2;
-                }
-                if (v2 is double)
-                {
-                    return (int) v1 - (double) v2;
-                }
+                if (v2 is int) return (int) v1 - (int) v2;
+                if (v2 is double) return (int) v1 - (double) v2;
             }
             else if (v1 is double)
             {
-                if (v2 is double)
-                {
-                    return (double) v1 == (double) v2 ? 0.0 : (double) v1 - (double) v2;
-                }
-                if (v2 is int)
-                {
-                    return (double) v1 - (int) v2;
-                }
+                if (v2 is double) return (double) v1 == (double) v2 ? 0.0 : (double) v1 - (double) v2;
+                if (v2 is int) return (double) v1 - (int) v2;
             }
             return TurboCompare2(v1, v2, Convert.GetIConvertible(v1), Convert.GetIConvertible(v2),
                 Convert.GetTypeCode(v1, Convert.GetIConvertible(v1)),
@@ -196,10 +171,7 @@ namespace Turbo.Runtime
             switch (t1)
             {
                 case TypeCode.Char:
-                    if (t2 == TypeCode.String)
-                    {
-                        return string.CompareOrdinal(Convert.ToString(v1, ic1), ic2.ToString(null));
-                    }
+                    if (t2 == TypeCode.String) return string.CompareOrdinal(Convert.ToString(v1, ic1), ic2.ToString(null));
                     break;
                 case TypeCode.SByte:
                 case TypeCode.Byte:
@@ -221,13 +193,9 @@ namespace Turbo.Runtime
                         case TypeCode.Int32:
                         case TypeCode.UInt32:
                         case TypeCode.Int64:
-                        {
                             return ic2.ToInt64(null) < 0L ? 1.0 : (num == (ulong) ic2.ToInt64(null) ? 0.0 : -1.0);
-                        }
                         case TypeCode.UInt64:
-                        {
                             return num < ic2.ToUInt64(null) ? -1.0 : (num == ic2.ToUInt64(null) ? 0.0 : 1.0);
-                        }
                         case TypeCode.Single:
                         case TypeCode.Double:
                             return num - ic2.ToDouble(null);
@@ -371,15 +339,11 @@ namespace Turbo.Runtime
                     type3 = Typeob.Object;
                 }
             }
-            if (type3 == Typeob.SByte || type3 == Typeob.Int16)
-            {
-                type3 = Typeob.Int32;
-            }
-            else if (type3 == Typeob.Byte || type3 == Typeob.UInt16)
-            {
-                type3 = Typeob.UInt32;
-            }
-            if (metaData == null)
+
+            if (type3 == Typeob.SByte || type3 == Typeob.Int16) type3 = Typeob.Int32;
+            else if (type3 == Typeob.Byte || type3 == Typeob.UInt16) type3 = Typeob.UInt32;
+
+            if (_metaData == null)
             {
                 operand1.TranslateToIL(il, type3);
                 operand2.TranslateToIL(il, type3);
@@ -391,9 +355,9 @@ namespace Turbo.Runtime
                     type3 = Typeob.Double;
                 }
             }
-            else if (metaData is MethodInfo)
+            else if (_metaData is MethodInfo)
             {
-                var methodInfo = (MethodInfo) metaData;
+                var methodInfo = (MethodInfo) _metaData;
                 var parameters = methodInfo.GetParameters();
                 operand1.TranslateToIL(il, parameters[0].ParameterType);
                 operand2.TranslateToIL(il, parameters[1].ParameterType);
@@ -408,7 +372,7 @@ namespace Turbo.Runtime
             }
             else
             {
-                il.Emit(OpCodes.Ldloc, (LocalBuilder) metaData);
+                il.Emit(OpCodes.Ldloc, (LocalBuilder) _metaData);
                 operand1.TranslateToIL(il, Typeob.Object);
                 operand2.TranslateToIL(il, Typeob.Object);
                 il.Emit(OpCodes.Call, CompilerGlobals.evaluateRelationalMethod);
@@ -515,7 +479,7 @@ namespace Turbo.Runtime
             var @operator = GetOperator(operand1.InferType(null), operand2.InferType(null));
             if (@operator != null)
             {
-                metaData = @operator;
+                _metaData = @operator;
                 return;
             }
             if ((type1.IsPrimitive || Typeob.TObject.IsAssignableFrom(type1)) &&
@@ -523,10 +487,10 @@ namespace Turbo.Runtime
             {
                 return;
             }
-            metaData = il.DeclareLocal(Typeob.Relational);
+            _metaData = il.DeclareLocal(Typeob.Relational);
             ConstantWrapper.TranslateToILInt(il, (int) operatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.relationalConstructor);
-            il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
+            il.Emit(OpCodes.Stloc, (LocalBuilder) _metaData);
         }
     }
 }
