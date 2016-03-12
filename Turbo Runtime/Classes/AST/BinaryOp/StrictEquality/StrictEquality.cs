@@ -90,31 +90,16 @@ namespace Turbo.Runtime
                 case TypeCode.Empty:
                     return t2 == TypeCode.Empty;
                 case TypeCode.Object:
-                    if (v1 == v2)
-                    {
-                        return true;
-                    }
-                    if (v1 is Missing || v1 is System.Reflection.Missing)
-                    {
-                        v1 = null;
-                    }
-                    if (v1 == v2)
-                    {
-                        return true;
-                    }
-                    if (v2 is Missing || v2 is System.Reflection.Missing)
-                    {
-                        v2 = null;
-                    }
+                    if (v1 == v2) return true;
+                    if (v1 is Missing || v1 is System.Reflection.Missing) v1 = null;
+                    if (v1 == v2) return true;
+                    if (v2 is Missing || v2 is System.Reflection.Missing) v2 = null;
                     if (checkForDebuggerObjects)
                     {
                         var debuggerObject = v1 as IDebuggerObject;
                         if (debuggerObject == null) return v1 == v2;
                         var debuggerObject2 = v2 as IDebuggerObject;
-                        if (debuggerObject2 != null)
-                        {
-                            return debuggerObject.IsEqual(debuggerObject2);
-                        }
+                        if (debuggerObject2 != null) return debuggerObject.IsEqual(debuggerObject2);
                     }
                     return v1 == v2;
                 case TypeCode.DBNull:
@@ -469,55 +454,25 @@ namespace Turbo.Runtime
         {
             var type = Convert.ToType(operand1.InferType(null));
             var type2 = Convert.ToType(operand2.InferType(null));
-            if (operand1 is ConstantWrapper && operand1.Evaluate() == null)
-            {
-                type = Typeob.Empty;
-            }
-            if (operand2 is ConstantWrapper && operand2.Evaluate() == null)
-            {
-                type2 = Typeob.Empty;
-            }
+            if (operand1 is ConstantWrapper && operand1.Evaluate() == null) type = Typeob.Empty;
+            if (operand2 is ConstantWrapper && operand2.Evaluate() == null) type2 = Typeob.Empty;
             if (type != type2 && type.IsPrimitive && type2.IsPrimitive)
             {
-                if (type == Typeob.Single)
-                {
-                    type2 = type;
-                }
-                else if (type2 == Typeob.Single)
-                {
-                    type = type2;
-                }
-                else if (Convert.IsPromotableTo(type2, type))
-                {
-                    type2 = type;
-                }
-                else if (Convert.IsPromotableTo(type, type2))
-                {
-                    type = type2;
-                }
+                if (type == Typeob.Single) type2 = type;
+                else if (type2 == Typeob.Single) type = type2;
+                else if (Convert.IsPromotableTo(type2, type)) type2 = type;
+                else if (Convert.IsPromotableTo(type, type2)) type = type2;
             }
             var flag = true;
             if (type == type2 && type != Typeob.Object)
             {
                 var rtype = type;
-                if (!type.IsPrimitive)
-                {
-                    rtype = Typeob.Object;
-                }
+                if (!type.IsPrimitive) rtype = Typeob.Object;
                 operand1.TranslateToIL(il, rtype);
                 operand2.TranslateToIL(il, rtype);
-                if (type == Typeob.String)
-                {
-                    il.Emit(OpCodes.Call, CompilerGlobals.stringEqualsMethod);
-                }
-                else if (!type.IsPrimitive)
-                {
-                    il.Emit(OpCodes.Callvirt, CompilerGlobals.equalsMethod);
-                }
-                else
-                {
-                    flag = false;
-                }
+                if (type == Typeob.String) il.Emit(OpCodes.Call, CompilerGlobals.stringEqualsMethod);
+                else if (!type.IsPrimitive) il.Emit(OpCodes.Callvirt, CompilerGlobals.equalsMethod);
+                else flag = false;
             }
             else if (type == Typeob.Empty)
             {
