@@ -1497,10 +1497,10 @@ namespace Turbo.Runtime
                         }
                         ConstantWrapper constantWrapper2;
                         if (obj is ClassScope && !((ClassScope) obj).owner.isStatic && this is Member &&
-                            (constantWrapper2 = ((Member) this).rootObject as ConstantWrapper) != null &&
+                            (constantWrapper2 = ((Member) this).RootObject as ConstantWrapper) != null &&
                             !(constantWrapper2.Evaluate() is Namespace))
                         {
-                            ((Member) this).rootObject.context.HandleError(TError.NeedInstance);
+                            ((Member) this).RootObject.context.HandleError(TError.NeedInstance);
                             return null;
                         }
                         members = obj is ClassScope
