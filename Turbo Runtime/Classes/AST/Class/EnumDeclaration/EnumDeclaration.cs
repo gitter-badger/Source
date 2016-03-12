@@ -60,7 +60,7 @@ namespace Turbo.Runtime
 {
     internal sealed class EnumDeclaration : Class
     {
-        internal TypeExpression baseType;
+        internal TypeExpression BaseType;
 
         internal EnumDeclaration(Context context, AST id, TypeExpression baseType, Block body,
             FieldAttributes attributes, CustomAttributeList customAttributes)
@@ -68,51 +68,42 @@ namespace Turbo.Runtime
                 context, id, new TypeExpression(new ConstantWrapper(Typeob.Enum, null)), new TypeExpression[0], body,
                 attributes, false, false, true, false, customAttributes)
         {
-            this.baseType = (baseType ?? new TypeExpression(new ConstantWrapper(Typeob.Int32, null)));
+            BaseType = (baseType ?? new TypeExpression(new ConstantWrapper(Typeob.Int32, null)));
             needsEngine = false;
             this.attributes &= TypeAttributes.VisibilityMask;
             var type = new TypeExpression(new ConstantWrapper(classob, this.context));
-            AST aST = new ConstantWrapper(-1, null);
+            AST aSt = new ConstantWrapper(-1, null);
             AST operand = new ConstantWrapper(1, null);
             var memberFields = fields;
-            foreach (var jSVariableField in memberFields)
+            foreach (var variableField in memberFields)
             {
-                jSVariableField.attributeFlags = (FieldAttributes.FamANDAssem | FieldAttributes.Family |
+                variableField.attributeFlags = (FieldAttributes.FamANDAssem | FieldAttributes.Family |
                                                   FieldAttributes.Static | FieldAttributes.Literal);
-                jSVariableField.type = type;
-                aST = jSVariableField.value == null
-                    ? (AST) (jSVariableField.value = new Plus(aST.context, aST, operand))
-                    : (AST) jSVariableField.value;
-                var expr_E2 = jSVariableField;
-                expr_E2.value = new DeclaredEnumValue(expr_E2.value, jSVariableField.Name, classob);
+                variableField.type = type;
+                aSt = variableField.value == null
+                    ? (AST) (variableField.value = new Plus(aSt.context, aSt, operand))
+                    : (AST) variableField.value;
+                var exprE2 = variableField;
+                exprE2.value = new DeclaredEnumValue(exprE2.value, variableField.Name, classob);
             }
         }
 
         internal override AST PartiallyEvaluate()
         {
-            if (!(classob.GetParent() is GlobalScope))
-            {
-                return this;
-            }
-            baseType.PartiallyEvaluate();
-            var reflect = baseType.ToIReflect();
+            if (!(classob.GetParent() is GlobalScope)) return this;
+            BaseType.PartiallyEvaluate();
+            var reflect = BaseType.ToIReflect();
             Type bt;
             if (!(reflect is Type) || !Convert.IsPrimitiveIntegerType(bt = (Type) reflect))
             {
-                baseType.context.HandleError(TError.InvalidBaseTypeForEnum);
-                baseType = new TypeExpression(new ConstantWrapper(Typeob.Int32, null));
+                BaseType.context.HandleError(TError.InvalidBaseTypeForEnum);
+                BaseType = new TypeExpression(new ConstantWrapper(Typeob.Int32, null));
                 bt = Typeob.Int32;
             }
-            if (customAttributes != null)
-            {
-                customAttributes.PartiallyEvaluate();
-            }
+            customAttributes?.PartiallyEvaluate();
             if (NeedsToBeCheckedForCLSCompliance())
             {
-                if (!TypeExpression.TypeIsCLSCompliant(reflect))
-                {
-                    baseType.context.HandleError(TError.NonCLSCompliantType);
-                }
+                if (!TypeExpression.TypeIsCLSCompliant(reflect)) BaseType.context.HandleError(TError.NonCLSCompliantType);
                 CheckMemberNamesForCLSCompliance();
             }
             var scriptObject = enclosingScope;
@@ -125,9 +116,9 @@ namespace Turbo.Runtime
             try
             {
                 var memberFields = fields;
-                foreach (var jSMemberField in memberFields)
+                foreach (var memberField in memberFields)
                 {
-                    ((DeclaredEnumValue) jSMemberField.value).CoerceToBaseType(bt, jSMemberField.originalContext);
+                    ((DeclaredEnumValue) memberField.value).CoerceToBaseType(bt, memberField.originalContext);
                 }
             }
             finally
@@ -139,10 +130,7 @@ namespace Turbo.Runtime
 
         internal override Type GetTypeBuilderOrEnumBuilder()
         {
-            if (classob.classwriter != null)
-            {
-                return classob.classwriter;
-            }
+            if (classob.classwriter != null) return classob.classwriter;
             PartiallyEvaluate();
             var classScope = enclosingScope as ClassScope;
             if (classScope != null)
@@ -150,25 +138,19 @@ namespace Turbo.Runtime
                 var typeBuilder = ((TypeBuilder) classScope.classwriter).DefineNestedType(name,
                     attributes | TypeAttributes.Sealed, Typeob.Enum, null);
                 classob.classwriter = typeBuilder;
-                var type = baseType.ToType();
+                var type = BaseType.ToType();
                 typeBuilder.DefineField("value__", type, FieldAttributes.Private | FieldAttributes.SpecialName);
                 if (customAttributes == null) return typeBuilder;
                 var customAttributeBuilders = customAttributes.GetCustomAttributeBuilders(false);
-                foreach (var t in customAttributeBuilders)
-                {
-                    typeBuilder.SetCustomAttribute(t);
-                }
+                foreach (var t in customAttributeBuilders) typeBuilder.SetCustomAttribute(t);
                 return typeBuilder;
             }
-            var enumBuilder = compilerGlobals.module.DefineEnum(name, attributes, baseType.ToType());
+            var enumBuilder = compilerGlobals.module.DefineEnum(name, attributes, BaseType.ToType());
             classob.classwriter = enumBuilder;
             if (customAttributes != null)
             {
                 var customAttributeBuilders2 = customAttributes.GetCustomAttributeBuilders(false);
-                foreach (var t in customAttributeBuilders2)
-                {
-                    enumBuilder.SetCustomAttribute(t);
-                }
+                foreach (var t in customAttributeBuilders2) enumBuilder.SetCustomAttribute(t);
             }
             var memberFields = fields;
             foreach (var fieldInfo2 in memberFields)

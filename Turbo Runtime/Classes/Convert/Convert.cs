@@ -619,7 +619,7 @@ namespace Turbo.Runtime
                 var enumWrapper2 = value as EnumWrapper;
                 if (enumWrapper2 == null)
                 {
-                    return new DeclaredEnumValue(Coerce(value, enumDeclaration.baseType), null, classScope);
+                    return new DeclaredEnumValue(Coerce(value, enumDeclaration.BaseType), null, classScope);
                 }
                 if (enumWrapper2.classScopeOrType == classScope)
                 {
@@ -4869,7 +4869,7 @@ namespace Turbo.Runtime
                     }
                     if (!IsPrimitiveNumericType(source_ir))
                         return ReferenceEquals(source_ir, Typeob.String) || source_ir == target_ir;
-                    target_ir = ((EnumDeclaration) ((ClassScope) target_ir).owner).baseType.ToType();
+                    target_ir = ((EnumDeclaration) ((ClassScope) target_ir).owner).BaseType.ToType();
                     continue;
                 }
                 Type type;

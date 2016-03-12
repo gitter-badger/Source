@@ -382,7 +382,7 @@ namespace Turbo.Runtime
                         {
                             return true;
                         }
-                        lhir = enumDeclaration.baseType.ToType();
+                        lhir = enumDeclaration.BaseType.ToType();
                     }
                 }
                 else if (lhir is Type)
@@ -2305,7 +2305,7 @@ namespace Turbo.Runtime
                             var enumDeclaration = classScope.owner as EnumDeclaration;
                             if (enumDeclaration != null)
                             {
-                                obj = enumDeclaration.baseType.ToType();
+                                obj = enumDeclaration.BaseType.ToType();
                             }
                         }
                         var type6 = Convert.ToType(aST2.InferType(null));

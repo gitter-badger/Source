@@ -448,7 +448,7 @@ namespace Turbo.Runtime
             owner.PartiallyEvaluate();
             if (owner is EnumDeclaration)
             {
-                return ((EnumDeclaration) owner).baseType.ToType();
+                return ((EnumDeclaration) owner).BaseType.ToType();
             }
             var contained_object = ((WithObject) parent).contained_object;
             if (contained_object is ClassScope)
@@ -487,7 +487,7 @@ namespace Turbo.Runtime
         {
             if (owner is EnumDeclaration)
             {
-                return ((EnumDeclaration) owner.PartiallyEvaluate()).baseType.ToIReflect();
+                return ((EnumDeclaration) owner.PartiallyEvaluate()).BaseType.ToIReflect();
             }
             return this;
         }
@@ -586,7 +586,7 @@ namespace Turbo.Runtime
                 return true;
             }
             var enumDeclaration = owner as EnumDeclaration;
-            return enumDeclaration != null && Convert.IsPromotableTo(enumDeclaration.baseType.ToType(), other);
+            return enumDeclaration != null && Convert.IsPromotableTo(enumDeclaration.BaseType.ToType(), other);
         }
 
         internal bool ParentIsInSamePackage()
