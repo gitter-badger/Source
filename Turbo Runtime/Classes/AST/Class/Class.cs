@@ -65,133 +65,121 @@ namespace Turbo.Runtime
 {
     internal class Class : AST
     {
-        internal string name;
+        internal string Name;
 
-        private TypeExpression superTypeExpression;
+        private TypeExpression _superTypeExpression;
 
-        private TypeExpression[] interfaces;
+        private TypeExpression[] _interfaces;
 
-        internal readonly Block body;
+        internal readonly Block Body;
 
-        internal ScriptObject enclosingScope;
+        internal ScriptObject EnclosingScope;
 
-        internal TypeAttributes attributes;
+        internal TypeAttributes Attributes;
 
-        private bool hasAlreadyBeenAskedAboutDynamicElement;
+        private bool _hasAlreadyBeenAskedAboutDynamicElement;
 
-        internal readonly bool isAbstract;
+        internal readonly bool IsAbstract;
 
-        private bool isAlreadyPartiallyEvaluated;
+        private bool _isAlreadyPartiallyEvaluated;
 
-        private bool isCooked;
+        private bool _isCooked;
 
-        private Type cookedType;
+        private Type _cookedType;
 
-        private bool isDynamicElement;
+        private bool _isDynamicElement;
 
-        internal readonly bool isInterface;
+        internal readonly bool IsInterface;
 
         internal readonly bool isStatic;
 
-        protected bool needsEngine;
+        protected bool NeedsEngine;
 
-        internal AttributeTargets validOn;
+        internal AttributeTargets ValidOn;
 
-        internal bool allowMultiple;
+        internal bool AllowMultiple;
 
-        protected readonly ClassScope classob;
+        protected readonly ClassScope Classob;
 
-        private FunctionObject implicitDefaultConstructor;
+        private FunctionObject _implicitDefaultConstructor;
 
-        private TVariableField ownField;
+        private TVariableField _ownField;
 
-        protected readonly TMemberField[] fields;
+        protected readonly TMemberField[] Fields;
 
-        private Class superClass;
+        private Class _superClass;
 
-        private IReflect superIR;
+        private IReflect _superIr;
 
-        private object[] superMembers;
+        private object[] _superMembers;
 
-        private SimpleHashtable firstIndex;
+        private SimpleHashtable _firstIndex;
 
-        private MethodInfo fieldInitializer;
+        private MethodInfo _fieldInitializer;
 
-        internal readonly CustomAttributeList customAttributes;
+        internal readonly CustomAttributeList CustomAttributes;
 
-        internal CLSComplianceSpec clsCompliance;
+        internal CLSComplianceSpec ClsCompliance;
 
-        private bool generateCodeForDynamicElement;
+        private bool _generateCodeForDynamicElement;
 
-        private PropertyBuilder dynamicItemProp;
+        private PropertyBuilder _dynamicItemProp;
 
-        private MethodBuilder getHashTableMethod;
+        private MethodBuilder _getHashTableMethod;
 
-        private MethodBuilder getItem;
+        private MethodBuilder _getItem;
 
-        private MethodBuilder setItem;
+        private MethodBuilder _setItem;
 
-        internal MethodBuilder deleteOpMethod;
+        internal MethodBuilder DeleteOpMethod;
 
-        private static int badTypeNameCount;
+        private static int _badTypeNameCount;
 
-        internal bool IsStatic => isStatic || !(enclosingScope is ClassScope);
+        internal bool IsStatic => isStatic || !(EnclosingScope is ClassScope);
 
         internal Class(Context context, AST id, TypeExpression superTypeExpression, TypeExpression[] interfaces,
             Block body, FieldAttributes attributes, bool isAbstract, bool isFinal, bool isStatic, bool isInterface,
             CustomAttributeList customAttributes) : base(context)
         {
-            name = id.ToString();
-            this.superTypeExpression = superTypeExpression;
-            this.interfaces = interfaces;
-            this.body = body;
-            enclosingScope = (ScriptObject) Globals.ScopeStack.Peek(1);
-            this.attributes = TypeAttributes.Serializable;
+            Name = id.ToString();
+            _superTypeExpression = superTypeExpression;
+            _interfaces = interfaces;
+            Body = body;
+            EnclosingScope = (ScriptObject) Globals.ScopeStack.Peek(1);
+            Attributes = TypeAttributes.Serializable;
             SetAccessibility(attributes);
-            if (isAbstract)
-            {
-                this.attributes |= TypeAttributes.Abstract;
-            }
-            this.isAbstract = isAbstract | isInterface;
-            isAlreadyPartiallyEvaluated = false;
-            if (isFinal)
-            {
-                this.attributes |= TypeAttributes.Sealed;
-            }
-            if (isInterface)
-            {
-                this.attributes |= TypeAttributes.ClassSemanticsMask | TypeAttributes.Abstract;
-            }
-            isCooked = false;
-            cookedType = null;
-            isDynamicElement = false;
-            this.isInterface = isInterface;
+            if (isAbstract) Attributes |= TypeAttributes.Abstract;
+            IsAbstract = isAbstract | isInterface;
+            _isAlreadyPartiallyEvaluated = false;
+            if (isFinal) Attributes |= TypeAttributes.Sealed;
+            if (isInterface) Attributes |= TypeAttributes.ClassSemanticsMask | TypeAttributes.Abstract;
+            _isCooked = false;
+            _cookedType = null;
+            _isDynamicElement = false;
+            IsInterface = isInterface;
             this.isStatic = isStatic;
-            needsEngine = !isInterface;
-            validOn = 0;
-            allowMultiple = true;
-            classob = (ClassScope) Globals.ScopeStack.Peek();
-            classob.name = name;
-            classob.owner = this;
-            implicitDefaultConstructor = null;
-            if (!isInterface && !(this is EnumDeclaration))
-            {
-                SetupConstructors();
-            }
+            NeedsEngine = !isInterface;
+            ValidOn = 0;
+            AllowMultiple = true;
+            Classob = (ClassScope) Globals.ScopeStack.Peek();
+            Classob.name = Name;
+            Classob.owner = this;
+            _implicitDefaultConstructor = null;
+            if (!isInterface && !(this is EnumDeclaration)) SetupConstructors();
             EnterNameIntoEnclosingScopeAndGetOwnField(id, isStatic);
-            fields = classob.GetMemberFields();
-            superClass = null;
-            superIR = null;
-            superMembers = null;
-            firstIndex = null;
-            fieldInitializer = null;
-            this.customAttributes = customAttributes;
-            clsCompliance = CLSComplianceSpec.NotAttributed;
-            generateCodeForDynamicElement = false;
-            dynamicItemProp = null;
-            getHashTableMethod = null;
-            getItem = null;
-            setItem = null;
+            Fields = Classob.GetMemberFields();
+            _superClass = null;
+            _superIr = null;
+            _superMembers = null;
+            _firstIndex = null;
+            _fieldInitializer = null;
+            CustomAttributes = customAttributes;
+            ClsCompliance = CLSComplianceSpec.NotAttributed;
+            _generateCodeForDynamicElement = false;
+            _dynamicItemProp = null;
+            _getHashTableMethod = null;
+            _getItem = null;
+            _setItem = null;
         }
 
         private static void AddImplicitInterfaces(IReflect iface, IReflect[] explicitInterfaces,
@@ -203,44 +191,32 @@ namespace Turbo.Runtime
                 var array = type.GetInterfaces();
                 foreach (var value in array)
                 {
-                    if (Array.IndexOf(explicitInterfaces, value, 0) >= 0)
-                    {
-                        return;
-                    }
-                    if (implicitInterfaces.IndexOf(value, 0) >= 0)
-                    {
-                        return;
-                    }
+                    if (Array.IndexOf(explicitInterfaces, value, 0) >= 0) return;
+                    if (implicitInterfaces.IndexOf(value, 0) >= 0) return;
                     implicitInterfaces.Add(value);
                 }
                 return;
             }
-            var array2 = ((ClassScope) iface).owner.interfaces;
+            var array2 = ((ClassScope) iface).owner._interfaces;
             foreach (var value2 in array2.Select(t => t.ToIReflect()))
             {
-                if (Array.IndexOf(explicitInterfaces, value2, 0) >= 0)
-                {
-                    return;
-                }
-                if (implicitInterfaces.IndexOf(value2, 0) >= 0)
-                {
-                    return;
-                }
+                if (Array.IndexOf(explicitInterfaces, value2, 0) >= 0) return;
+                if (implicitInterfaces.IndexOf(value2, 0) >= 0) return;
                 implicitInterfaces.Add(value2);
             }
         }
 
         private void AllocateImplicitDefaultConstructor()
         {
-            implicitDefaultConstructor = new FunctionObject(".ctor", new ParameterDeclaration[0], null,
+            _implicitDefaultConstructor = new FunctionObject(".ctor", new ParameterDeclaration[0], null,
                 new Block(context),
-                new FunctionScope(classob, true), classob, context,
+                new FunctionScope(Classob, true), Classob, context,
                 MethodAttributes.FamANDAssem | MethodAttributes.Family | MethodAttributes.Virtual |
                 MethodAttributes.VtableLayoutMask, null, true)
             {
                 isImplicitCtor = true,
                 isConstructor = true,
-                proto = classob
+                proto = Classob
             };
         }
 
@@ -283,10 +259,7 @@ namespace Turbo.Runtime
             }
             MethodBase methodBase = TProperty.GetGetMethod((PropertyInfo) member, true) ??
                                     TProperty.GetSetMethod((PropertyInfo) member, true);
-            if (methodBase == null)
-            {
-                return false;
-            }
+            if (methodBase == null) return false;
             return (methodBase.Attributes & MethodAttributes.MemberAccessMask) != MethodAttributes.Private &&
                    (methodBase.Attributes & MethodAttributes.MemberAccessMask) != MethodAttributes.PrivateScope &&
                    (methodBase.Attributes & MethodAttributes.MemberAccessMask) != MethodAttributes.FamANDAssem &&
@@ -296,25 +269,16 @@ namespace Turbo.Runtime
 
         private void CheckFieldDeclarationConsistency(TVariableField field)
         {
-            var obj = firstIndex[field.Name];
-            if (obj == null)
-            {
-                return;
-            }
+            var obj = _firstIndex[field.Name];
+            if (obj == null) return;
             var i = (int) obj;
-            var num = superMembers.Length;
+            var num = _superMembers.Length;
             while (i < num)
             {
-                var obj2 = superMembers[i];
-                if (!(obj2 is MemberInfo))
-                {
-                    return;
-                }
+                var obj2 = _superMembers[i];
+                if (!(obj2 is MemberInfo)) return;
                 var memberInfo = (MemberInfo) obj2;
-                if (!memberInfo.Name.Equals(field.Name))
-                {
-                    return;
-                }
+                if (!memberInfo.Name.Equals(field.Name)) return;
                 if (CanSee(memberInfo))
                 {
                     var fullNameFor = GetFullNameFor(memberInfo);
@@ -326,103 +290,85 @@ namespace Turbo.Runtime
             }
         }
 
-        private void CheckIfOKToGenerateCodeForDynamicElement(bool superClassIsDynamicElement)
+        private void CheckIfOkToGenerateCodeForDynamicElement(bool superClassIsDynamicElement)
         {
             if (superClassIsDynamicElement)
             {
                 context.HandleError(TError.BaseClassIsDynamicElementAlready);
-                generateCodeForDynamicElement = false;
+                _generateCodeForDynamicElement = false;
                 return;
             }
             if (
-                classob.GetMember("Item",
+                Classob.GetMember("Item",
                     BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
                     BindingFlags.NonPublic).Length != 0)
             {
                 context.HandleError(TError.ItemNotAllowedOnDynamicElementClass);
-                generateCodeForDynamicElement = false;
+                _generateCodeForDynamicElement = false;
                 return;
             }
             if (
-                classob.GetMember("get_Item",
+                Classob.GetMember("get_Item",
                     BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
                     BindingFlags.NonPublic).Length != 0 ||
-                classob.GetMember("set_Item",
+                Classob.GetMember("set_Item",
                     BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
                     BindingFlags.NonPublic).Length != 0)
             {
                 context.HandleError(TError.MethodNotAllowedOnDynamicElementClass);
-                generateCodeForDynamicElement = false;
+                _generateCodeForDynamicElement = false;
                 return;
             }
             if (ImplementsInterface(Typeob.IEnumerable))
             {
                 context.HandleError(TError.DynamicElementClassShouldNotImpleEnumerable);
-                generateCodeForDynamicElement = false;
+                _generateCodeForDynamicElement = false;
                 return;
             }
             if (
-                superIR.GetMember("Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length !=
+                _superIr.GetMember("Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length !=
                 0 ||
-                superIR.GetMember("get_Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                _superIr.GetMember("get_Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                     .Length != 0 ||
-                superIR.GetMember("set_Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                _superIr.GetMember("set_Item", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                     .Length != 0)
             {
                 context.HandleError(TError.MethodClashOnDynamicElementSuperClass);
-                generateCodeForDynamicElement = false;
+                _generateCodeForDynamicElement = false;
                 return;
             }
-            var jSProperty = classob.itemProp = new TProperty("Item");
-            jSProperty.getter = new TDynamicElementIndexerMethod(classob, true);
-            jSProperty.setter = new TDynamicElementIndexerMethod(classob, false);
-            classob.AddNewField("Item", jSProperty, FieldAttributes.Literal);
+            var property = Classob.itemProp = new TProperty("Item");
+            property.getter = new TDynamicElementIndexerMethod(Classob, true);
+            property.setter = new TDynamicElementIndexerMethod(Classob, false);
+            Classob.AddNewField("Item", property, FieldAttributes.Literal);
         }
 
         private string GetFullName()
         {
-            var rootNamespace = ((ActivationObject) enclosingScope).GetName();
-            if (rootNamespace == null)
-            {
-                var engine = context.document.engine;
-                if (engine != null && engine.genStartupClass)
-                {
-                    rootNamespace = engine.RootNamespace;
-                }
-            }
-            if (rootNamespace != null)
-            {
-                return rootNamespace + "." + name;
-            }
-            return name;
+            var rootNamespace = ((ActivationObject) EnclosingScope).GetName();
+            if (rootNamespace != null) return rootNamespace + "." + Name;
+            var engine = context.document.engine;
+            if (engine != null && engine.genStartupClass) rootNamespace = engine.RootNamespace;
+            return rootNamespace != null ? rootNamespace + "." + Name : Name;
         }
 
-        protected void CheckMemberNamesForCLSCompliance()
+        protected void CheckMemberNamesForClsCompliance()
         {
-            if (!(enclosingScope is ClassScope))
-            {
-                Engine.CheckTypeNameForCLSCompliance(name, GetFullName(), context);
-            }
+            if (!(EnclosingScope is ClassScope)) Engine.CheckTypeNameForCLSCompliance(Name, GetFullName(), context);
             var hashtable = new Hashtable(StringComparer.OrdinalIgnoreCase);
             var i = 0;
-            var num = fields.Length;
+            var num = Fields.Length;
             while (i < num)
             {
-                var jSMemberField = fields[i];
-                if (!jSMemberField.IsPrivate)
+                var memberField = Fields[i];
+                if (!memberField.IsPrivate)
                 {
-                    if (!THPMainEngine.CheckIdentifierForCLSCompliance(jSMemberField.Name))
-                    {
-                        jSMemberField.originalContext.HandleError(TError.NonCLSCompliantMember);
-                    }
-                    else if ((TMemberField) hashtable[jSMemberField.Name] == null)
-                    {
-                        hashtable.Add(jSMemberField.Name, jSMemberField);
-                    }
+                    if (!THPMainEngine.CheckIdentifierForCLSCompliance(memberField.Name))
+                        memberField.originalContext.HandleError(TError.NonCLSCompliantMember);
+                    else if ((TMemberField) hashtable[memberField.Name] == null)
+                        hashtable.Add(memberField.Name, memberField);
                     else
-                    {
-                        jSMemberField.originalContext.HandleError(TError.NonCLSCompliantMember);
-                    }
+                        memberField.originalContext.HandleError(TError.NonCLSCompliantMember);
                 }
                 i++;
             }
@@ -430,100 +376,82 @@ namespace Turbo.Runtime
 
         private void CheckIfValidExtensionOfSuperType()
         {
-            GetIRForSuperType();
-            var classScope = superIR as ClassScope;
+            GetIrForSuperType();
+            var classScope = _superIr as ClassScope;
             if (classScope != null)
             {
                 if (IsStatic)
                 {
                     if (!classScope.owner.IsStatic)
                     {
-                        superTypeExpression.context.HandleError(TError.NestedInstanceTypeCannotBeExtendedByStatic);
-                        superIR = Typeob.Object;
-                        superTypeExpression = null;
+                        _superTypeExpression.context.HandleError(TError.NestedInstanceTypeCannotBeExtendedByStatic);
+                        _superIr = Typeob.Object;
+                        _superTypeExpression = null;
                     }
                 }
-                else if (!classScope.owner.IsStatic && enclosingScope != classScope.owner.enclosingScope)
+                else if (!classScope.owner.IsStatic && EnclosingScope != classScope.owner.EnclosingScope)
                 {
-                    superTypeExpression.context.HandleError(TError.NestedInstanceTypeCannotBeExtendedByStatic);
-                    superIR = Typeob.Object;
-                    superTypeExpression = null;
+                    _superTypeExpression.context.HandleError(TError.NestedInstanceTypeCannotBeExtendedByStatic);
+                    _superIr = Typeob.Object;
+                    _superTypeExpression = null;
                 }
             }
             GetSuperTypeMembers();
             GetStartIndexForEachName();
-            var flag = NeedsToBeCheckedForCLSCompliance();
-            if (flag)
-            {
-                CheckMemberNamesForCLSCompliance();
-            }
+            var flag = NeedsToBeCheckedForClsCompliance();
+            if (flag) CheckMemberNamesForClsCompliance();
             var i = 0;
-            var num = fields.Length;
+            var num = Fields.Length;
             while (i < num)
             {
-                var jSMemberField = fields[i];
-                if (jSMemberField.IsLiteral)
+                var memberField = Fields[i];
+                if (memberField.IsLiteral)
                 {
-                    var value = jSMemberField.value;
+                    var value = memberField.value;
                     if (value is FunctionObject)
                     {
                         while (true)
                         {
                             var functionObject = (FunctionObject) value;
-                            if (functionObject.implementedIface == null)
-                            {
-                                break;
-                            }
+                            if (functionObject.implementedIface == null) break;
                             CheckMethodDeclarationConsistency(functionObject);
                             if (functionObject.implementedIfaceMethod == null)
                             {
                                 functionObject.funcContext.HandleError(TError.NoMethodInBaseToOverride);
                             }
-                            if (jSMemberField.IsPublic || jSMemberField.IsFamily || jSMemberField.IsFamilyOrAssembly)
+                            if (memberField.IsPublic || memberField.IsFamily || memberField.IsFamilyOrAssembly)
                             {
                                 functionObject.CheckCLSCompliance(flag);
                             }
-                            jSMemberField = jSMemberField.nextOverload;
-                            if (jSMemberField == null)
-                            {
-                                break;
-                            }
-                            value = jSMemberField.value;
+                            memberField = memberField.nextOverload;
+                            if (memberField == null) break;
+                            value = memberField.value;
                         }
                     }
                 }
                 i++;
             }
             var j = 0;
-            var num2 = fields.Length;
+            var num2 = Fields.Length;
             while (j < num2)
             {
-                var jSMemberField2 = fields[j];
-                if (!jSMemberField2.IsLiteral)
-                {
-                    goto IL_21B;
-                }
-                var value2 = jSMemberField2.value;
+                var memberField2 = Fields[j];
+                if (!memberField2.IsLiteral) goto IL_21B;
+                var value2 = memberField2.value;
                 if (value2 is FunctionObject)
                 {
                     while (true)
                     {
                         var functionObject2 = (FunctionObject) value2;
-                        if (functionObject2.implementedIface != null)
-                        {
-                            break;
-                        }
+                        if (functionObject2.implementedIface != null) break;
                         CheckMethodDeclarationConsistency(functionObject2);
-                        if (jSMemberField2.IsPublic || jSMemberField2.IsFamily || jSMemberField2.IsFamilyOrAssembly)
+                        if (memberField2.IsPublic || memberField2.IsFamily || memberField2.IsFamilyOrAssembly)
                         {
                             functionObject2.CheckCLSCompliance(flag);
                         }
-                        jSMemberField2 = jSMemberField2.nextOverload;
-                        if (jSMemberField2 == null)
-                        {
-                            break;
-                        }
-                        value2 = jSMemberField2.value;
+                        memberField2 = memberField2.nextOverload;
+                        if (memberField2 == null) break;
+                        value2 = memberField2.value;
                     }
                 }
                 else if (!(value2 is TProperty))
@@ -534,10 +462,10 @@ namespace Turbo.Runtime
                 j++;
                 continue;
                 IL_21B:
-                CheckFieldDeclarationConsistency(jSMemberField2);
-                if (jSMemberField2.IsPublic || jSMemberField2.IsFamily || jSMemberField2.IsFamilyOrAssembly)
+                CheckFieldDeclarationConsistency(memberField2);
+                if (memberField2.IsPublic || memberField2.IsFamily || memberField2.IsFamilyOrAssembly)
                 {
-                    jSMemberField2.CheckCLSCompliance(flag);
+                    memberField2.CheckCLSCompliance(flag);
                 }
                 goto IL_246;
             }
@@ -545,15 +473,9 @@ namespace Turbo.Runtime
 
         private void CheckMethodDeclarationConsistency(FunctionObject func)
         {
-            if (func.isStatic && !func.isDynamicElementMethod)
-            {
-                return;
-            }
-            if (func.isConstructor)
-            {
-                return;
-            }
-            var obj = firstIndex[func.name];
+            if (func.isStatic && !func.isDynamicElementMethod) return;
+            if (func.isConstructor) return;
+            var obj = _firstIndex[func.name];
             if (obj == null)
             {
                 CheckThatMethodIsNotMarkedWithOverrideOrHide(func);
@@ -566,16 +488,13 @@ namespace Turbo.Runtime
             }
             MemberInfo memberInfo = null;
             var i = (int) obj;
-            var num = superMembers.Length;
+            var num = _superMembers.Length;
             while (i < num)
             {
-                var memberInfo2 = superMembers[i] as MemberInfo;
+                var memberInfo2 = _superMembers[i] as MemberInfo;
                 if (!(memberInfo2 == null))
                 {
-                    if (!memberInfo2.Name.Equals(func.name))
-                    {
-                        break;
-                    }
+                    if (!memberInfo2.Name.Equals(func.name)) break;
                     if (CanSee(memberInfo2))
                     {
                         if (memberInfo2.MemberType != MemberTypes.Method)
@@ -644,19 +563,19 @@ namespace Turbo.Runtime
 
         private void CheckMatchingMethodForConsistency(MethodInfo matchingMethod, FunctionObject func, int i, int n)
         {
-            object arg_2C_0 = func.ReturnType(null);
-            IReflect arg_2A_0;
+            object arg_2C0 = func.ReturnType(null);
+            IReflect arg_2A0;
             if (!(matchingMethod is TFieldMethod))
             {
                 IReflect returnType = matchingMethod.ReturnType;
-                arg_2A_0 = returnType;
+                arg_2A0 = returnType;
             }
             else
             {
-                arg_2A_0 = ((TFieldMethod) matchingMethod).func.ReturnType(null);
+                arg_2A0 = ((TFieldMethod) matchingMethod).func.ReturnType(null);
             }
-            var obj = arg_2A_0;
-            if (!arg_2C_0.Equals(obj))
+            var obj = arg_2A0;
+            if (!arg_2C0.Equals(obj))
             {
                 func.funcContext.HandleError(TError.DifferentReturnTypeFromBase, func.name, true);
                 return;
@@ -664,7 +583,7 @@ namespace Turbo.Runtime
             if (func.implementedIface != null)
             {
                 func.implementedIfaceMethod = matchingMethod;
-                superMembers[i] = func.name;
+                _superMembers[i] = func.name;
                 return;
             }
             var methodAttributes = func.attributes & MethodAttributes.MemberAccessMask;
@@ -680,7 +599,7 @@ namespace Turbo.Runtime
                 {
                     if ((matchingMethod.Attributes & MethodAttributes.Abstract) != MethodAttributes.PrivateScope)
                     {
-                        func.funcContext.HandleError(TError.HidesAbstractInBase, name + "." + func.name);
+                        func.funcContext.HandleError(TError.HidesAbstractInBase, Name + "." + func.name);
                         func.attributes &= ~MethodAttributes.VtableLayoutMask;
                     }
                     else
@@ -723,7 +642,7 @@ namespace Turbo.Runtime
             }
             else if ((matchingMethod.Attributes & MethodAttributes.Abstract) != MethodAttributes.PrivateScope)
             {
-                func.funcContext.HandleError(TError.HidesAbstractInBase, name + "." + func.name);
+                func.funcContext.HandleError(TError.HidesAbstractInBase, Name + "." + func.name);
                 func.attributes &= ~MethodAttributes.VtableLayoutMask;
             }
             else
@@ -732,10 +651,10 @@ namespace Turbo.Runtime
             }
             if (i < 0) return;
             {
-                superMembers[i] = func.name;
+                _superMembers[i] = func.name;
                 for (var j = i + 1; j < n; j++)
                 {
-                    var memberInfo = superMembers[j] as MemberInfo;
+                    var memberInfo = _superMembers[j] as MemberInfo;
                     if (memberInfo == null) continue;
                     if (memberInfo.Name != matchingMethod.Name)
                     {
@@ -744,30 +663,30 @@ namespace Turbo.Runtime
                     var methodInfo = memberInfo as MethodInfo;
                     if (methodInfo == null || !methodInfo.IsAbstract ||
                         !ParametersMatch(methodInfo.GetParameters(), matchingMethod.GetParameters())) continue;
-                    IReflect arg_2D2_0;
+                    IReflect arg_2D20;
                     if (!(matchingMethod is TFieldMethod))
                     {
                         IReflect returnType = matchingMethod.ReturnType;
-                        arg_2D2_0 = returnType;
+                        arg_2D20 = returnType;
                     }
                     else
                     {
-                        arg_2D2_0 = ((TFieldMethod) matchingMethod).ReturnIR();
+                        arg_2D20 = ((TFieldMethod) matchingMethod).ReturnIR();
                     }
-                    IReflect arg_2CE_0;
+                    IReflect arg2Ce0;
                     if (!(methodInfo is TFieldMethod))
                     {
                         IReflect returnType = methodInfo.ReturnType;
-                        arg_2CE_0 = returnType;
+                        arg2Ce0 = returnType;
                     }
                     else
                     {
-                        arg_2CE_0 = ((TFieldMethod) methodInfo).ReturnIR();
+                        arg2Ce0 = ((TFieldMethod) methodInfo).ReturnIR();
                     }
-                    var reflect = arg_2CE_0;
-                    if (arg_2D2_0 == reflect)
+                    var reflect = arg2Ce0;
+                    if (arg_2D20 == reflect)
                     {
-                        superMembers[j] = func.name;
+                        _superMembers[j] = func.name;
                     }
                 }
             }
@@ -776,50 +695,47 @@ namespace Turbo.Runtime
         private void CheckThatAllAbstractSuperClassMethodsAreImplemented()
         {
             var i = 0;
-            var num = superMembers.Length;
+            var num = _superMembers.Length;
             while (i < num)
             {
-                var methodInfo = superMembers[i] as MethodInfo;
+                var methodInfo = _superMembers[i] as MethodInfo;
                 if (methodInfo != null && methodInfo.IsAbstract)
                 {
                     for (var j = i - 1; j >= 0; j--)
                     {
-                        var obj = superMembers[j];
+                        var obj = _superMembers[j];
                         if (!(obj is MethodInfo)) continue;
                         var methodInfo2 = (MethodInfo) obj;
-                        if (methodInfo2.Name != methodInfo.Name)
-                        {
-                            break;
-                        }
+                        if (methodInfo2.Name != methodInfo.Name) break;
                         if (methodInfo2.IsAbstract ||
                             !ParametersMatch(methodInfo2.GetParameters(), methodInfo.GetParameters()))
                             continue;
-                        IReflect arg_D6_0;
+                        IReflect argD60;
                         if (!(methodInfo is TFieldMethod))
                         {
                             IReflect returnType = methodInfo.ReturnType;
-                            arg_D6_0 = returnType;
+                            argD60 = returnType;
                         }
                         else
                         {
-                            arg_D6_0 = ((TFieldMethod) methodInfo).ReturnIR();
+                            argD60 = ((TFieldMethod) methodInfo).ReturnIR();
                         }
-                        IReflect arg_D2_0;
+                        IReflect argD20;
                         if (!(methodInfo2 is TFieldMethod))
                         {
                             IReflect returnType = methodInfo2.ReturnType;
-                            arg_D2_0 = returnType;
+                            argD20 = returnType;
                         }
                         else
                         {
-                            arg_D2_0 = ((TFieldMethod) methodInfo2).ReturnIR();
+                            argD20 = ((TFieldMethod) methodInfo2).ReturnIR();
                         }
-                        var reflect = arg_D2_0;
-                        if (arg_D6_0 != reflect) continue;
-                        superMembers[i] = methodInfo.Name;
+                        var reflect = argD20;
+                        if (argD60 != reflect) continue;
+                        _superMembers[i] = methodInfo.Name;
                         goto IL_1FB;
                     }
-                    if (!isAbstract || (!isInterface && DefinedOnInterface(methodInfo)))
+                    if (!IsAbstract || (!IsInterface && DefinedOnInterface(methodInfo)))
                     {
                         var stringBuilder = new StringBuilder(methodInfo.DeclaringType.ToString());
                         stringBuilder.Append('.');
@@ -831,10 +747,7 @@ namespace Turbo.Runtime
                         while (k < num2)
                         {
                             stringBuilder.Append(parameters[k].ParameterType.FullName);
-                            if (k < num2 - 1)
-                            {
-                                stringBuilder.Append(", ");
-                            }
+                            if (k < num2 - 1) stringBuilder.Append(", ");
                             k++;
                         }
                         stringBuilder.Append(")");
@@ -844,7 +757,7 @@ namespace Turbo.Runtime
                             stringBuilder.Append(methodInfo.ReturnType.FullName);
                         }
                         context.HandleError(TError.MustImplementMethod, stringBuilder.ToString());
-                        attributes |= TypeAttributes.Abstract;
+                        Attributes |= TypeAttributes.Abstract;
                     }
                 }
                 IL_1FB:
@@ -854,10 +767,7 @@ namespace Turbo.Runtime
 
         private static void CheckThatMethodIsNotMarkedWithOverrideOrHide(FunctionObject func)
         {
-            if (func.noVersionSafeAttributeSpecified)
-            {
-                return;
-            }
+            if (func.noVersionSafeAttributeSpecified) return;
             if ((func.attributes & MethodAttributes.VtableLayoutMask) == MethodAttributes.PrivateScope)
             {
                 func.funcContext.HandleError(TError.NoMethodInBaseToOverride);
@@ -867,17 +777,12 @@ namespace Turbo.Runtime
         }
 
         private static bool DefinedOnInterface(MethodInfo meth)
-            =>
-                ((ClassScope) (meth as TFieldMethod)?.func.enclosing_scope)?.owner.isInterface ??
-                meth.DeclaringType.IsInterface;
+            => ((ClassScope) (meth as TFieldMethod)?.func.enclosing_scope)?.owner.IsInterface ?? meth.DeclaringType.IsInterface;
 
         private void EmitILForINeedEngineMethods()
         {
-            if (!needsEngine)
-            {
-                return;
-            }
-            var typeBuilder = (TypeBuilder) classob.classwriter;
+            if (!NeedsEngine) return;
+            var typeBuilder = (TypeBuilder) Classob.classwriter;
             var field = typeBuilder.DefineField("thp Engine", Typeob.THPMainEngine,
                 FieldAttributes.Private | FieldAttributes.NotSerialized);
             var methodBuilder = typeBuilder.DefineMethod("GetEngine",
@@ -889,19 +794,13 @@ namespace Turbo.Runtime
             var label = iLGenerator.DefineLabel();
             iLGenerator.Emit(OpCodes.Bne_Un_S, label);
             iLGenerator.Emit(OpCodes.Ldarg_0);
-            if (body.Engine.doCRS)
-            {
-                iLGenerator.Emit(OpCodes.Ldsfld, CompilerGlobals.contextEngineField);
-            }
+            if (Body.Engine.doCRS) iLGenerator.Emit(OpCodes.Ldsfld, CompilerGlobals.contextEngineField);
             else if (context.document.engine.PEFileKind == PEFileKinds.Dll)
             {
                 iLGenerator.Emit(OpCodes.Ldtoken, typeBuilder);
                 iLGenerator.Emit(OpCodes.Call, CompilerGlobals.createTHPMainEngineWithType);
             }
-            else
-            {
-                iLGenerator.Emit(OpCodes.Call, CompilerGlobals.createTHPMainEngine);
-            }
+            else iLGenerator.Emit(OpCodes.Call, CompilerGlobals.createTHPMainEngine);
             iLGenerator.Emit(OpCodes.Stfld, field);
             iLGenerator.MarkLabel(label);
             iLGenerator.Emit(OpCodes.Ldarg_0);
@@ -933,60 +832,57 @@ namespace Turbo.Runtime
                 var array = new object[num];
                 for (var i = 0; i < num; i++)
                 {
-                    var aST = i < num2 ? argAST[i] : new ConstantWrapper(null, null);
+                    var aSt = i < num2 ? argAST[i] : new ConstantWrapper(null, null);
                     if (pars[i].ParameterType.IsByRef)
                     {
-                        array[i] = aST.TranslateToILReference(il, pars[i].ParameterType.GetElementType());
+                        array[i] = aSt.TranslateToILReference(il, pars[i].ParameterType.GetElementType());
                     }
                     else
                     {
-                        aST.TranslateToIL(il, pars[i].ParameterType);
+                        aSt.TranslateToIL(il, pars[i].ParameterType);
                         array[i] = null;
                     }
                 }
                 if (supcons is TConstructor)
                 {
-                    var expr_AC = (TConstructor) supcons;
-                    flag = expr_AC.GetClassScope() != classob;
-                    supcons = expr_AC.GetConstructorInfo(compilerGlobals);
-                    if (expr_AC.GetClassScope().outerClassField != null)
-                    {
-                        Convert.EmitLdarg(il, (short) callerParameterCount);
-                    }
+                    var exprAc = (TConstructor) supcons;
+                    flag = exprAc.GetClassScope() != Classob;
+                    supcons = exprAc.GetConstructorInfo(compilerGlobals);
+                    if (exprAc.GetClassScope().outerClassField != null) Convert.EmitLdarg(il, (short) callerParameterCount);
                 }
                 il.Emit(OpCodes.Call, (ConstructorInfo) supcons);
                 for (var j = 0; j < num2; j++)
                 {
-                    var aST2 = argAST[j];
-                    if (!(aST2 is AddressOf) || array[j] == null) continue;
-                    var target_type = Convert.ToType(aST2.InferType(null));
-                    aST2.TranslateToILPreSet(il);
+                    var aSt2 = argAST[j];
+                    if (!(aSt2 is AddressOf) || array[j] == null) continue;
+                    var targetType = Convert.ToType(aSt2.InferType(null));
+                    aSt2.TranslateToILPreSet(il);
                     il.Emit(OpCodes.Ldloc, (LocalBuilder) array[j]);
-                    Convert.Emit(this, il, pars[j].ParameterType, target_type);
-                    aST2.TranslateToILSet(il);
+                    Convert.Emit(this, il, pars[j].ParameterType, targetType);
+                    aSt2.TranslateToILSet(il);
                 }
             }
-            if (classob.outerClassField != null)
+            if (Classob.outerClassField != null)
             {
                 il.Emit(OpCodes.Ldarg_0);
                 Convert.EmitLdarg(il, (short) callerParameterCount);
-                il.Emit(OpCodes.Stfld, classob.outerClassField);
+                il.Emit(OpCodes.Stfld, Classob.outerClassField);
             }
             if (!flag) return;
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Call, fieldInitializer);
-            body.TranslateToILInitOnlyInitializers(il);
+            il.Emit(OpCodes.Call, _fieldInitializer);
+            Body.TranslateToILInitOnlyInitializers(il);
         }
 
         private void EnterNameIntoEnclosingScopeAndGetOwnField(AST id, bool isStatic)
         {
-            if (((IActivationObject) enclosingScope).GetLocalField(name) != null)
+            if (((IActivationObject) EnclosingScope).GetLocalField(Name) != null)
             {
                 id.context.HandleError(TError.DuplicateName, true);
-                name += " class";
+                Name += " class";
             }
             var fieldAttributes = FieldAttributes.Literal;
-            switch (attributes & TypeAttributes.VisibilityMask)
+            switch (Attributes & TypeAttributes.VisibilityMask)
             {
                 case TypeAttributes.NestedPrivate:
                     fieldAttributes |= FieldAttributes.Private;
@@ -1007,7 +903,7 @@ namespace Turbo.Runtime
                     fieldAttributes |= FieldAttributes.Public;
                     break;
             }
-            var parent = enclosingScope;
+            var parent = EnclosingScope;
             while (parent is BlockScope)
             {
                 parent = parent.GetParent();
@@ -1015,45 +911,30 @@ namespace Turbo.Runtime
             if (!(parent is GlobalScope) && !(parent is PackageScope) && !(parent is ClassScope))
             {
                 isStatic = false;
-                if (this is EnumDeclaration)
-                {
-                    context.HandleError(TError.EnumNotAllowed);
-                }
-                else
-                {
-                    context.HandleError(TError.ClassNotAllowed);
-                }
+                if (this is EnumDeclaration) context.HandleError(TError.EnumNotAllowed);
+                else context.HandleError(TError.ClassNotAllowed);
             }
-            if (isStatic)
+            if (isStatic) fieldAttributes |= FieldAttributes.Static;
+            if (EnclosingScope is ActivationObject)
             {
-                fieldAttributes |= FieldAttributes.Static;
-            }
-            if (enclosingScope is ActivationObject)
-            {
-                if (enclosingScope is ClassScope && name == ((ClassScope) enclosingScope).name)
+                if (EnclosingScope is ClassScope && Name == ((ClassScope) EnclosingScope).name)
                 {
                     context.HandleError(TError.CannotUseNameOfClass);
-                    name += " nested class";
+                    Name += " nested class";
                 }
-                ownField = ((ActivationObject) enclosingScope).AddNewField(name, classob, fieldAttributes);
-                if (ownField is TLocalField)
-                {
-                    ((TLocalField) ownField).isDefined = true;
-                }
+                _ownField = ((ActivationObject) EnclosingScope).AddNewField(Name, Classob, fieldAttributes);
+                if (_ownField is TLocalField) ((TLocalField) _ownField).isDefined = true;
             }
-            else
-            {
-                ownField = ((StackFrame) enclosingScope).AddNewField(name, classob, fieldAttributes);
-            }
-            ownField.originalContext = id.context;
+            else _ownField = ((StackFrame) EnclosingScope).AddNewField(Name, Classob, fieldAttributes);
+            _ownField.originalContext = id.context;
         }
 
         internal override object Evaluate()
         {
-            Globals.ScopeStack.GuardedPush(classob);
+            Globals.ScopeStack.GuardedPush(Classob);
             try
             {
-                body.EvaluateStaticVariableInitializers();
+                Body.EvaluateStaticVariableInitializers();
             }
             finally
             {
@@ -1064,106 +945,106 @@ namespace Turbo.Runtime
 
         private void GenerateGetEnumerator()
         {
-            var expr_0B = classob.GetTypeBuilder();
-            var methodBuilder = expr_0B.DefineMethod("get enumerator",
+            var typeBuilder = Classob.GetTypeBuilder();
+            var methodBuilder = typeBuilder.DefineMethod("get enumerator",
                 MethodAttributes.Private | MethodAttributes.Virtual, Typeob.IEnumerator, null);
-            var expr_25 = methodBuilder.GetILGenerator();
-            expr_25.Emit(OpCodes.Ldarg_0);
-            expr_25.Emit(OpCodes.Call, getHashTableMethod);
-            expr_25.Emit(OpCodes.Call, CompilerGlobals.hashTableGetEnumerator);
-            expr_25.Emit(OpCodes.Ret);
-            expr_0B.DefineMethodOverride(methodBuilder, CompilerGlobals.getEnumeratorMethod);
+            var ilGenerator = methodBuilder.GetILGenerator();
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Call, _getHashTableMethod);
+            ilGenerator.Emit(OpCodes.Call, CompilerGlobals.hashTableGetEnumerator);
+            ilGenerator.Emit(OpCodes.Ret);
+            typeBuilder.DefineMethodOverride(methodBuilder, CompilerGlobals.getEnumeratorMethod);
         }
 
         private void GetDynamicElementFieldGetter(TypeBuilder classwriter)
         {
-            if (dynamicItemProp != null) return;
-            dynamicItemProp = classwriter.DefineProperty("Item", PropertyAttributes.None, Typeob.Object, new[]
+            if (_dynamicItemProp != null) return;
+            _dynamicItemProp = classwriter.DefineProperty("Item", PropertyAttributes.None, Typeob.Object, new[]
             {
                 Typeob.String
             });
             FieldInfo field = classwriter.DefineField("dynamic table", Typeob.SimpleHashtable, FieldAttributes.Private);
-            getHashTableMethod = classwriter.DefineMethod("get dynamic table", MethodAttributes.Private,
+            _getHashTableMethod = classwriter.DefineMethod("get dynamic table", MethodAttributes.Private,
                 Typeob.SimpleHashtable, null);
-            var expr_6B = getHashTableMethod.GetILGenerator();
-            expr_6B.Emit(OpCodes.Ldarg_0);
-            expr_6B.Emit(OpCodes.Ldfld, field);
-            expr_6B.Emit(OpCodes.Ldnull);
-            var label = expr_6B.DefineLabel();
-            expr_6B.Emit(OpCodes.Bne_Un_S, label);
-            expr_6B.Emit(OpCodes.Ldarg_0);
-            expr_6B.Emit(OpCodes.Ldc_I4_8);
-            expr_6B.Emit(OpCodes.Newobj, CompilerGlobals.hashtableCtor);
-            expr_6B.Emit(OpCodes.Stfld, field);
-            expr_6B.MarkLabel(label);
-            expr_6B.Emit(OpCodes.Ldarg_0);
-            expr_6B.Emit(OpCodes.Ldfld, field);
-            expr_6B.Emit(OpCodes.Ret);
+            var ilGenerator = _getHashTableMethod.GetILGenerator();
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldfld, field);
+            ilGenerator.Emit(OpCodes.Ldnull);
+            var label = ilGenerator.DefineLabel();
+            ilGenerator.Emit(OpCodes.Bne_Un_S, label);
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldc_I4_8);
+            ilGenerator.Emit(OpCodes.Newobj, CompilerGlobals.hashtableCtor);
+            ilGenerator.Emit(OpCodes.Stfld, field);
+            ilGenerator.MarkLabel(label);
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Ldfld, field);
+            ilGenerator.Emit(OpCodes.Ret);
         }
 
         internal MethodInfo GetDynamicElementIndexerGetter()
         {
-            if (getItem != null) return getItem;
-            var typeBuilder = classob.GetTypeBuilder();
+            if (_getItem != null) return _getItem;
+            var typeBuilder = Classob.GetTypeBuilder();
             GetDynamicElementFieldGetter(typeBuilder);
-            getItem = typeBuilder.DefineMethod("get_Item",
+            _getItem = typeBuilder.DefineMethod("get_Item",
                 MethodAttributes.FamANDAssem | MethodAttributes.Family | MethodAttributes.SpecialName, Typeob.Object,
                 new[]
                 {
                     Typeob.String
                 });
-            var expr_58 = getItem.GetILGenerator();
-            expr_58.Emit(OpCodes.Ldarg_0);
-            expr_58.Emit(OpCodes.Call, getHashTableMethod);
-            expr_58.Emit(OpCodes.Ldarg_1);
-            expr_58.Emit(OpCodes.Call, CompilerGlobals.hashtableGetItem);
-            expr_58.Emit(OpCodes.Dup);
-            var label = expr_58.DefineLabel();
-            expr_58.Emit(OpCodes.Brtrue_S, label);
-            expr_58.Emit(OpCodes.Pop);
-            expr_58.Emit(OpCodes.Ldsfld, CompilerGlobals.missingField);
-            expr_58.MarkLabel(label);
-            expr_58.Emit(OpCodes.Ret);
-            dynamicItemProp.SetGetMethod(getItem);
-            return getItem;
+            var ilGenerator = _getItem.GetILGenerator();
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Call, _getHashTableMethod);
+            ilGenerator.Emit(OpCodes.Ldarg_1);
+            ilGenerator.Emit(OpCodes.Call, CompilerGlobals.hashtableGetItem);
+            ilGenerator.Emit(OpCodes.Dup);
+            var label = ilGenerator.DefineLabel();
+            ilGenerator.Emit(OpCodes.Brtrue_S, label);
+            ilGenerator.Emit(OpCodes.Pop);
+            ilGenerator.Emit(OpCodes.Ldsfld, CompilerGlobals.missingField);
+            ilGenerator.MarkLabel(label);
+            ilGenerator.Emit(OpCodes.Ret);
+            _dynamicItemProp.SetGetMethod(_getItem);
+            return _getItem;
         }
 
         internal MethodInfo GetDynamicElementIndexerSetter()
         {
-            if (setItem != null) return setItem;
-            var typeBuilder = classob.GetTypeBuilder();
+            if (_setItem != null) return _setItem;
+            var typeBuilder = Classob.GetTypeBuilder();
             GetDynamicElementFieldGetter(typeBuilder);
-            setItem = typeBuilder.DefineMethod("set_Item",
+            _setItem = typeBuilder.DefineMethod("set_Item",
                 MethodAttributes.FamANDAssem | MethodAttributes.Family | MethodAttributes.SpecialName, Typeob.Void,
                 new[]
                 {
                     Typeob.String,
                     Typeob.Object
                 });
-            var expr_60 = setItem.GetILGenerator();
-            expr_60.Emit(OpCodes.Ldarg_0);
-            expr_60.Emit(OpCodes.Call, getHashTableMethod);
-            expr_60.Emit(OpCodes.Ldarg_2);
-            expr_60.Emit(OpCodes.Ldsfld, CompilerGlobals.missingField);
-            var label = expr_60.DefineLabel();
-            expr_60.Emit(OpCodes.Beq_S, label);
-            expr_60.Emit(OpCodes.Ldarg_1);
-            expr_60.Emit(OpCodes.Ldarg_2);
-            expr_60.Emit(OpCodes.Call, CompilerGlobals.hashtableSetItem);
-            expr_60.Emit(OpCodes.Ret);
-            expr_60.MarkLabel(label);
-            expr_60.Emit(OpCodes.Ldarg_1);
-            expr_60.Emit(OpCodes.Call, CompilerGlobals.hashtableRemove);
-            expr_60.Emit(OpCodes.Ret);
-            dynamicItemProp.SetSetMethod(setItem);
-            return setItem;
+            var ilGenerator = _setItem.GetILGenerator();
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Call, _getHashTableMethod);
+            ilGenerator.Emit(OpCodes.Ldarg_2);
+            ilGenerator.Emit(OpCodes.Ldsfld, CompilerGlobals.missingField);
+            var label = ilGenerator.DefineLabel();
+            ilGenerator.Emit(OpCodes.Beq_S, label);
+            ilGenerator.Emit(OpCodes.Ldarg_1);
+            ilGenerator.Emit(OpCodes.Ldarg_2);
+            ilGenerator.Emit(OpCodes.Call, CompilerGlobals.hashtableSetItem);
+            ilGenerator.Emit(OpCodes.Ret);
+            ilGenerator.MarkLabel(label);
+            ilGenerator.Emit(OpCodes.Ldarg_1);
+            ilGenerator.Emit(OpCodes.Call, CompilerGlobals.hashtableRemove);
+            ilGenerator.Emit(OpCodes.Ret);
+            _dynamicItemProp.SetSetMethod(_setItem);
+            return _setItem;
         }
 
         private void GetDynamicElementDeleteMethod()
         {
-            var typeBuilder = classob.GetTypeBuilder();
+            var typeBuilder = Classob.GetTypeBuilder();
             var methodBuilder =
-                deleteOpMethod =
+                DeleteOpMethod =
                     typeBuilder.DefineMethod("op_Delete",
                         MethodAttributes.FamANDAssem | MethodAttributes.Family | MethodAttributes.Static |
                         MethodAttributes.SpecialName, Typeob.Boolean, new[]
@@ -1174,63 +1055,42 @@ namespace Turbo.Runtime
             methodBuilder.DefineParameter(2, ParameterAttributes.None, null)
                 .SetCustomAttribute(
                     new CustomAttributeBuilder(Typeob.ParamArrayAttribute.GetConstructor(Type.EmptyTypes), new object[0]));
-            var expr_6B = methodBuilder.GetILGenerator();
-            expr_6B.Emit(OpCodes.Ldarg_0);
-            expr_6B.Emit(OpCodes.Call, getHashTableMethod);
-            expr_6B.Emit(OpCodes.Ldarg_1);
-            expr_6B.Emit(OpCodes.Dup);
-            expr_6B.Emit(OpCodes.Ldlen);
-            expr_6B.Emit(OpCodes.Ldc_I4_1);
-            expr_6B.Emit(OpCodes.Sub);
-            expr_6B.Emit(OpCodes.Ldelem_Ref);
-            expr_6B.Emit(OpCodes.Call, CompilerGlobals.hashtableRemove);
-            expr_6B.Emit(OpCodes.Ldc_I4_1);
-            expr_6B.Emit(OpCodes.Ret);
+            var ilGenerator = methodBuilder.GetILGenerator();
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            ilGenerator.Emit(OpCodes.Call, _getHashTableMethod);
+            ilGenerator.Emit(OpCodes.Ldarg_1);
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldlen);
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+            ilGenerator.Emit(OpCodes.Sub);
+            ilGenerator.Emit(OpCodes.Ldelem_Ref);
+            ilGenerator.Emit(OpCodes.Call, CompilerGlobals.hashtableRemove);
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+            ilGenerator.Emit(OpCodes.Ret);
         }
 
         private static string GetFullNameFor(MemberInfo supMem)
         {
             string str;
-            if (supMem is TField)
-            {
-                str = ((TField) supMem).GetClassFullName();
-            }
-            else if (supMem is TConstructor)
-            {
-                str = ((TConstructor) supMem).GetClassFullName();
-            }
-            else if (supMem is TMethod)
-            {
-                str = ((TMethod) supMem).GetClassFullName();
-            }
-            else if (supMem is TProperty)
-            {
-                str = ((TProperty) supMem).GetClassFullName();
-            }
-            else if (supMem is TWrappedProperty)
-            {
-                str = ((TWrappedProperty) supMem).GetClassFullName();
-            }
-            else
-            {
-                str = supMem.DeclaringType.FullName;
-            }
+            if (supMem is TField) str = ((TField) supMem).GetClassFullName();
+            else if (supMem is TConstructor) str = ((TConstructor) supMem).GetClassFullName();
+            else if (supMem is TMethod) str = ((TMethod) supMem).GetClassFullName();
+            else if (supMem is TProperty) str = ((TProperty) supMem).GetClassFullName();
+            else if (supMem is TWrappedProperty) str = ((TWrappedProperty) supMem).GetClassFullName();
+            else str = supMem.DeclaringType.FullName;
             return str + "." + supMem.Name;
         }
 
         internal MemberInfo[] GetInterfaceMember(string name)
         {
             PartiallyEvaluate();
-            if (isInterface)
+            if (IsInterface)
             {
-                var member = classob.GetMember(name,
+                var member = Classob.GetMember(name,
                     BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public);
-                if (member != null && member.Length != 0)
-                {
-                    return member;
-                }
+                if (member != null && member.Length != 0) return member;
             }
-            var array = interfaces;
+            var array = _interfaces;
             foreach (
                 var member in
                     array.Select(
@@ -1244,64 +1104,61 @@ namespace Turbo.Runtime
             return new MemberInfo[0];
         }
 
-        private void GetIRForSuperType()
+        private void GetIrForSuperType()
         {
-            var reflect = superIR = Typeob.Object;
-            if (superTypeExpression != null)
+            var reflect = _superIr = Typeob.Object;
+            if (_superTypeExpression != null)
             {
-                superTypeExpression.PartiallyEvaluate();
-                reflect = superIR = superTypeExpression.ToIReflect();
+                _superTypeExpression.PartiallyEvaluate();
+                reflect = _superIr = _superTypeExpression.ToIReflect();
             }
             var type = reflect as Type;
             if (type != null)
             {
                 if (type.IsSealed || type.IsInterface || type == Typeob.ValueType || type == Typeob.ArrayObject)
                 {
-                    if (superTypeExpression.Evaluate() is Namespace)
+                    if (_superTypeExpression.Evaluate() is Namespace)
                     {
-                        superTypeExpression.context.HandleError(TError.NeedType);
+                        _superTypeExpression.context.HandleError(TError.NeedType);
                     }
                     else
                     {
-                        superTypeExpression.context.HandleError(TError.TypeCannotBeExtended, type.FullName);
+                        _superTypeExpression.context.HandleError(TError.TypeCannotBeExtended, type.FullName);
                     }
-                    superTypeExpression = null;
-                    superIR = Typeob.Object;
+                    _superTypeExpression = null;
+                    _superIr = Typeob.Object;
                     return;
                 }
-                if (Typeob.INeedEngine.IsAssignableFrom(type))
-                {
-                    needsEngine = false;
-                }
+                if (Typeob.INeedEngine.IsAssignableFrom(type)) NeedsEngine = false;
             }
             else if (reflect is ClassScope)
             {
                 if (((ClassScope) reflect).owner.IsASubClassOf(this))
                 {
-                    superTypeExpression.context.HandleError(TError.CircularDefinition);
-                    superTypeExpression = null;
-                    superIR = Typeob.Object;
+                    _superTypeExpression.context.HandleError(TError.CircularDefinition);
+                    _superTypeExpression = null;
+                    _superIr = Typeob.Object;
                     return;
                 }
-                needsEngine = false;
-                superClass = ((ClassScope) reflect).owner;
-                if ((superClass.attributes & TypeAttributes.Sealed) != TypeAttributes.NotPublic)
+                NeedsEngine = false;
+                _superClass = ((ClassScope) reflect).owner;
+                if ((_superClass.Attributes & TypeAttributes.Sealed) != TypeAttributes.NotPublic)
                 {
-                    superTypeExpression.context.HandleError(TError.TypeCannotBeExtended, superClass.name);
-                    superClass.attributes &= ~TypeAttributes.Sealed;
-                    superTypeExpression = null;
+                    _superTypeExpression.context.HandleError(TError.TypeCannotBeExtended, _superClass.Name);
+                    _superClass.Attributes &= ~TypeAttributes.Sealed;
+                    _superTypeExpression = null;
                     return;
                 }
-                if (!superClass.isInterface) return;
-                superTypeExpression.context.HandleError(TError.TypeCannotBeExtended, superClass.name);
-                superIR = Typeob.Object;
-                superTypeExpression = null;
+                if (!_superClass.IsInterface) return;
+                _superTypeExpression.context.HandleError(TError.TypeCannotBeExtended, _superClass.Name);
+                _superIr = Typeob.Object;
+                _superTypeExpression = null;
             }
             else
             {
-                superTypeExpression.context.HandleError(TError.TypeCannotBeExtended);
-                superIR = Typeob.Object;
-                superTypeExpression = null;
+                _superTypeExpression.context.HandleError(TError.TypeCannotBeExtended);
+                _superIr = Typeob.Object;
+                _superTypeExpression = null;
             }
         }
 
@@ -1310,220 +1167,151 @@ namespace Turbo.Runtime
             var simpleHashtable = new SimpleHashtable(32u);
             string b = null;
             var i = 0;
-            var num = superMembers.Length;
+            var num = _superMembers.Length;
             while (i < num)
             {
-                var text = ((MemberInfo) superMembers[i]).Name;
-                if (text != b)
-                {
-                    simpleHashtable[b = text] = i;
-                }
+                var text = ((MemberInfo) _superMembers[i]).Name;
+                if (text != b) simpleHashtable[b = text] = i;
                 i++;
             }
-            firstIndex = simpleHashtable;
+            _firstIndex = simpleHashtable;
         }
 
         internal ConstructorInfo GetSuperConstructor(IReflect[] argIRs)
-            =>
-                (superTypeExpression != null ? superTypeExpression.Evaluate() : Typeob.Object) is ClassScope
-                    ? TBinder.SelectConstructor(
-                        ((ClassScope) (superTypeExpression != null ? superTypeExpression.Evaluate() : Typeob.Object))
-                            .constructors, argIRs)
-                    : TBinder.SelectConstructor(
-                        ((Type) (superTypeExpression != null ? superTypeExpression.Evaluate() : Typeob.Object))
-                            .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic),
-                        argIRs);
+            => (_superTypeExpression != null ? _superTypeExpression.Evaluate() : Typeob.Object) is ClassScope
+                ? TBinder.SelectConstructor(
+                    ((ClassScope) (_superTypeExpression != null ? _superTypeExpression.Evaluate() : Typeob.Object))
+                        .constructors, argIRs)
+                : TBinder.SelectConstructor(
+                    ((Type) (_superTypeExpression != null ? _superTypeExpression.Evaluate() : Typeob.Object))
+                        .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic),
+                            argIRs);
 
         private void GetSuperTypeMembers()
         {
             var superTypeMembersSorter = new SuperTypeMembersSorter();
-            var reflect = superIR;
+            var reflect = _superIr;
             while (reflect != null)
             {
                 superTypeMembersSorter.Add(
                     reflect.GetMembers(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static |
                                        BindingFlags.Public | BindingFlags.NonPublic));
-                if (reflect is Type)
-                {
-                    reflect = ((Type) reflect).BaseType;
-                }
-                else
-                {
-                    reflect = ((ClassScope) reflect).GetSuperType();
-                }
+                reflect = reflect is Type ? ((Type) reflect).BaseType : ((ClassScope) reflect).GetSuperType();
             }
             var arrayList = new ArrayList();
-            var num = interfaces.Length;
+            var num = _interfaces.Length;
             var array = new IReflect[num];
             for (var i = 0; i < num; i++)
             {
-                var reflect2 = array[i] = interfaces[i].ToIReflect();
+                var reflect2 = array[i] = _interfaces[i].ToIReflect();
                 var type = reflect2 as Type;
-                var flag = type?.IsInterface ?? ((ClassScope) reflect2).owner.isInterface;
-                if (!flag)
-                {
-                    interfaces[i].context.HandleError(TError.NeedInterface);
-                }
+                var flag = type?.IsInterface ?? ((ClassScope) reflect2).owner.IsInterface;
+                if (!flag) _interfaces[i].context.HandleError(TError.NeedInterface);
             }
             var array2 = array;
-            foreach (var iface in array2)
-            {
-                AddImplicitInterfaces(iface, array, arrayList);
-            }
-            foreach (var iface2 in arrayList.Cast<IReflect>())
-            {
-                AddImplicitInterfaces(iface2, array, arrayList);
-            }
+            foreach (var iface in array2) AddImplicitInterfaces(iface, array, arrayList);
+            foreach (var iface2 in arrayList.Cast<IReflect>()) AddImplicitInterfaces(iface2, array, arrayList);
             var count = arrayList.Count;
             if (count > 0)
             {
                 var array3 = new TypeExpression[num + count];
-                for (var l = 0; l < num; l++)
-                {
-                    array3[l] = interfaces[l];
-                }
-                for (var m = 0; m < count; m++)
-                {
-                    array3[m + num] = new TypeExpression(new ConstantWrapper(arrayList[m], null));
-                }
-                interfaces = array3;
+                for (var l = 0; l < num; l++) array3[l] = _interfaces[l];
+                for (var m = 0; m < count; m++) array3[m + num] = new TypeExpression(new ConstantWrapper(arrayList[m], null));
+                _interfaces = array3;
             }
-            var array4 = interfaces;
+            var array4 = _interfaces;
             foreach (var typeExpression in array4)
             {
                 var classScope = typeExpression.ToIReflect() as ClassScope;
-                if (classScope != null && classScope.owner.ImplementsInterface(classob))
+                if (classScope != null && classScope.owner.ImplementsInterface(Classob))
                 {
                     context.HandleError(TError.CircularDefinition);
-                    interfaces = new TypeExpression[0];
+                    _interfaces = new TypeExpression[0];
                     break;
                 }
                 superTypeMembersSorter.Add(
                     typeExpression.ToIReflect()
                         .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic));
             }
-            reflect = superIR;
+            reflect = _superIr;
             while (reflect != null)
             {
                 var type2 = reflect as Type;
                 if (type2 != null)
                 {
-                    if (!type2.IsAbstract)
-                    {
-                        break;
-                    }
+                    if (!type2.IsAbstract) break;
                     GetUnimplementedInferfaceMembersFor(type2, superTypeMembersSorter);
                     reflect = type2.BaseType;
                 }
                 else
                 {
                     var classScope2 = (ClassScope) reflect;
-                    if (!classScope2.owner.isAbstract)
-                    {
-                        break;
-                    }
+                    if (!classScope2.owner.IsAbstract) break;
                     classScope2.owner.GetUnimplementedInferfaceMembers(superTypeMembersSorter);
                     reflect = null;
                 }
             }
-            superMembers = superTypeMembersSorter.GetMembers();
+            _superMembers = superTypeMembersSorter.GetMembers();
         }
 
-        internal TypeBuilder GetTypeBuilder()
-        {
-            return (TypeBuilder) GetTypeBuilderOrEnumBuilder();
-        }
+        internal TypeBuilder GetTypeBuilder() => (TypeBuilder) GetTypeBuilderOrEnumBuilder();
 
         internal virtual Type GetTypeBuilderOrEnumBuilder()
         {
-            if (classob.classwriter != null)
-            {
-                return classob.classwriter;
-            }
-            if (!isAlreadyPartiallyEvaluated)
-            {
-                PartiallyEvaluate();
-            }
+            if (Classob.classwriter != null) return Classob.classwriter;
+            if (!_isAlreadyPartiallyEvaluated) PartiallyEvaluate();
             Type parent;
-            if (superTypeExpression != null)
-            {
-                parent = superTypeExpression.ToType();
-            }
-            else
-            {
-                parent = isInterface ? null : Typeob.Object;
-            }
-            var num = (needsEngine ? 1 : 0) + (generateCodeForDynamicElement ? 1 : 0);
-            var num2 = interfaces.Length + num;
+            parent = _superTypeExpression != null ? _superTypeExpression.ToType() : (IsInterface ? null : Typeob.Object);
+            var num = (NeedsEngine ? 1 : 0) + (_generateCodeForDynamicElement ? 1 : 0);
+            var num2 = _interfaces.Length + num;
             var array = new Type[num2];
-            for (var i = num; i < num2; i++)
-            {
-                array[i] = interfaces[i - num].ToType();
-            }
-            if (needsEngine)
-            {
-                array[--num] = Typeob.INeedEngine;
-            }
-            if (generateCodeForDynamicElement)
-            {
-                array[num - 1] = Typeob.IEnumerable;
-            }
+            for (var i = num; i < num2; i++) array[i] = _interfaces[i - num].ToType();
+            if (NeedsEngine) array[--num] = Typeob.INeedEngine;
+            if (_generateCodeForDynamicElement) array[num - 1] = Typeob.IEnumerable;
             TypeBuilder typeBuilder;
-            if (enclosingScope is ClassScope)
+            if (EnclosingScope is ClassScope)
             {
-                if ((typeBuilder = (TypeBuilder) classob.classwriter) == null)
+                if ((typeBuilder = (TypeBuilder) Classob.classwriter) == null)
                 {
-                    var typeBuilder2 = ((ClassScope) enclosingScope).owner.GetTypeBuilder();
-                    if (classob.classwriter != null)
+                    var typeBuilder2 = ((ClassScope) EnclosingScope).owner.GetTypeBuilder();
+                    if (Classob.classwriter != null) return Classob.classwriter;
+                    typeBuilder = typeBuilder2.DefineNestedType(Name, Attributes, parent, array);
+                    Classob.classwriter = typeBuilder;
+                    if (!isStatic && !IsInterface)
                     {
-                        return classob.classwriter;
-                    }
-                    typeBuilder = typeBuilder2.DefineNestedType(name, attributes, parent, array);
-                    classob.classwriter = typeBuilder;
-                    if (!isStatic && !isInterface)
-                    {
-                        classob.outerClassField = typeBuilder.DefineField("outer class instance", typeBuilder2,
+                        Classob.outerClassField = typeBuilder.DefineField("outer class instance", typeBuilder2,
                             FieldAttributes.Private);
                     }
                 }
             }
             else
             {
-                var rootNamespace = ((ActivationObject) enclosingScope).GetName();
+                var rootNamespace = ((ActivationObject) EnclosingScope).GetName();
                 if (rootNamespace == null)
                 {
                     var engine = context.document.engine;
-                    if (engine != null && engine.genStartupClass)
-                    {
-                        rootNamespace = engine.RootNamespace;
-                    }
+                    if (engine != null && engine.genStartupClass) rootNamespace = engine.RootNamespace;
                 }
-                if ((typeBuilder = (TypeBuilder) classob.classwriter) == null)
+                if ((typeBuilder = (TypeBuilder) Classob.classwriter) == null)
                 {
-                    var text = name;
-                    if (rootNamespace != null)
-                    {
-                        text = rootNamespace + "." + text;
-                    }
+                    var text = Name;
+                    if (rootNamespace != null) text = rootNamespace + "." + text;
                     if (text.Length >= 1024)
                     {
                         context.HandleError(TError.TypeNameTooLong, text);
-                        text = "bad type name " + badTypeNameCount.ToString(CultureInfo.InvariantCulture);
-                        badTypeNameCount++;
+                        text = "bad type name " + _badTypeNameCount.ToString(CultureInfo.InvariantCulture);
+                        _badTypeNameCount++;
                     }
-                    typeBuilder = compilerGlobals.module.DefineType(text, attributes, parent, array);
-                    classob.classwriter = typeBuilder;
+                    typeBuilder = compilerGlobals.module.DefineType(text, Attributes, parent, array);
+                    Classob.classwriter = typeBuilder;
                 }
             }
-            if (customAttributes != null)
+            if (CustomAttributes != null)
             {
-                var customAttributeBuilders = customAttributes.GetCustomAttributeBuilders(false);
-                foreach (var t in customAttributeBuilders)
-                {
-                    typeBuilder.SetCustomAttribute(t);
-                }
+                var customAttributeBuilders = CustomAttributes.GetCustomAttributeBuilders(false);
+                foreach (var t in customAttributeBuilders) typeBuilder.SetCustomAttribute(t);
             }
-            if (clsCompliance == CLSComplianceSpec.CLSCompliant)
+            if (ClsCompliance == CLSComplianceSpec.CLSCompliant)
             {
                 typeBuilder.SetCustomAttribute(new CustomAttributeBuilder(CompilerGlobals.clsCompliantAttributeCtor,
                     new object[]
@@ -1531,7 +1319,7 @@ namespace Turbo.Runtime
                         true
                     }));
             }
-            else if (clsCompliance == CLSComplianceSpec.NonCLSCompliant)
+            else if (ClsCompliance == CLSComplianceSpec.NonCLSCompliant)
             {
                 typeBuilder.SetCustomAttribute(new CustomAttributeBuilder(CompilerGlobals.clsCompliantAttributeCtor,
                     new object[]
@@ -1539,7 +1327,7 @@ namespace Turbo.Runtime
                         false
                     }));
             }
-            if (generateCodeForDynamicElement)
+            if (_generateCodeForDynamicElement)
             {
                 typeBuilder.SetCustomAttribute(new CustomAttributeBuilder(CompilerGlobals.defaultMemberAttributeCtor,
                     new object[]
@@ -1548,30 +1336,27 @@ namespace Turbo.Runtime
                     }));
             }
             var k = 0;
-            var num3 = fields.Length;
+            var num3 = Fields.Length;
             while (k < num3)
             {
-                var jSMemberField = fields[k];
-                if (jSMemberField.IsLiteral)
+                var memberField = Fields[k];
+                if (memberField.IsLiteral)
                 {
-                    var value = jSMemberField.value;
+                    var value = memberField.value;
                     if (value is TProperty)
                     {
-                        var jSProperty = (TProperty) value;
-                        var indexParameters = jSProperty.GetIndexParameters();
+                        var property = (TProperty) value;
+                        var indexParameters = property.GetIndexParameters();
                         var num4 = indexParameters.Length;
                         var array2 = new Type[num4];
-                        for (var l = 0; l < num4; l++)
-                        {
-                            array2[l] = indexParameters[l].ParameterType;
-                        }
+                        for (var l = 0; l < num4; l++) array2[l] = indexParameters[l].ParameterType;
                         var propertyBuilder =
-                            jSProperty.metaData =
-                                typeBuilder.DefineProperty(jSMemberField.Name, jSProperty.Attributes,
-                                    jSProperty.PropertyType, array2);
-                        if (jSProperty.getter != null)
+                            property.metaData =
+                                typeBuilder.DefineProperty(memberField.Name, property.Attributes,
+                                    property.PropertyType, array2);
+                        if (property.getter != null)
                         {
-                            var customAttributeList = ((TFieldMethod) jSProperty.getter).func.customAttributes;
+                            var customAttributeList = ((TFieldMethod) property.getter).func.customAttributes;
                             if (customAttributeList != null)
                             {
                                 var customAttributeBuilders2 = customAttributeList.GetCustomAttributeBuilders(true);
@@ -1581,11 +1366,11 @@ namespace Turbo.Runtime
                                 }
                             }
                             propertyBuilder.SetGetMethod(
-                                (MethodBuilder) jSProperty.getter.GetMethodInfo(compilerGlobals));
+                                (MethodBuilder) property.getter.GetMethodInfo(compilerGlobals));
                         }
-                        if (jSProperty.setter != null)
+                        if (property.setter != null)
                         {
-                            var customAttributeList2 = ((TFieldMethod) jSProperty.setter).func.customAttributes;
+                            var customAttributeList2 = ((TFieldMethod) property.setter).func.customAttributes;
                             if (customAttributeList2 != null)
                             {
                                 var customAttributeBuilders2 = customAttributeList2.GetCustomAttributeBuilders(true);
@@ -1595,7 +1380,7 @@ namespace Turbo.Runtime
                                 }
                             }
                             propertyBuilder.SetSetMethod(
-                                (MethodBuilder) jSProperty.setter.GetMethodInfo(compilerGlobals));
+                                (MethodBuilder) property.setter.GetMethodInfo(compilerGlobals));
                         }
                     }
                     else if (value is ClassScope)
@@ -1604,41 +1389,38 @@ namespace Turbo.Runtime
                     }
                     else if (Convert.GetTypeCode(value) != TypeCode.Object)
                     {
-                        var fieldBuilder = typeBuilder.DefineField(jSMemberField.Name, jSMemberField.FieldType,
-                            jSMemberField.Attributes);
-                        fieldBuilder.SetConstant(jSMemberField.value);
-                        jSMemberField.metaData = fieldBuilder;
-                        jSMemberField.WriteCustomAttribute(Engine.doCRS);
+                        var fieldBuilder = typeBuilder.DefineField(memberField.Name, memberField.FieldType,
+                            memberField.Attributes);
+                        fieldBuilder.SetConstant(memberField.value);
+                        memberField.metaData = fieldBuilder;
+                        memberField.WriteCustomAttribute(Engine.doCRS);
                     }
                     else if (value is FunctionObject)
                     {
                         var functionObject = (FunctionObject) value;
                         if (functionObject.isDynamicElementMethod)
                         {
-                            jSMemberField.metaData = typeBuilder.DefineField(jSMemberField.Name, Typeob.ScriptFunction,
-                                jSMemberField.Attributes & ~(FieldAttributes.Static | FieldAttributes.Literal));
+                            memberField.metaData = typeBuilder.DefineField(memberField.Name, Typeob.ScriptFunction,
+                                memberField.Attributes & ~(FieldAttributes.Static | FieldAttributes.Literal));
                             functionObject.isStatic = false;
                         }
-                        if (isInterface)
+                        if (IsInterface)
                         {
                             while (true)
                             {
                                 functionObject.GetMethodInfo(compilerGlobals);
-                                jSMemberField = jSMemberField.nextOverload;
-                                if (jSMemberField == null)
-                                {
-                                    break;
-                                }
-                                functionObject = (FunctionObject) jSMemberField.value;
+                                memberField = memberField.nextOverload;
+                                if (memberField == null) break;
+                                functionObject = (FunctionObject) memberField.value;
                             }
                         }
                     }
                 }
                 else
                 {
-                    jSMemberField.metaData = typeBuilder.DefineField(jSMemberField.Name, jSMemberField.FieldType,
-                        jSMemberField.Attributes);
-                    jSMemberField.WriteCustomAttribute(Engine.doCRS);
+                    memberField.metaData = typeBuilder.DefineField(memberField.Name, memberField.FieldType,
+                        memberField.Attributes);
+                    memberField.WriteCustomAttribute(Engine.doCRS);
                 }
                 k++;
             }
@@ -1648,14 +1430,11 @@ namespace Turbo.Runtime
         private void GetUnimplementedInferfaceMembers(SuperTypeMembersSorter sorter)
         {
             var i = 0;
-            var num = superMembers.Length;
+            var num = _superMembers.Length;
             while (i < num)
             {
-                var methodInfo = superMembers[i] as MethodInfo;
-                if (methodInfo != null && methodInfo.DeclaringType.IsInterface)
-                {
-                    sorter.Add(methodInfo);
-                }
+                var methodInfo = _superMembers[i] as MethodInfo;
+                if (methodInfo != null && methodInfo.DeclaringType.IsInterface) sorter.Add(methodInfo);
                 i++;
             }
         }
@@ -1665,17 +1444,14 @@ namespace Turbo.Runtime
             var array = type.GetInterfaces();
             foreach (var interfaceType in array)
             {
-                var expr_16 = type.GetInterfaceMap(interfaceType);
-                var interfaceMethods = expr_16.InterfaceMethods;
-                var targetMethods = expr_16.TargetMethods;
+                var interfaceMap = type.GetInterfaceMap(interfaceType);
+                var interfaceMethods = interfaceMap.InterfaceMethods;
+                var targetMethods = interfaceMap.TargetMethods;
                 var j = 0;
                 var num = interfaceMethods.Length;
                 while (j < num)
                 {
-                    if (targetMethods[j] == null || targetMethods[j].IsAbstract)
-                    {
-                        sorter.Add(interfaceMethods[j]);
-                    }
+                    if (targetMethods[j] == null || targetMethods[j].IsAbstract) sorter.Add(interfaceMethods[j]);
                     j++;
                 }
             }
@@ -1683,30 +1459,21 @@ namespace Turbo.Runtime
 
         internal bool ImplementsInterface(IReflect iface)
         {
-            var array = interfaces;
+            var array = _interfaces;
             foreach (var reflect in array.Select(t => t.ToIReflect()))
             {
-                if (reflect == iface)
-                {
-                    return true;
-                }
-                if (reflect is ClassScope && ((ClassScope) reflect).ImplementsInterface(iface))
-                {
-                    return true;
-                }
-                if (reflect is Type && iface is Type && ((Type) iface).IsAssignableFrom((Type) reflect))
-                {
-                    return true;
-                }
+                if (reflect == iface) return true;
+                if (reflect is ClassScope && ((ClassScope) reflect).ImplementsInterface(iface)) return true;
+                if (reflect is Type && iface is Type && ((Type) iface).IsAssignableFrom((Type) reflect)) return true;
             }
             return false;
         }
 
         private bool IsASubClassOf(Class cl)
         {
-            if (superTypeExpression == null) return false;
-            superTypeExpression.PartiallyEvaluate();
-            var reflect = superTypeExpression.ToIReflect();
+            if (_superTypeExpression == null) return false;
+            _superTypeExpression.PartiallyEvaluate();
+            var reflect = _superTypeExpression.ToIReflect();
             if (!(reflect is ClassScope)) return false;
             var owner = ((ClassScope) reflect).owner;
             return owner == cl || owner.IsASubClassOf(cl);
@@ -1714,89 +1481,64 @@ namespace Turbo.Runtime
 
         internal bool IsCustomAttribute()
         {
-            GetIRForSuperType();
-            if (!ReferenceEquals(superIR, Typeob.Attribute))
-            {
-                return false;
-            }
-            if (customAttributes == null)
-            {
-                return false;
-            }
-            customAttributes.PartiallyEvaluate();
-            return validOn != 0;
+            GetIrForSuperType();
+            if (!ReferenceEquals(_superIr, Typeob.Attribute)) return false;
+            if (CustomAttributes == null) return false;
+            CustomAttributes.PartiallyEvaluate();
+            return ValidOn != 0;
         }
 
         internal bool IsDynamicElement()
         {
-            if (hasAlreadyBeenAskedAboutDynamicElement)
+            if (_hasAlreadyBeenAskedAboutDynamicElement) return _isDynamicElement;
+            if (CustomAttributes != null)
             {
-                return isDynamicElement;
-            }
-            if (customAttributes != null)
-            {
-                customAttributes.PartiallyEvaluate();
-                if (customAttributes.GetAttribute(Typeob.DynamicElement) != null)
-                {
-                    generateCodeForDynamicElement = isDynamicElement = true;
-                }
+                CustomAttributes.PartiallyEvaluate();
+                if (CustomAttributes.GetAttribute(Typeob.DynamicElement) != null)
+                    _generateCodeForDynamicElement = _isDynamicElement = true;
             }
             var superClassIsDynamicElement = false;
-            GetIRForSuperType();
-            var classScope = superIR as ClassScope;
+            GetIrForSuperType();
+            var classScope = _superIr as ClassScope;
             if (classScope != null)
             {
                 classScope.owner.PartiallyEvaluate();
-                if (classScope.owner.IsDynamicElement())
-                {
-                    superClassIsDynamicElement = isDynamicElement = true;
-                }
+                if (classScope.owner.IsDynamicElement()) superClassIsDynamicElement = _isDynamicElement = true;
             }
-            else if (CustomAttribute.IsDefined((Type) superIR, typeof (DynamicElement), true))
+            else if (CustomAttribute.IsDefined((Type) _superIr, typeof (DynamicElement), true))
             {
-                superClassIsDynamicElement = isDynamicElement = true;
+                superClassIsDynamicElement = _isDynamicElement = true;
             }
-            hasAlreadyBeenAskedAboutDynamicElement = true;
-            if (generateCodeForDynamicElement)
-            {
-                CheckIfOKToGenerateCodeForDynamicElement(superClassIsDynamicElement);
-            }
-            if (!isDynamicElement) return false;
-            classob.noDynamicElement = false;
+            _hasAlreadyBeenAskedAboutDynamicElement = true;
+            if (_generateCodeForDynamicElement) CheckIfOkToGenerateCodeForDynamicElement(superClassIsDynamicElement);
+            if (!_isDynamicElement) return false;
+            Classob.noDynamicElement = false;
             return true;
         }
 
-        private static bool IsInTheSameCompilationUnit(MemberInfo member)
-        {
-            return member is TField || member is TMethod;
-        }
+        private static bool IsInTheSameCompilationUnit(MemberInfo member) => member is TField || member is TMethod;
 
-        private bool IsInTheSamePackage(MemberInfo member) => (member is TMethod || member is TField) &&
-                                                              classob.GetPackage() ==
-                                                              (member is TMethod
-                                                                  ? ((TMethod) member).GetPackage()
-                                                                  : ((TField) member).GetPackage());
+        private bool IsInTheSamePackage(MemberInfo member) 
+            => (member is TMethod || member is TField) &&
+                Classob.GetPackage() == (member is TMethod ? ((TMethod) member).GetPackage() : ((TField) member).GetPackage());
 
-        protected bool NeedsToBeCheckedForCLSCompliance()
+        protected bool NeedsToBeCheckedForClsCompliance()
         {
             var result = false;
-            clsCompliance = CLSComplianceSpec.NotAttributed;
-            if (customAttributes != null)
+            ClsCompliance = CLSComplianceSpec.NotAttributed;
+            var attribute = CustomAttributes?.GetAttribute(Typeob.CLSCompliantAttribute);
+            if (attribute != null)
             {
-                var attribute = customAttributes.GetAttribute(Typeob.CLSCompliantAttribute);
-                if (attribute != null)
-                {
-                    clsCompliance = attribute.GetCLSComplianceValue();
-                    result = clsCompliance == CLSComplianceSpec.CLSCompliant;
-                    customAttributes.Remove(attribute);
-                }
+                ClsCompliance = attribute.GetCLSComplianceValue();
+                result = ClsCompliance == CLSComplianceSpec.CLSCompliant;
+                CustomAttributes.Remove(attribute);
             }
-            if (clsCompliance == CLSComplianceSpec.CLSCompliant && !Engine.isCLSCompliant)
+            if (ClsCompliance == CLSComplianceSpec.CLSCompliant && !Engine.isCLSCompliant)
             {
                 context.HandleError(TError.TypeAssemblyCLSCompliantMismatch);
             }
-            if (clsCompliance == CLSComplianceSpec.NotAttributed &&
-                (attributes & TypeAttributes.Public) != TypeAttributes.NotPublic)
+            if (ClsCompliance == CLSComplianceSpec.NotAttributed &&
+                (Attributes & TypeAttributes.Public) != TypeAttributes.NotPublic)
             {
                 result = Engine.isCLSCompliant;
             }
@@ -1813,28 +1555,28 @@ namespace Turbo.Runtime
             var num = pars.Length;
             while (i < num)
             {
-                IReflect arg_35_0;
+                IReflect arg350;
                 if (!(suppars[i] is ParameterDeclaration))
                 {
                     IReflect parameterType = suppars[i].ParameterType;
-                    arg_35_0 = parameterType;
+                    arg350 = parameterType;
                 }
                 else
                 {
-                    arg_35_0 = ((ParameterDeclaration) suppars[i]).ParameterIReflect;
+                    arg350 = ((ParameterDeclaration) suppars[i]).ParameterIReflect;
                 }
-                var obj = arg_35_0;
-                object arg_5A_0;
+                var obj = arg350;
+                object arg_5A0;
                 if (!(pars[i] is ParameterDeclaration))
                 {
                     IReflect parameterType = pars[i].ParameterType;
-                    arg_5A_0 = parameterType;
+                    arg_5A0 = parameterType;
                 }
                 else
                 {
-                    arg_5A_0 = ((ParameterDeclaration) pars[i]).ParameterIReflect;
+                    arg_5A0 = ((ParameterDeclaration) pars[i]).ParameterIReflect;
                 }
-                if (!arg_5A_0.Equals(obj))
+                if (!arg_5A0.Equals(obj))
                 {
                     return false;
                 }
@@ -1845,27 +1587,27 @@ namespace Turbo.Runtime
 
         internal override AST PartiallyEvaluate()
         {
-            if (isAlreadyPartiallyEvaluated)
+            if (_isAlreadyPartiallyEvaluated)
             {
                 return this;
             }
-            isAlreadyPartiallyEvaluated = true;
+            _isAlreadyPartiallyEvaluated = true;
             IsDynamicElement();
-            classob.SetParent(new WithObject(enclosingScope, superIR, true));
-            Globals.ScopeStack.Push(classob);
+            Classob.SetParent(new WithObject(EnclosingScope, _superIr, true));
+            Globals.ScopeStack.Push(Classob);
             try
             {
-                body.PartiallyEvaluate();
-                if (implicitDefaultConstructor != null)
+                Body.PartiallyEvaluate();
+                if (_implicitDefaultConstructor != null)
                 {
-                    implicitDefaultConstructor.PartiallyEvaluate();
+                    _implicitDefaultConstructor.PartiallyEvaluate();
                 }
             }
             finally
             {
                 Globals.ScopeStack.Pop();
             }
-            var array = fields;
+            var array = Fields;
             foreach (var t in array)
             {
                 t.CheckOverloadsForDuplicates();
@@ -1878,54 +1620,54 @@ namespace Turbo.Runtime
         private void SetAccessibility(FieldAttributes attributes)
         {
             var fieldAttributes = attributes & FieldAttributes.FieldAccessMask;
-            if (!(enclosingScope is ClassScope))
+            if (!(EnclosingScope is ClassScope))
             {
                 if (fieldAttributes == FieldAttributes.Public || fieldAttributes == FieldAttributes.PrivateScope)
                 {
-                    this.attributes |= TypeAttributes.Public;
+                    Attributes |= TypeAttributes.Public;
                 }
                 return;
             }
             if (fieldAttributes == FieldAttributes.Public)
             {
-                this.attributes |= TypeAttributes.NestedPublic;
+                Attributes |= TypeAttributes.NestedPublic;
                 return;
             }
             if (fieldAttributes == FieldAttributes.Family)
             {
-                this.attributes |= TypeAttributes.NestedFamily;
+                Attributes |= TypeAttributes.NestedFamily;
                 return;
             }
             if (fieldAttributes == FieldAttributes.Assembly)
             {
-                this.attributes |= TypeAttributes.NestedAssembly;
+                Attributes |= TypeAttributes.NestedAssembly;
                 return;
             }
             if (fieldAttributes == FieldAttributes.Private)
             {
-                this.attributes |= TypeAttributes.NestedPrivate;
+                Attributes |= TypeAttributes.NestedPrivate;
                 return;
             }
             if (fieldAttributes == FieldAttributes.FamORAssem)
             {
-                this.attributes |= TypeAttributes.VisibilityMask;
+                Attributes |= TypeAttributes.VisibilityMask;
                 return;
             }
-            this.attributes |= TypeAttributes.NestedPublic;
+            Attributes |= TypeAttributes.NestedPublic;
         }
 
         private void SetupConstructors()
         {
-            var member = classob.GetMember(name,
+            var member = Classob.GetMember(Name,
                 BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
                 BindingFlags.NonPublic);
             if (member == null)
             {
                 AllocateImplicitDefaultConstructor();
-                classob.AddNewField(name, implicitDefaultConstructor, FieldAttributes.Literal);
-                classob.constructors = new ConstructorInfo[]
+                Classob.AddNewField(Name, _implicitDefaultConstructor, FieldAttributes.Literal);
+                Classob.constructors = new ConstructorInfo[]
                 {
-                    new TConstructor(implicitDefaultConstructor)
+                    new TConstructor(_implicitDefaultConstructor)
                 };
                 return;
             }
@@ -1947,32 +1689,32 @@ namespace Turbo.Runtime
                     (func.attributes & MethodAttributes.Static) != MethodAttributes.PrivateScope)
                 {
                     func.isStatic = false;
-                    var expr_E0 = (TVariableField) ((TFieldMethod) memberInfo2).field;
-                    expr_E0.attributeFlags &= ~FieldAttributes.Static;
-                    expr_E0.originalContext.HandleError(TError.NotValidForConstructor);
+                    var exprE0 = (TVariableField) ((TFieldMethod) memberInfo2).field;
+                    exprE0.attributeFlags &= ~FieldAttributes.Static;
+                    exprE0.originalContext.HandleError(TError.NotValidForConstructor);
                 }
                 func.return_type_expr = new TypeExpression(new ConstantWrapper(Typeob.Void, context));
                 func.own_scope.AddReturnValueField();
             }
             if (memberInfo != null)
             {
-                classob.constructors = ((TMemberField) ((TFieldMethod) memberInfo).field).GetAsConstructors(classob);
+                Classob.constructors = ((TMemberField) ((TFieldMethod) memberInfo).field).GetAsConstructors(Classob);
                 return;
             }
             AllocateImplicitDefaultConstructor();
-            classob.constructors = new ConstructorInfo[]
+            Classob.constructors = new ConstructorInfo[]
             {
-                new TConstructor(implicitDefaultConstructor)
+                new TConstructor(_implicitDefaultConstructor)
             };
         }
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
             GetTypeBuilderOrEnumBuilder();
-            TranslateToCOMPlusClass();
-            var metaData = ownField.GetMetaData();
+            TranslateToComPlusClass();
+            var metaData = _ownField.GetMetaData();
             if (metaData == null) return;
-            il.Emit(OpCodes.Ldtoken, classob.classwriter);
+            il.Emit(OpCodes.Ldtoken, Classob.classwriter);
             il.Emit(OpCodes.Call, CompilerGlobals.getTypeFromHandleMethod);
             if (metaData is LocalBuilder)
             {
@@ -1988,8 +1730,8 @@ namespace Turbo.Runtime
 
         private void EmitUsingNamespaces(ILGenerator il)
         {
-            if (!body.Engine.GenerateDebugInfo) return;
-            for (var parent = enclosingScope; parent != null; parent = parent.GetParent())
+            if (!Body.Engine.GenerateDebugInfo) return;
+            for (var parent = EnclosingScope; parent != null; parent = parent.GetParent())
             {
                 if (parent is PackageScope)
                 {
@@ -2002,52 +1744,52 @@ namespace Turbo.Runtime
             }
         }
 
-        private void TranslateToCOMPlusClass()
+        private void TranslateToComPlusClass()
         {
-            if (isCooked)
+            if (_isCooked)
             {
                 return;
             }
-            isCooked = true;
+            _isCooked = true;
             if (this is EnumDeclaration)
             {
-                if (!(enclosingScope is ClassScope))
+                if (!(EnclosingScope is ClassScope))
                 {
                     TranslateToCreateTypeCall();
                 }
                 return;
             }
-            if (superClass != null)
+            if (_superClass != null)
             {
-                superClass.TranslateToCOMPlusClass();
+                _superClass.TranslateToComPlusClass();
             }
             var i = 0;
-            var num = interfaces.Length;
+            var num = _interfaces.Length;
             while (i < num)
             {
-                var reflect = interfaces[i].ToIReflect();
+                var reflect = _interfaces[i].ToIReflect();
                 if (reflect is ClassScope)
                 {
-                    ((ClassScope) reflect).owner.TranslateToCOMPlusClass();
+                    ((ClassScope) reflect).owner.TranslateToComPlusClass();
                 }
                 i++;
             }
-            Globals.ScopeStack.Push(classob);
+            Globals.ScopeStack.Push(Classob);
             var classwriter = compilerGlobals.classwriter;
-            compilerGlobals.classwriter = (TypeBuilder) classob.classwriter;
-            if (!isInterface)
+            compilerGlobals.classwriter = (TypeBuilder) Classob.classwriter;
+            if (!IsInterface)
             {
                 var iLGenerator = compilerGlobals.classwriter.DefineTypeInitializer().GetILGenerator();
                 LocalBuilder local = null;
-                if (classob.staticInitializerUsesEval)
+                if (Classob.staticInitializerUsesEval)
                 {
                     local = iLGenerator.DeclareLocal(Typeob.THPMainEngine);
-                    iLGenerator.Emit(OpCodes.Ldtoken, classob.GetTypeBuilder());
+                    iLGenerator.Emit(OpCodes.Ldtoken, Classob.GetTypeBuilder());
                     ConstantWrapper.TranslateToILInt(iLGenerator, 0);
                     iLGenerator.Emit(OpCodes.Newarr, Typeob.TLocalField);
                     if (Engine.PEFileKind == PEFileKinds.Dll)
                     {
-                        iLGenerator.Emit(OpCodes.Ldtoken, classob.GetTypeBuilder());
+                        iLGenerator.Emit(OpCodes.Ldtoken, Classob.GetTypeBuilder());
                         iLGenerator.Emit(OpCodes.Call, CompilerGlobals.createTHPMainEngineWithType);
                     }
                     else
@@ -2059,8 +1801,8 @@ namespace Turbo.Runtime
                     iLGenerator.Emit(OpCodes.Call, CompilerGlobals.pushStackFrameForStaticMethod);
                     iLGenerator.BeginExceptionBlock();
                 }
-                body.TranslateToILStaticInitializers(iLGenerator);
-                if (classob.staticInitializerUsesEval)
+                Body.TranslateToILStaticInitializers(iLGenerator);
+                if (Classob.staticInitializerUsesEval)
                 {
                     iLGenerator.BeginFinallyBlock();
                     iLGenerator.Emit(OpCodes.Ldloc, local);
@@ -2072,9 +1814,9 @@ namespace Turbo.Runtime
                 EmitUsingNamespaces(iLGenerator);
                 var methodBuilder = compilerGlobals.classwriter.DefineMethod(".init", MethodAttributes.Private,
                     Typeob.Void, new Type[0]);
-                fieldInitializer = methodBuilder;
+                _fieldInitializer = methodBuilder;
                 iLGenerator = methodBuilder.GetILGenerator();
-                if (classob.instanceInitializerUsesEval)
+                if (Classob.instanceInitializerUsesEval)
                 {
                     iLGenerator.Emit(OpCodes.Ldarg_0);
                     ConstantWrapper.TranslateToILInt(iLGenerator, 0);
@@ -2084,8 +1826,8 @@ namespace Turbo.Runtime
                     iLGenerator.Emit(OpCodes.Call, CompilerGlobals.pushStackFrameForMethod);
                     iLGenerator.BeginExceptionBlock();
                 }
-                body.TranslateToILInstanceInitializers(iLGenerator);
-                if (classob.instanceInitializerUsesEval)
+                Body.TranslateToILInstanceInitializers(iLGenerator);
+                if (Classob.instanceInitializerUsesEval)
                 {
                     iLGenerator.BeginFinallyBlock();
                     iLGenerator.Emit(OpCodes.Ldarg_0);
@@ -2096,11 +1838,11 @@ namespace Turbo.Runtime
                 }
                 iLGenerator.Emit(OpCodes.Ret);
                 EmitUsingNamespaces(iLGenerator);
-                if (implicitDefaultConstructor != null)
+                if (_implicitDefaultConstructor != null)
                 {
-                    implicitDefaultConstructor.TranslateToIL(compilerGlobals);
+                    _implicitDefaultConstructor.TranslateToIL(compilerGlobals);
                 }
-                if (generateCodeForDynamicElement)
+                if (_generateCodeForDynamicElement)
                 {
                     GetDynamicElementIndexerGetter();
                     GetDynamicElementIndexerSetter();
@@ -2109,7 +1851,7 @@ namespace Turbo.Runtime
                 }
                 EmitILForINeedEngineMethods();
             }
-            if (!(enclosingScope is ClassScope))
+            if (!(EnclosingScope is ClassScope))
             {
                 TranslateToCreateTypeCall();
             }
@@ -2119,40 +1861,40 @@ namespace Turbo.Runtime
 
         private void TranslateToCreateTypeCall()
         {
-            if (cookedType != null)
+            if (_cookedType != null)
             {
                 return;
             }
             if (!(this is EnumDeclaration))
             {
-                if (superClass != null)
+                if (_superClass != null)
                 {
-                    superClass.TranslateToCreateTypeCall();
+                    _superClass.TranslateToCreateTypeCall();
                 }
-                var arg_7F_0 = Thread.GetDomain();
+                var arg_7F0 = Thread.GetDomain();
                 var value = new ResolveEventHandler(ResolveEnum);
-                arg_7F_0.TypeResolve += value;
-                cookedType = ((TypeBuilder) classob.classwriter).CreateType();
-                arg_7F_0.TypeResolve -= value;
-                var array = fields;
+                arg_7F0.TypeResolve += value;
+                _cookedType = ((TypeBuilder) Classob.classwriter).CreateType();
+                arg_7F0.TypeResolve -= value;
+                var array = Fields;
                 foreach (var classScope in array.Select(t => t.value).OfType<ClassScope>())
                 {
                     classScope.owner.TranslateToCreateTypeCall();
                 }
                 return;
             }
-            var enumBuilder = classob.classwriter as EnumBuilder;
+            var enumBuilder = Classob.classwriter as EnumBuilder;
             if (enumBuilder != null)
             {
-                cookedType = enumBuilder.CreateType();
+                _cookedType = enumBuilder.CreateType();
                 return;
             }
-            cookedType = ((TypeBuilder) classob.classwriter).CreateType();
+            _cookedType = ((TypeBuilder) Classob.classwriter).CreateType();
         }
 
         private Assembly ResolveEnum(object sender, ResolveEventArgs args)
         {
-            var field = classob.GetField(args.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            var field = Classob.GetField(args.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             if (field == null || !field.IsLiteral) return compilerGlobals.assemblyBuilder;
             var classScope = TypeReferences.GetConstantValue(field) as ClassScope;
             if (classScope != null)

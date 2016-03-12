@@ -69,12 +69,12 @@ namespace Turbo.Runtime
                 attributes, false, false, true, false, customAttributes)
         {
             BaseType = (baseType ?? new TypeExpression(new ConstantWrapper(Typeob.Int32, null)));
-            needsEngine = false;
-            this.attributes &= TypeAttributes.VisibilityMask;
-            var type = new TypeExpression(new ConstantWrapper(classob, this.context));
+            NeedsEngine = false;
+            this.Attributes &= TypeAttributes.VisibilityMask;
+            var type = new TypeExpression(new ConstantWrapper(Classob, this.context));
             AST aSt = new ConstantWrapper(-1, null);
             AST operand = new ConstantWrapper(1, null);
-            var memberFields = fields;
+            var memberFields = Fields;
             foreach (var variableField in memberFields)
             {
                 variableField.attributeFlags = (FieldAttributes.FamANDAssem | FieldAttributes.Family |
@@ -84,13 +84,13 @@ namespace Turbo.Runtime
                     ? (AST) (variableField.value = new Plus(aSt.context, aSt, operand))
                     : (AST) variableField.value;
                 var exprE2 = variableField;
-                exprE2.value = new DeclaredEnumValue(exprE2.value, variableField.Name, classob);
+                exprE2.value = new DeclaredEnumValue(exprE2.value, variableField.Name, Classob);
             }
         }
 
         internal override AST PartiallyEvaluate()
         {
-            if (!(classob.GetParent() is GlobalScope)) return this;
+            if (!(Classob.GetParent() is GlobalScope)) return this;
             BaseType.PartiallyEvaluate();
             var reflect = BaseType.ToIReflect();
             Type bt;
@@ -100,22 +100,22 @@ namespace Turbo.Runtime
                 BaseType = new TypeExpression(new ConstantWrapper(Typeob.Int32, null));
                 bt = Typeob.Int32;
             }
-            customAttributes?.PartiallyEvaluate();
-            if (NeedsToBeCheckedForCLSCompliance())
+            CustomAttributes?.PartiallyEvaluate();
+            if (NeedsToBeCheckedForClsCompliance())
             {
                 if (!TypeExpression.TypeIsCLSCompliant(reflect)) BaseType.context.HandleError(TError.NonCLSCompliantType);
-                CheckMemberNamesForCLSCompliance();
+                CheckMemberNamesForClsCompliance();
             }
-            var scriptObject = enclosingScope;
+            var scriptObject = EnclosingScope;
             while (!(scriptObject is GlobalScope) && !(scriptObject is PackageScope))
             {
                 scriptObject = scriptObject.GetParent();
             }
-            classob.SetParent(new WithObject(scriptObject, Typeob.Enum, true));
-            Globals.ScopeStack.Push(classob);
+            Classob.SetParent(new WithObject(scriptObject, Typeob.Enum, true));
+            Globals.ScopeStack.Push(Classob);
             try
             {
-                var memberFields = fields;
+                var memberFields = Fields;
                 foreach (var memberField in memberFields)
                 {
                     ((DeclaredEnumValue) memberField.value).CoerceToBaseType(bt, memberField.originalContext);
@@ -130,29 +130,29 @@ namespace Turbo.Runtime
 
         internal override Type GetTypeBuilderOrEnumBuilder()
         {
-            if (classob.classwriter != null) return classob.classwriter;
+            if (Classob.classwriter != null) return Classob.classwriter;
             PartiallyEvaluate();
-            var classScope = enclosingScope as ClassScope;
+            var classScope = EnclosingScope as ClassScope;
             if (classScope != null)
             {
-                var typeBuilder = ((TypeBuilder) classScope.classwriter).DefineNestedType(name,
-                    attributes | TypeAttributes.Sealed, Typeob.Enum, null);
-                classob.classwriter = typeBuilder;
+                var typeBuilder = ((TypeBuilder) classScope.classwriter).DefineNestedType(Name,
+                    Attributes | TypeAttributes.Sealed, Typeob.Enum, null);
+                Classob.classwriter = typeBuilder;
                 var type = BaseType.ToType();
                 typeBuilder.DefineField("value__", type, FieldAttributes.Private | FieldAttributes.SpecialName);
-                if (customAttributes == null) return typeBuilder;
-                var customAttributeBuilders = customAttributes.GetCustomAttributeBuilders(false);
+                if (CustomAttributes == null) return typeBuilder;
+                var customAttributeBuilders = CustomAttributes.GetCustomAttributeBuilders(false);
                 foreach (var t in customAttributeBuilders) typeBuilder.SetCustomAttribute(t);
                 return typeBuilder;
             }
-            var enumBuilder = compilerGlobals.module.DefineEnum(name, attributes, BaseType.ToType());
-            classob.classwriter = enumBuilder;
-            if (customAttributes != null)
+            var enumBuilder = compilerGlobals.module.DefineEnum(Name, Attributes, BaseType.ToType());
+            Classob.classwriter = enumBuilder;
+            if (CustomAttributes != null)
             {
-                var customAttributeBuilders2 = customAttributes.GetCustomAttributeBuilders(false);
+                var customAttributeBuilders2 = CustomAttributes.GetCustomAttributeBuilders(false);
                 foreach (var t in customAttributeBuilders2) enumBuilder.SetCustomAttribute(t);
             }
-            var memberFields = fields;
+            var memberFields = Fields;
             foreach (var fieldInfo2 in memberFields)
             {
                 fieldInfo2.metaData = enumBuilder.DefineLiteral(fieldInfo2.Name,

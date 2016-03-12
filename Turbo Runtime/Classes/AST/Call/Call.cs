@@ -470,7 +470,7 @@ namespace Turbo.Runtime
                 MethodInfo methodInfo;
                 if (reflect is ClassScope)
                 {
-                    methodInfo = ((ClassScope) reflect).owner.deleteOpMethod;
+                    methodInfo = ((ClassScope) reflect).owner.DeleteOpMethod;
                 }
                 else
                 {

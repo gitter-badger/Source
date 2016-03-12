@@ -348,7 +348,7 @@ namespace Turbo.Runtime
                 Func.implementedIface = _ifaceId.ToIReflect();
                 var type = Func.implementedIface as Type;
                 var classScope = Func.implementedIface as ClassScope;
-                if ((type != null && !type.IsInterface) || (classScope != null && !classScope.owner.isInterface))
+                if ((type != null && !type.IsInterface) || (classScope != null && !classScope.owner.IsInterface))
                 {
                     _ifaceId.context.HandleError(TError.NeedInterface);
                     Func.implementedIface = null;
@@ -362,9 +362,9 @@ namespace Turbo.Runtime
                 _field.type.expression = new ConstantWrapper(Typeob.ScriptFunction, null);
 
             if ((Func.attributes & MethodAttributes.Abstract) != MethodAttributes.PrivateScope
-                && !((ClassScope) Func.enclosing_scope).owner.isAbstract)
+                && !((ClassScope) Func.enclosing_scope).owner.IsAbstract)
             {
-                ((ClassScope) Func.enclosing_scope).owner.attributes |= TypeAttributes.Abstract;
+                ((ClassScope) Func.enclosing_scope).owner.Attributes |= TypeAttributes.Abstract;
                 ((ClassScope) Func.enclosing_scope).owner.context.HandleError(TError.CannotBeAbstract, _name);
             }
 

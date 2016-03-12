@@ -104,7 +104,7 @@ namespace Turbo.Runtime
                     }
                 }
             }
-            else if ((((ClassScope) obj).owner.attributes & TypeAttributes.Public) == TypeAttributes.NotPublic)
+            else if ((((ClassScope) obj).owner.Attributes & TypeAttributes.Public) == TypeAttributes.NotPublic)
             {
                 if ((bindingAttr & BindingFlags.NonPublic) == BindingFlags.Default)
                 {

@@ -302,7 +302,7 @@ namespace Turbo.Runtime
                 globals.ScopeStack.GuardedPush((thisob is TObject) ? ((TObject) thisob) : enclosing_scope);
                 try
                 {
-                    ((ClassScope) enclosing_scope).owner.body.EvaluateInstanceVariableInitializers();
+                    ((ClassScope) enclosing_scope).owner.Body.EvaluateInstanceVariableInitializers();
                     goto IL_16F;
                 }
                 finally

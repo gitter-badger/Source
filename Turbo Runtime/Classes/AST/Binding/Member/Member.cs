@@ -134,7 +134,7 @@ namespace Turbo.Runtime
                     if (classScope != null)
                     {
                         var fieldAttributes = FieldAttributes.Literal;
-                        if ((classScope.owner.attributes & TypeAttributes.Public) == TypeAttributes.NotPublic)
+                        if ((classScope.owner.Attributes & TypeAttributes.Public) == TypeAttributes.NotPublic)
                         {
                             fieldAttributes |= FieldAttributes.Private;
                         }
@@ -169,7 +169,7 @@ namespace Turbo.Runtime
                 return;
             }
             var classScope2 = reflect as ClassScope;
-            if (classScope2 != null && classScope2.owner.isInterface)
+            if (classScope2 != null && classScope2.owner.IsInterface)
             {
                 members = classScope2.owner.GetInterfaceMember(name);
                 return;

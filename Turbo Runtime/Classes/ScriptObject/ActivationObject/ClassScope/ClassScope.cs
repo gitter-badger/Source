@@ -211,7 +211,7 @@ namespace Turbo.Runtime
 
         public object[] GetCustomAttributes()
         {
-            var customAttributes = owner.customAttributes;
+            var customAttributes = owner.CustomAttributes;
             if (customAttributes == null)
             {
                 return new object[0];
@@ -255,9 +255,9 @@ namespace Turbo.Runtime
             {
                 return packageScope.GetName() + "." + name;
             }
-            if (owner.enclosingScope is ClassScope)
+            if (owner.EnclosingScope is ClassScope)
             {
-                return ((ClassScope) owner.enclosingScope).GetFullName() + "." + name;
+                return ((ClassScope) owner.EnclosingScope).GetFullName() + "." + name;
             }
             return name;
         }
@@ -339,7 +339,7 @@ namespace Turbo.Runtime
                 memberInfoList.Add(fieldInfo);
             }
             IL_135:
-            if (owner != null && owner.isInterface && (bindingAttr & BindingFlags.DeclaredOnly) == BindingFlags.Default)
+            if (owner != null && owner.IsInterface && (bindingAttr & BindingFlags.DeclaredOnly) == BindingFlags.Default)
             {
                 return owner.GetInterfaceMember(name);
             }
@@ -510,16 +510,16 @@ namespace Turbo.Runtime
         internal bool IsCLSCompliant()
         {
             owner.PartiallyEvaluate();
-            var typeAttributes = owner.attributes & TypeAttributes.VisibilityMask;
+            var typeAttributes = owner.Attributes & TypeAttributes.VisibilityMask;
             if (typeAttributes != TypeAttributes.Public && typeAttributes != TypeAttributes.NestedPublic)
             {
                 return false;
             }
-            if (owner.clsCompliance == CLSComplianceSpec.NotAttributed)
+            if (owner.ClsCompliance == CLSComplianceSpec.NotAttributed)
             {
                 return owner.Engine.isCLSCompliant;
             }
-            return owner.clsCompliance == CLSComplianceSpec.CLSCompliant;
+            return owner.ClsCompliance == CLSComplianceSpec.CLSCompliant;
         }
 
         internal bool IsNestedIn(ClassScope other, bool isStatic)
@@ -529,11 +529,11 @@ namespace Turbo.Runtime
                 return false;
             }
             owner.PartiallyEvaluate();
-            if (owner.enclosingScope == other)
+            if (owner.EnclosingScope == other)
             {
                 return isStatic || !owner.isStatic;
             }
-            return owner.enclosingScope is ClassScope && ((ClassScope) owner.enclosingScope).IsNestedIn(other, isStatic);
+            return owner.EnclosingScope is ClassScope && ((ClassScope) owner.EnclosingScope).IsNestedIn(other, isStatic);
         }
 
         internal bool IsSameOrDerivedFrom(ClassScope other)
@@ -542,7 +542,7 @@ namespace Turbo.Runtime
             {
                 return true;
             }
-            if (other.owner.isInterface)
+            if (other.owner.IsInterface)
             {
                 return ImplementsInterface(other);
             }

@@ -165,7 +165,7 @@ namespace Turbo.Runtime
         private bool AccessibleConstructor()
         {
             var constructorInfo = (ConstructorInfo) member;
-            if ((constructorInfo is TConstructor && ((TConstructor) member).GetClassScope().owner.isAbstract) ||
+            if ((constructorInfo is TConstructor && ((TConstructor) member).GetClassScope().owner.IsAbstract) ||
                 (!(constructorInfo is TConstructor) && constructorInfo.DeclaringType.IsAbstract))
             {
                 context.HandleError(TError.CannotInstantiateAbstractClass);

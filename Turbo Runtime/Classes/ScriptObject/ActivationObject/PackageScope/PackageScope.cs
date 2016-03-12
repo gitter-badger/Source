@@ -104,14 +104,14 @@ namespace Turbo.Runtime
                     if (classScope == null) continue;
                     classScope.owner.context.HandleError(TError.DuplicateName, jSGlobalField.Name, true);
                     var @class = classScope.owner;
-                    @class.name += p.GetHashCode().ToString(CultureInfo.InvariantCulture);
+                    @class.Name += p.GetHashCode().ToString(CultureInfo.InvariantCulture);
                 }
                 else
                 {
                     field_table.Add(jSGlobalField);
                     name_table[jSGlobalField.Name] = jSGlobalField;
                     if (classScope == null) continue;
-                    classScope.owner.enclosingScope = this;
+                    classScope.owner.EnclosingScope = this;
                     classScope.package = this;
                 }
             }

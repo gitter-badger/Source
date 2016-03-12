@@ -107,12 +107,12 @@ namespace Turbo.Runtime
             var validOn = caType is Type
                 ? ((AttributeUsageAttribute)
                     GetCustomAttributes(caType as Type, typeof (AttributeUsageAttribute), true)[0]).ValidOn
-                : ((ClassScope) caType).owner.validOn;
+                : ((ClassScope) caType).owner.ValidOn;
             object obj = target;
             var @class = obj as Class;
             if (@class != null)
             {
-                if (@class.isInterface)
+                if (@class.IsInterface)
                 {
                     if ((validOn & AttributeTargets.Interface) != 0)
                     {
@@ -136,7 +136,7 @@ namespace Turbo.Runtime
                             var obj2 = positionalArgValues[0];
                             if (obj2 is AttributeTargets)
                             {
-                                @class.validOn = (AttributeTargets) obj2;
+                                @class.ValidOn = (AttributeTargets) obj2;
                             }
                         }
                         var i = 0;
@@ -145,7 +145,7 @@ namespace Turbo.Runtime
                         {
                             if ((namedArgProperties[i] as PropertyInfo).Name == "AllowMultiple")
                             {
-                                @class.allowMultiple = (bool) namedArgPropertyValues[i];
+                                @class.AllowMultiple = (bool) namedArgPropertyValues[i];
                             }
                             i++;
                         }
@@ -153,7 +153,7 @@ namespace Turbo.Runtime
                     }
                     if ((caType as Type).FullName == "System.NonSerializedAttribute")
                     {
-                        @class.attributes &= ~TypeAttributes.Serializable;
+                        @class.Attributes &= ~TypeAttributes.Serializable;
                         return false;
                     }
                 }
@@ -338,7 +338,7 @@ namespace Turbo.Runtime
 
         internal object GetTypeIfAttributeHasToBeUnique()
             => !(type is Type)
-                ? (!((ClassScope) type).owner.allowMultiple ? type : null)
+                ? (!((ClassScope) type).owner.AllowMultiple ? type : null)
                 : (GetCustomAttributes(type as Type, typeof (AttributeUsageAttribute), false).Length != 0
                    &&
                    !((AttributeUsageAttribute)
