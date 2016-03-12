@@ -4949,7 +4949,7 @@ namespace Turbo.Runtime
                 case TToken.LogicalOr:
                     return new Logical_or(context, operand1, operand2);
                 case TToken.LogicalAnd:
-                    return new Logical_and(context, operand1, operand2);
+                    return new LogicalAnd(context, operand1, operand2);
                 case TToken.BitwiseOr:
                     return new BitwiseBinary(context, operand1, operand2, TToken.BitwiseOr);
                 case TToken.BitwiseXor:
