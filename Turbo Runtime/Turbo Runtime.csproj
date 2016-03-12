@@ -256,7 +256,7 @@
     <Compile Include="Classes\ScriptObject\TObject\StringObject\StringPrototype\LenientStringPrototype\LenientStringPrototype.cs" />
     <Compile Include="Classes\ListEnumerator\ListEnumerator.cs" />
     <Compile Include="Classes\AST\BinaryOp\LogicalAnd\LogicalAnd.cs" />
-    <Compile Include="Classes\AST\BinaryOp\Logical_or\Logical_or.cs" />
+    <Compile Include="Classes\AST\BinaryOp\LogicalOr\LogicalOr.cs" />
     <Compile Include="Classes\AST\Binding\Lookup\Lookup.cs" />
     <Compile Include="Classes\ScriptObject\TObject\MathObject\MathObject.cs" />
     <Compile Include="Classes\AST\Binding\Member\Member.cs" />

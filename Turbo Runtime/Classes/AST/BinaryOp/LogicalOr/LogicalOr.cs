@@ -58,9 +58,9 @@ using System.Reflection.Emit;
 
 namespace Turbo.Runtime
 {
-    internal sealed class Logical_or : BinaryOp
+    internal sealed class LogicalOr : BinaryOp
     {
-        internal Logical_or(Context context, AST operand1, AST operand2) : base(context, operand1, operand2)
+        internal LogicalOr(Context context, AST operand1, AST operand2) : base(context, operand1, operand2)
         {
         }
 
@@ -84,18 +84,9 @@ namespace Turbo.Runtime
                     methodInfo = null;
                 }
             }
-            if (methodInfo == null)
-            {
-                return Convert.ToBoolean(obj) ? obj : operand2.Evaluate();
-            }
+            if (methodInfo == null) return Convert.ToBoolean(obj) ? obj : operand2.Evaluate();
             methodInfo = new TMethodInfo(methodInfo);
-            if ((bool) methodInfo.Invoke(null, BindingFlags.SuppressChangeType, null, new[]
-            {
-                obj
-            }, null))
-            {
-                return obj;
-            }
+            if ((bool) methodInfo.Invoke(null, BindingFlags.SuppressChangeType, null, new[]{obj}, null)) return obj;
             var obj2 = operand2.Evaluate();
             if (obj2 == null || obj2 is IConvertible) return obj2;
             var type2 = obj2.GetType();
@@ -140,10 +131,7 @@ namespace Turbo.Runtime
         {
             var type = Convert.ToType(operand1.InferType(null));
             var right = Convert.ToType(operand2.InferType(null));
-            if (type != right)
-            {
-                type = Typeob.Object;
-            }
+            if (type != right) type = Typeob.Object;
             var methodInfo = type.GetMethod("op_True",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.ExactBinding, null, new[]
                 {
@@ -175,10 +163,7 @@ namespace Turbo.Runtime
             il.Emit(OpCodes.Dup);
             if (methodInfo != null)
             {
-                if (type.IsValueType)
-                {
-                    Convert.EmitLdloca(il, type);
-                }
+                if (type.IsValueType) Convert.EmitLdloca(il, type);
                 il.Emit(OpCodes.Call, methodInfo);
                 il.Emit(OpCodes.Brtrue, label);
                 operand2.TranslateToIL(il, type);
