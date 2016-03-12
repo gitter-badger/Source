@@ -1547,39 +1547,20 @@ namespace Turbo.Runtime
 
         internal static bool ParametersMatch(ParameterInfo[] suppars, ParameterInfo[] pars)
         {
-            if (suppars.Length != pars.Length)
-            {
-                return false;
-            }
+            if (suppars.Length != pars.Length) return false;
             var i = 0;
             var num = pars.Length;
             while (i < num)
             {
-                IReflect arg350;
-                if (!(suppars[i] is ParameterDeclaration))
-                {
-                    IReflect parameterType = suppars[i].ParameterType;
-                    arg350 = parameterType;
-                }
-                else
-                {
-                    arg350 = ((ParameterDeclaration) suppars[i]).ParameterIReflect;
-                }
-                var obj = arg350;
-                object arg_5A0;
-                if (!(pars[i] is ParameterDeclaration))
-                {
-                    IReflect parameterType = pars[i].ParameterType;
-                    arg_5A0 = parameterType;
-                }
-                else
-                {
-                    arg_5A0 = ((ParameterDeclaration) pars[i]).ParameterIReflect;
-                }
-                if (!arg_5A0.Equals(obj))
-                {
-                    return false;
-                }
+                var reflect = !(suppars[i] is ParameterDeclaration)
+                    ? suppars[i].ParameterType
+                    : ((ParameterDeclaration) suppars[i]).ParameterIReflect;
+
+                object type = !(pars[i] is ParameterDeclaration)
+                    ? pars[i].ParameterType
+                    : ((ParameterDeclaration) pars[i]).ParameterIReflect;
+
+                if (!type.Equals(reflect)) return false;
                 i++;
             }
             return true;
@@ -1587,10 +1568,7 @@ namespace Turbo.Runtime
 
         internal override AST PartiallyEvaluate()
         {
-            if (_isAlreadyPartiallyEvaluated)
-            {
-                return this;
-            }
+            if (_isAlreadyPartiallyEvaluated) return this;
             _isAlreadyPartiallyEvaluated = true;
             IsDynamicElement();
             Classob.SetParent(new WithObject(EnclosingScope, _superIr, true));
@@ -1598,20 +1576,14 @@ namespace Turbo.Runtime
             try
             {
                 Body.PartiallyEvaluate();
-                if (_implicitDefaultConstructor != null)
-                {
-                    _implicitDefaultConstructor.PartiallyEvaluate();
-                }
+                _implicitDefaultConstructor?.PartiallyEvaluate();
             }
             finally
             {
                 Globals.ScopeStack.Pop();
             }
             var array = Fields;
-            foreach (var t in array)
-            {
-                t.CheckOverloadsForDuplicates();
-            }
+            foreach (var t in array) t.CheckOverloadsForDuplicates();
             CheckIfValidExtensionOfSuperType();
             CheckThatAllAbstractSuperClassMethodsAreImplemented();
             return this;
@@ -1628,30 +1600,23 @@ namespace Turbo.Runtime
                 }
                 return;
             }
-            if (fieldAttributes == FieldAttributes.Public)
+            switch (fieldAttributes)
             {
-                Attributes |= TypeAttributes.NestedPublic;
-                return;
-            }
-            if (fieldAttributes == FieldAttributes.Family)
-            {
-                Attributes |= TypeAttributes.NestedFamily;
-                return;
-            }
-            if (fieldAttributes == FieldAttributes.Assembly)
-            {
-                Attributes |= TypeAttributes.NestedAssembly;
-                return;
-            }
-            if (fieldAttributes == FieldAttributes.Private)
-            {
-                Attributes |= TypeAttributes.NestedPrivate;
-                return;
-            }
-            if (fieldAttributes == FieldAttributes.FamORAssem)
-            {
-                Attributes |= TypeAttributes.VisibilityMask;
-                return;
+                case FieldAttributes.Public:
+                    Attributes |= TypeAttributes.NestedPublic;
+                    return;
+                case FieldAttributes.Family:
+                    Attributes |= TypeAttributes.NestedFamily;
+                    return;
+                case FieldAttributes.Assembly:
+                    Attributes |= TypeAttributes.NestedAssembly;
+                    return;
+                case FieldAttributes.Private:
+                    Attributes |= TypeAttributes.NestedPrivate;
+                    return;
+                case FieldAttributes.FamORAssem:
+                    Attributes |= TypeAttributes.VisibilityMask;
+                    return;
             }
             Attributes |= TypeAttributes.NestedPublic;
         }
@@ -1677,21 +1642,15 @@ namespace Turbo.Runtime
             {
                 if (!(memberInfo2 is TFieldMethod)) continue;
                 var func = ((TFieldMethod) memberInfo2).func;
-                if (memberInfo == null)
-                {
-                    memberInfo = memberInfo2;
-                }
-                if (func.return_type_expr != null)
-                {
-                    func.return_type_expr.context.HandleError(TError.ConstructorMayNotHaveReturnType);
-                }
+                if (memberInfo == null) memberInfo = memberInfo2;
+                func.return_type_expr?.context.HandleError(TError.ConstructorMayNotHaveReturnType);
                 if ((func.attributes & MethodAttributes.Abstract) != MethodAttributes.PrivateScope ||
                     (func.attributes & MethodAttributes.Static) != MethodAttributes.PrivateScope)
                 {
                     func.isStatic = false;
-                    var exprE0 = (TVariableField) ((TFieldMethod) memberInfo2).field;
-                    exprE0.attributeFlags &= ~FieldAttributes.Static;
-                    exprE0.originalContext.HandleError(TError.NotValidForConstructor);
+                    var field = (TVariableField) ((TFieldMethod) memberInfo2).field;
+                    field.attributeFlags &= ~FieldAttributes.Static;
+                    field.originalContext.HandleError(TError.NotValidForConstructor);
                 }
                 func.return_type_expr = new TypeExpression(new ConstantWrapper(Typeob.Void, context));
                 func.own_scope.AddReturnValueField();
@@ -1746,32 +1705,19 @@ namespace Turbo.Runtime
 
         private void TranslateToComPlusClass()
         {
-            if (_isCooked)
-            {
-                return;
-            }
+            if (_isCooked) return;
             _isCooked = true;
             if (this is EnumDeclaration)
             {
-                if (!(EnclosingScope is ClassScope))
-                {
-                    TranslateToCreateTypeCall();
-                }
+                if (!(EnclosingScope is ClassScope)) TranslateToCreateTypeCall();
                 return;
             }
-            if (_superClass != null)
-            {
-                _superClass.TranslateToComPlusClass();
-            }
+            _superClass?.TranslateToComPlusClass();
             var i = 0;
             var num = _interfaces.Length;
             while (i < num)
             {
-                var reflect = _interfaces[i].ToIReflect();
-                if (reflect is ClassScope)
-                {
-                    ((ClassScope) reflect).owner.TranslateToComPlusClass();
-                }
+                (_interfaces[i].ToIReflect() as ClassScope)?.owner.TranslateToComPlusClass();
                 i++;
             }
             Globals.ScopeStack.Push(Classob);
@@ -1838,10 +1784,7 @@ namespace Turbo.Runtime
                 }
                 iLGenerator.Emit(OpCodes.Ret);
                 EmitUsingNamespaces(iLGenerator);
-                if (_implicitDefaultConstructor != null)
-                {
-                    _implicitDefaultConstructor.TranslateToIL(compilerGlobals);
-                }
+                _implicitDefaultConstructor?.TranslateToIL(compilerGlobals);
                 if (_generateCodeForDynamicElement)
                 {
                     GetDynamicElementIndexerGetter();
@@ -1851,31 +1794,22 @@ namespace Turbo.Runtime
                 }
                 EmitILForINeedEngineMethods();
             }
-            if (!(EnclosingScope is ClassScope))
-            {
-                TranslateToCreateTypeCall();
-            }
+            if (!(EnclosingScope is ClassScope)) TranslateToCreateTypeCall();
             compilerGlobals.classwriter = classwriter;
             Globals.ScopeStack.Pop();
         }
 
         private void TranslateToCreateTypeCall()
         {
-            if (_cookedType != null)
-            {
-                return;
-            }
+            if (_cookedType != null) return;
             if (!(this is EnumDeclaration))
             {
-                if (_superClass != null)
-                {
-                    _superClass.TranslateToCreateTypeCall();
-                }
-                var arg_7F0 = Thread.GetDomain();
+                _superClass?.TranslateToCreateTypeCall();
+                var domain = Thread.GetDomain();
                 var value = new ResolveEventHandler(ResolveEnum);
-                arg_7F0.TypeResolve += value;
+                domain.TypeResolve += value;
                 _cookedType = ((TypeBuilder) Classob.classwriter).CreateType();
-                arg_7F0.TypeResolve -= value;
+                domain.TypeResolve -= value;
                 var array = Fields;
                 foreach (var classScope in array.Select(t => t.value).OfType<ClassScope>())
                 {
@@ -1896,17 +1830,10 @@ namespace Turbo.Runtime
         {
             var field = Classob.GetField(args.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             if (field == null || !field.IsLiteral) return compilerGlobals.assemblyBuilder;
-            var classScope = TypeReferences.GetConstantValue(field) as ClassScope;
-            if (classScope != null)
-            {
-                classScope.owner.TranslateToCreateTypeCall();
-            }
+            (TypeReferences.GetConstantValue(field) as ClassScope)?.owner.TranslateToCreateTypeCall();
             return compilerGlobals.assemblyBuilder;
         }
 
-        internal override Context GetFirstExecutableContext()
-        {
-            return null;
-        }
+        internal override Context GetFirstExecutableContext() => null;
     }
 }
