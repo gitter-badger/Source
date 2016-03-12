@@ -60,32 +60,32 @@ namespace Turbo.Runtime
 {
     public sealed class Block : AST
     {
-        private readonly Completion completion;
+        private readonly Completion _completion;
 
-        private readonly ArrayList list;
+        private readonly ArrayList _list;
 
         internal Block(Context context) : base(context)
         {
-            completion = new Completion();
-            list = new ArrayList();
+            _completion = new Completion();
+            _list = new ArrayList();
         }
 
         internal void Append(AST elem)
         {
-            list.Add(elem);
+            _list.Add(elem);
         }
 
         internal void ComplainAboutAnythingOtherThanClassOrPackage()
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var obj = list[i];
+                var obj = _list[i];
                 if (!(obj is Class) && !(obj is Package) && !(obj is Import))
                 {
                     var block = obj as Block;
-                    if (block == null || block.list.Count != 0)
+                    if (block == null || block._list.Count != 0)
                     {
                         var expression = obj as Expression;
                         if (expression != null && !(expression.operand is AssemblyCustomAttributeList))
@@ -101,58 +101,49 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            completion.Continue = 0;
-            completion.Exit = 0;
-            completion.value = null;
+            _completion.Continue = 0;
+            _completion.Exit = 0;
+            _completion.value = null;
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var aST = (AST) list[i];
+                var aSt = (AST) _list[i];
                 object obj;
                 try
                 {
-                    obj = aST.Evaluate();
+                    obj = aSt.Evaluate();
                 }
                 catch (TurboException ex)
                 {
-                    if (ex.context == null)
-                    {
-                        ex.context = aST.context;
-                    }
+                    if (ex.context == null) ex.context = aSt.context;
                     throw;
                 }
                 var evaluate = (Completion) obj;
-                if (evaluate.value != null)
-                {
-                    completion.value = evaluate.value;
-                }
+                if (evaluate.value != null) _completion.value = evaluate.value;
                 if (evaluate.Continue > 1)
                 {
-                    completion.Continue = evaluate.Continue - 1;
+                    _completion.Continue = evaluate.Continue - 1;
                     break;
                 }
                 if (evaluate.Exit > 0)
                 {
-                    completion.Exit = evaluate.Exit - 1;
+                    _completion.Exit = evaluate.Exit - 1;
                     break;
                 }
-                if (evaluate.Return)
-                {
-                    return evaluate;
-                }
+                if (evaluate.Return) return evaluate;
                 i++;
             }
-            return completion;
+            return _completion;
         }
 
         internal void EvaluateStaticVariableInitializers()
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var obj = list[i];
+                var obj = _list[i];
                 var variableDeclaration = obj as VariableDeclaration;
                 if (variableDeclaration != null && variableDeclaration.field.IsStatic &&
                     !variableDeclaration.field.IsLiteral)
@@ -182,11 +173,7 @@ namespace Turbo.Runtime
                             }
                             else
                             {
-                                var block = obj as Block;
-                                if (block != null)
-                                {
-                                    block.EvaluateStaticVariableInitializers();
-                                }
+                                (obj as Block)?.EvaluateStaticVariableInitializers();
                             }
                         }
                     }
@@ -198,10 +185,10 @@ namespace Turbo.Runtime
         internal void EvaluateInstanceVariableInitializers()
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var obj = list[i];
+                var obj = _list[i];
                 var variableDeclaration = obj as VariableDeclaration;
                 if (variableDeclaration != null && !variableDeclaration.field.IsStatic &&
                     !variableDeclaration.field.IsLiteral)
@@ -210,11 +197,7 @@ namespace Turbo.Runtime
                 }
                 else
                 {
-                    var block = obj as Block;
-                    if (block != null)
-                    {
-                        block.EvaluateInstanceVariableInitializers();
-                    }
+                    (obj as Block)?.EvaluateInstanceVariableInitializers();
                 }
                 i++;
             }
@@ -223,13 +206,10 @@ namespace Turbo.Runtime
         internal override bool HasReturn()
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                if (((AST) list[i]).HasReturn())
-                {
-                    return true;
-                }
+                if (((AST) _list[i]).HasReturn()) return true;
                 i++;
             }
             return false;
@@ -238,51 +218,35 @@ namespace Turbo.Runtime
         internal void ProcessAssemblyAttributeLists()
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var expression = list[i] as Expression;
-                if (expression != null)
-                {
-                    var assemblyCustomAttributeList = expression.operand as AssemblyCustomAttributeList;
-                    if (assemblyCustomAttributeList != null)
-                    {
-                        assemblyCustomAttributeList.Process();
-                    }
-                }
+                var expression = _list[i] as Expression;
+                var assemblyCustomAttributeList = expression?.operand as AssemblyCustomAttributeList;
+                assemblyCustomAttributeList?.Process();
                 i++;
             }
         }
 
-        internal void MarkSuperOKIfIsFirstStatement()
+        internal void MarkSuperOkIfIsFirstStatement()
         {
-            if (list.Count > 0 && list[0] is ConstructorCall)
-            {
-                ((ConstructorCall) list[0]).isOK = true;
-            }
+            if (_list.Count > 0 && _list[0] is ConstructorCall) ((ConstructorCall) _list[0]).isOK = true;
         }
 
         internal override AST PartiallyEvaluate()
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var aST = (AST) list[i];
-                list[i] = aST.PartiallyEvaluate();
+                var aSt = (AST) _list[i];
+                _list[i] = aSt.PartiallyEvaluate();
                 i++;
             }
             return this;
         }
 
-        internal Expression ToExpression()
-        {
-            if (list.Count == 1 && list[0] is Expression)
-            {
-                return (Expression) list[0];
-            }
-            return null;
-        }
+        internal Expression ToExpression() => _list.Count == 1 && _list[0] is Expression ? (Expression) _list[0] : null;
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
@@ -290,10 +254,10 @@ namespace Turbo.Runtime
             compilerGlobals.BreakLabelStack.Push(label);
             compilerGlobals.ContinueLabelStack.Push(label);
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                ((AST) list[i]).TranslateToIL(il, Typeob.Void);
+                ((AST) _list[i]).TranslateToIL(il, Typeob.Void);
                 i++;
             }
             il.MarkLabel(label);
@@ -304,10 +268,10 @@ namespace Turbo.Runtime
         internal override void TranslateToILInitializer(ILGenerator il)
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                ((AST) list[i]).TranslateToILInitializer(il);
+                ((AST) _list[i]).TranslateToILInitializer(il);
                 i++;
             }
         }
@@ -315,14 +279,10 @@ namespace Turbo.Runtime
         internal void TranslateToILInitOnlyInitializers(ILGenerator il)
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var constant = list[i] as Constant;
-                if (constant != null)
-                {
-                    constant.TranslateToILInitOnlyInitializers(il);
-                }
+                (_list[i] as Constant)?.TranslateToILInitOnlyInitializers(il);
                 i++;
             }
         }
@@ -330,27 +290,27 @@ namespace Turbo.Runtime
         internal void TranslateToILInstanceInitializers(ILGenerator il)
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var aST = (AST) list[i];
-                if (aST is VariableDeclaration && !((VariableDeclaration) aST).field.IsStatic &&
-                    !((VariableDeclaration) aST).field.IsLiteral)
+                var aSt = (AST) _list[i];
+                if (aSt is VariableDeclaration && !((VariableDeclaration) aSt).field.IsStatic &&
+                    !((VariableDeclaration) aSt).field.IsLiteral)
                 {
-                    aST.TranslateToILInitializer(il);
-                    aST.TranslateToIL(il, Typeob.Void);
+                    aSt.TranslateToILInitializer(il);
+                    aSt.TranslateToIL(il, Typeob.Void);
                 }
-                else if (aST is FunctionDeclaration && !((FunctionDeclaration) aST).Func.isStatic)
+                else if (aSt is FunctionDeclaration && !((FunctionDeclaration) aSt).Func.isStatic)
                 {
-                    aST.TranslateToILInitializer(il);
+                    aSt.TranslateToILInitializer(il);
                 }
-                else if (aST is Constant && !((Constant) aST).field.IsStatic)
+                else if (aSt is Constant && !((Constant) aSt).field.IsStatic)
                 {
-                    aST.TranslateToIL(il, Typeob.Void);
+                    aSt.TranslateToIL(il, Typeob.Void);
                 }
-                else if (aST is Block)
+                else
                 {
-                    ((Block) aST).TranslateToILInstanceInitializers(il);
+                    (aSt as Block)?.TranslateToILInstanceInitializers(il);
                 }
                 i++;
             }
@@ -359,31 +319,31 @@ namespace Turbo.Runtime
         internal void TranslateToILStaticInitializers(ILGenerator il)
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
-                var aST = (AST) list[i];
-                if ((aST is VariableDeclaration && ((VariableDeclaration) aST).field.IsStatic) ||
-                    (aST is Constant && ((Constant) aST).field.IsStatic))
+                var aSt = (AST) _list[i];
+                if ((aSt is VariableDeclaration && ((VariableDeclaration) aSt).field.IsStatic) ||
+                    (aSt is Constant && ((Constant) aSt).field.IsStatic))
                 {
-                    aST.TranslateToILInitializer(il);
-                    aST.TranslateToIL(il, Typeob.Void);
+                    aSt.TranslateToILInitializer(il);
+                    aSt.TranslateToIL(il, Typeob.Void);
                 }
-                else if (aST is StaticInitializer)
+                else if (aSt is StaticInitializer)
                 {
-                    aST.TranslateToIL(il, Typeob.Void);
+                    aSt.TranslateToIL(il, Typeob.Void);
                 }
-                else if (aST is FunctionDeclaration && ((FunctionDeclaration) aST).Func.isStatic)
+                else if (aSt is FunctionDeclaration && ((FunctionDeclaration) aSt).Func.isStatic)
                 {
-                    aST.TranslateToILInitializer(il);
+                    aSt.TranslateToILInitializer(il);
                 }
-                else if (aST is Class)
+                else if (aSt is Class)
                 {
-                    aST.TranslateToIL(il, Typeob.Void);
+                    aSt.TranslateToIL(il, Typeob.Void);
                 }
-                else if (aST is Block)
+                else
                 {
-                    ((Block) aST).TranslateToILStaticInitializers(il);
+                    (aSt as Block)?.TranslateToILStaticInitializers(il);
                 }
                 i++;
             }
@@ -392,11 +352,11 @@ namespace Turbo.Runtime
         internal override Context GetFirstExecutableContext()
         {
             var i = 0;
-            var count = list.Count;
+            var count = _list.Count;
             while (i < count)
             {
                 Context firstExecutableContext;
-                if ((firstExecutableContext = ((AST) list[i]).GetFirstExecutableContext()) != null)
+                if ((firstExecutableContext = ((AST) _list[i]).GetFirstExecutableContext()) != null)
                 {
                     return firstExecutableContext;
                 }

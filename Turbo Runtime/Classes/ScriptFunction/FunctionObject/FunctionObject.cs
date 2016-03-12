@@ -993,7 +993,7 @@ namespace Turbo.Runtime
             }
             else
             {
-                body.MarkSuperOKIfIsFirstStatement();
+                body.MarkSuperOkIfIsFirstStatement();
                 body.PartiallyEvaluate();
                 var classScope2 = (ClassScope) enclosing_scope;
                 var num3 = superConstructorCall?.arguments.Count ?? 0;
