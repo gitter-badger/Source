@@ -60,14 +60,14 @@ namespace Turbo.Runtime
 {
     internal sealed class Assign : AST
     {
-        internal AST lhside;
+        internal AST Lhside;
 
-        internal AST rhside;
+        internal AST Rhside;
 
         internal Assign(Context context, AST lhside, AST rhside) : base(context)
         {
-            this.lhside = lhside;
-            this.rhside = rhside;
+            Lhside = lhside;
+            Rhside = rhside;
         }
 
         internal override object Evaluate()
@@ -75,10 +75,9 @@ namespace Turbo.Runtime
             object result;
             try
             {
-                var call = lhside as Call;
-                if (call != null) call.EvaluateIndices();
-                var obj = rhside.Evaluate();
-                lhside.SetValue(obj);
+                (Lhside as Call)?.EvaluateIndices();
+                var obj = Rhside.Evaluate();
+                Lhside.SetValue(obj);
                 result = obj;
             }
             catch (TurboException ex)
@@ -86,48 +85,48 @@ namespace Turbo.Runtime
                 if (ex.context == null) ex.context = context;
                 throw;
             }
-            catch (Exception arg_56_0)
+            catch (Exception arg560)
             {
-                throw new TurboException(arg_56_0, context);
+                throw new TurboException(arg560, context);
             }
             return result;
         }
 
-        internal override IReflect InferType(TField inference_target) => rhside.InferType(inference_target);
+        internal override IReflect InferType(TField inferenceTarget) => Rhside.InferType(inferenceTarget);
 
         internal override AST PartiallyEvaluate()
         {
-            var aST = lhside.PartiallyEvaluateAsReference();
-            lhside = aST;
-            rhside = rhside.PartiallyEvaluate();
-            aST.SetPartialValue(rhside);
+            var aSt = Lhside.PartiallyEvaluateAsReference();
+            Lhside = aSt;
+            Rhside = Rhside.PartiallyEvaluate();
+            aSt.SetPartialValue(Rhside);
             return this;
         }
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            var target_type = Convert.ToType(lhside.InferType(null));
-            lhside.TranslateToILPreSet(il);
+            var targetType = Convert.ToType(Lhside.InferType(null));
+            Lhside.TranslateToILPreSet(il);
             if (rtype != Typeob.Void)
             {
-                var type = Convert.ToType(rhside.InferType(null));
-                rhside.TranslateToIL(il, type);
+                var type = Convert.ToType(Rhside.InferType(null));
+                Rhside.TranslateToIL(il, type);
                 var local = il.DeclareLocal(type);
                 il.Emit(OpCodes.Dup);
                 il.Emit(OpCodes.Stloc, local);
-                Convert.Emit(this, il, type, target_type);
-                lhside.TranslateToILSet(il);
+                Convert.Emit(this, il, type, targetType);
+                Lhside.TranslateToILSet(il);
                 il.Emit(OpCodes.Ldloc, local);
                 Convert.Emit(this, il, type, rtype);
                 return;
             }
-            lhside.TranslateToILSet(il, rhside);
+            Lhside.TranslateToILSet(il, Rhside);
         }
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            lhside.TranslateToILInitializer(il);
-            rhside.TranslateToILInitializer(il);
+            Lhside.TranslateToILInitializer(il);
+            Rhside.TranslateToILInitializer(il);
         }
     }
 }
