@@ -61,45 +61,45 @@ namespace Turbo.Runtime
 {
     internal class Call : AST
     {
-        internal AST func;
+        internal AST Func;
 
-        private ASTList args;
+        private ASTList _args;
 
-        private object[] argValues;
+        private object[] _argValues;
 
-        private readonly int outParameterCount;
+        private readonly int _outParameterCount;
 
-        internal bool isConstructor;
+        internal bool IsConstructor;
 
-        internal readonly bool inBrackets;
+        internal readonly bool InBrackets;
 
-        private readonly FunctionScope enclosingFunctionScope;
+        private readonly FunctionScope _enclosingFunctionScope;
 
-        private bool alreadyPartiallyEvaluated;
+        private bool _alreadyPartiallyEvaluated;
 
-        private bool isAssignmentToDefaultIndexedProperty;
+        private bool _isAssignmentToDefaultIndexedProperty;
 
         internal Call(Context context, AST func, ASTList args, bool inBrackets) : base(context)
         {
-            this.func = func;
-            this.args = args ?? new ASTList(context);
-            argValues = null;
-            outParameterCount = 0;
+            this.Func = func;
+            this._args = args ?? new ASTList(context);
+            _argValues = null;
+            _outParameterCount = 0;
             var i = 0;
-            var count = this.args.Count;
+            var count = this._args.Count;
             while (i < count)
             {
-                if (this.args[i] is AddressOf)
+                if (this._args[i] is AddressOf)
                 {
-                    outParameterCount++;
+                    _outParameterCount++;
                 }
                 i++;
             }
-            isConstructor = false;
-            this.inBrackets = inBrackets;
-            enclosingFunctionScope = null;
-            alreadyPartiallyEvaluated = false;
-            isAssignmentToDefaultIndexedProperty = false;
+            IsConstructor = false;
+            this.InBrackets = inBrackets;
+            _enclosingFunctionScope = null;
+            _alreadyPartiallyEvaluated = false;
+            _isAssignmentToDefaultIndexedProperty = false;
             var scriptObject = Globals.ScopeStack.Peek();
             while (!(scriptObject is FunctionScope))
             {
@@ -109,17 +109,17 @@ namespace Turbo.Runtime
                     return;
                 }
             }
-            enclosingFunctionScope = (FunctionScope) scriptObject;
+            _enclosingFunctionScope = (FunctionScope) scriptObject;
         }
 
         private bool AllParamsAreMissing()
         {
             var i = 0;
-            var count = args.Count;
+            var count = _args.Count;
             while (i < count)
             {
-                var aST = args[i];
-                if (!(aST is ConstantWrapper) || ((ConstantWrapper) aST).value != System.Reflection.Missing.Value)
+                var aSt = _args[i];
+                if (!(aSt is ConstantWrapper) || ((ConstantWrapper) aSt).value != System.Reflection.Missing.Value)
                 {
                     return false;
                 }
@@ -130,13 +130,13 @@ namespace Turbo.Runtime
 
         private IReflect[] ArgIRs()
         {
-            var count = args.Count;
+            var count = _args.Count;
             var array = new IReflect[count];
             for (var i = 0; i < count; i++)
             {
-                var aST = args[i];
-                var reflect = array[i] = aST.InferType(null);
-                if (!(aST is AddressOf)) continue;
+                var aSt = _args[i];
+                var reflect = array[i] = aSt.InferType(null);
+                if (!(aSt is AddressOf)) continue;
                 if (reflect is ClassScope)
                 {
                     reflect = ((ClassScope) reflect).GetBakedSuperType();
@@ -148,13 +148,13 @@ namespace Turbo.Runtime
 
         internal bool CanBeFunctionDeclaration()
         {
-            var flag = func is Lookup && outParameterCount == 0;
+            var flag = Func is Lookup && _outParameterCount == 0;
             if (!flag) return false;
             var i = 0;
-            var count = args.Count;
+            var count = _args.Count;
             while (i < count)
             {
-                flag = args[i] is Lookup;
+                flag = _args[i] is Lookup;
                 if (!flag)
                 {
                     break;
@@ -166,14 +166,14 @@ namespace Turbo.Runtime
 
         internal override void CheckIfOKToUseInSuperConstructorCall()
         {
-            func.CheckIfOKToUseInSuperConstructorCall();
+            Func.CheckIfOKToUseInSuperConstructorCall();
         }
 
         internal override bool Delete()
         {
-            var array = args?.EvaluateAsArray();
+            var array = _args?.EvaluateAsArray();
             var num = array.Length;
-            var obj = func.Evaluate();
+            var obj = Func.Evaluate();
             if (obj == null)
             {
                 return true;
@@ -205,36 +205,36 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            if (outParameterCount > 0 && THPMainEngine.executeForJSEE)
+            if (_outParameterCount > 0 && THPMainEngine.executeForJSEE)
             {
                 throw new TurboException(TError.RefParamsNonSupportedInDebugger);
             }
-            var lateBinding = func.EvaluateAsLateBinding();
-            var array = args?.EvaluateAsArray();
+            var lateBinding = Func.EvaluateAsLateBinding();
+            var array = _args?.EvaluateAsArray();
             Globals.CallContextStack.Push(new CallContext(context, lateBinding));
             object result;
             try
             {
-                var callableExpression = func as CallableExpression;
+                var callableExpression = Func as CallableExpression;
                 object obj;
                 if (callableExpression == null || !(callableExpression.Expression is Call))
                 {
-                    obj = lateBinding.Call(array, isConstructor, inBrackets, Engine);
+                    obj = lateBinding.Call(array, IsConstructor, InBrackets, Engine);
                 }
                 else
                 {
-                    obj = LateBinding.CallValue(lateBinding.obj, array, isConstructor, inBrackets, Engine,
+                    obj = LateBinding.CallValue(lateBinding.obj, array, IsConstructor, InBrackets, Engine,
                         callableExpression.GetObject2(), TBinder.ob, null, null);
                 }
-                if (outParameterCount > 0)
+                if (_outParameterCount > 0)
                 {
                     var i = 0;
-                    var count = args.Count;
+                    var count = _args.Count;
                     while (i < count)
                     {
-                        if (args[i] is AddressOf)
+                        if (_args[i] is AddressOf)
                         {
-                            args[i].SetValue(array[i]);
+                            _args[i].SetValue(array[i]);
                         }
                         i++;
                     }
@@ -248,7 +248,7 @@ namespace Turbo.Runtime
                 {
                     ex2 = (TurboException) ex.InnerException;
                     if (ex2.context != null) throw ex2;
-                    ex2.context = ex2.Number == -2146823281 ? func.context : context;
+                    ex2.context = ex2.Number == -2146823281 ? Func.context : context;
                 }
                 else
                 {
@@ -259,12 +259,12 @@ namespace Turbo.Runtime
             catch (TurboException ex3)
             {
                 if (ex3.context != null) throw;
-                ex3.context = ex3.Number == -2146823281 ? func.context : context;
+                ex3.context = ex3.Number == -2146823281 ? Func.context : context;
                 throw;
             }
-            catch (Exception arg_1CC_0)
+            catch (Exception arg_1Cc0)
             {
-                throw new TurboException(arg_1CC_0, context);
+                throw new TurboException(arg_1Cc0, context);
             }
             finally
             {
@@ -275,40 +275,40 @@ namespace Turbo.Runtime
 
         internal void EvaluateIndices()
         {
-            argValues = args.EvaluateAsArray();
+            _argValues = _args.EvaluateAsArray();
         }
 
         internal IdentifierLiteral GetName()
         {
-            return new IdentifierLiteral(func.ToString(), func.context);
+            return new IdentifierLiteral(Func.ToString(), Func.context);
         }
 
         internal void GetParameters(ArrayList parameters)
         {
             var i = 0;
-            var count = args.Count;
+            var count = _args.Count;
             while (i < count)
             {
-                var aST = args[i];
-                parameters.Add(new ParameterDeclaration(aST.context, aST.ToString(), null, null));
+                var aSt = _args[i];
+                parameters.Add(new ParameterDeclaration(aSt.context, aSt.ToString(), null, null));
                 i++;
             }
         }
 
         internal override IReflect InferType(TField inferenceTarget)
         {
-            if (func is Binding)
+            if (Func is Binding)
             {
-                return ((Binding) func).InferTypeOfCall(inferenceTarget, isConstructor);
+                return ((Binding) Func).InferTypeOfCall(inferenceTarget, IsConstructor);
             }
-            if (!(func is ConstantWrapper)) return Typeob.Object;
-            var value = ((ConstantWrapper) func).value;
+            if (!(Func is ConstantWrapper)) return Typeob.Object;
+            var value = ((ConstantWrapper) Func).value;
             return value is Type || value is ClassScope || value is TypedArray ? (IReflect) value : Typeob.Object;
         }
 
         private TLocalField[] LocalsThatWereOutParameters()
         {
-            var num = outParameterCount;
+            var num = _outParameterCount;
             if (num == 0)
             {
                 return null;
@@ -317,9 +317,9 @@ namespace Turbo.Runtime
             var num2 = 0;
             for (var i = 0; i < num; i++)
             {
-                var aST = args[i];
-                if (!(aST is AddressOf)) continue;
-                var field = ((AddressOf) aST).GetField();
+                var aSt = _args[i];
+                if (!(aSt is AddressOf)) continue;
+                var field = ((AddressOf) aSt).GetField();
                 if (field is TLocalField)
                 {
                     array[num2++] = (TLocalField) field;
@@ -330,41 +330,41 @@ namespace Turbo.Runtime
 
         internal void MakeDeletable()
         {
-            if (!(func is Binding)) return;
-            var expr_18 = (Binding) func;
-            expr_18.InvalidateBinding();
-            expr_18.PartiallyEvaluateAsCallable();
-            expr_18.ResolveLHValue();
+            if (!(Func is Binding)) return;
+            var expr18 = (Binding) Func;
+            expr18.InvalidateBinding();
+            expr18.PartiallyEvaluateAsCallable();
+            expr18.ResolveLHValue();
         }
 
         internal override AST PartiallyEvaluate()
         {
-            if (alreadyPartiallyEvaluated)
+            if (_alreadyPartiallyEvaluated)
             {
                 return this;
             }
-            alreadyPartiallyEvaluated = true;
-            if (inBrackets && AllParamsAreMissing())
+            _alreadyPartiallyEvaluated = true;
+            if (InBrackets && AllParamsAreMissing())
             {
-                if (isConstructor)
+                if (IsConstructor)
                 {
-                    args.context.HandleError(TError.TypeMismatch);
+                    _args.context.HandleError(TError.TypeMismatch);
                 }
                 return
                     new ConstantWrapper(
-                        new TypedArray(((TypeExpression) new TypeExpression(func).PartiallyEvaluate()).ToIReflect(),
-                            args.Count + 1), context);
+                        new TypedArray(((TypeExpression) new TypeExpression(Func).PartiallyEvaluate()).ToIReflect(),
+                            _args.Count + 1), context);
             }
-            func = func.PartiallyEvaluateAsCallable();
-            args = (ASTList) args.PartiallyEvaluate();
+            Func = Func.PartiallyEvaluateAsCallable();
+            _args = (ASTList) _args.PartiallyEvaluate();
             var array = ArgIRs();
-            func.ResolveCall(args, array, isConstructor, inBrackets);
-            if (isConstructor || inBrackets || !(func is Binding) || args.Count != 1) return this;
-            var binding = (Binding) func;
+            Func.ResolveCall(_args, array, IsConstructor, InBrackets);
+            if (IsConstructor || InBrackets || !(Func is Binding) || _args.Count != 1) return this;
+            var binding = (Binding) Func;
             if (binding.member is Type)
             {
                 var type = (Type) binding.member;
-                var constantWrapper = args[0] as ConstantWrapper;
+                var constantWrapper = _args[0] as ConstantWrapper;
                 if (constantWrapper != null)
                 {
                     try
@@ -392,9 +392,9 @@ namespace Turbo.Runtime
                         return this;
                     }
                 }
-                if (!Binding.AssignmentCompatible(type, args[0], array[0], false))
+                if (!Binding.AssignmentCompatible(type, _args[0], array[0], false))
                 {
-                    args[0].context.HandleError(TError.ImpossibleConversion);
+                    _args[0].context.HandleError(TError.ImpossibleConversion);
                 }
             }
             else if (binding.member is TVariableField)
@@ -411,13 +411,13 @@ namespace Turbo.Runtime
                             !Convert.IsPromotableTo(underlyingTypeIfEnum, array[0]) &&
                             (!ReferenceEquals(array[0], Typeob.String) || underlyingTypeIfEnum == classScope))
                         {
-                            args[0].context.HandleError(TError.ImpossibleConversion);
+                            _args[0].context.HandleError(TError.ImpossibleConversion);
                         }
                     }
                     else if (!Convert.IsPromotableTo(array[0], classScope) &&
                              !Convert.IsPromotableTo(classScope, array[0]))
                     {
-                        args[0].context.HandleError(TError.ImpossibleConversion);
+                        _args[0].context.HandleError(TError.ImpossibleConversion);
                     }
                 }
                 else if (jSVariableField.value is TypedArray)
@@ -425,7 +425,7 @@ namespace Turbo.Runtime
                     var typedArray = (TypedArray) jSVariableField.value;
                     if (!Convert.IsPromotableTo(array[0], typedArray) && !Convert.IsPromotableTo(typedArray, array[0]))
                     {
-                        args[0].context.HandleError(TError.ImpossibleConversion);
+                        _args[0].context.HandleError(TError.ImpossibleConversion);
                     }
                 }
             }
@@ -434,47 +434,47 @@ namespace Turbo.Runtime
 
         internal override AST PartiallyEvaluateAsReference()
         {
-            func = func.PartiallyEvaluateAsCallable();
-            args = (ASTList) args.PartiallyEvaluate();
+            Func = Func.PartiallyEvaluateAsCallable();
+            _args = (ASTList) _args.PartiallyEvaluate();
             return this;
         }
 
-        internal override void SetPartialValue(AST partial_value)
+        internal override void SetPartialValue(AST partialValue)
         {
-            if (isConstructor)
+            if (IsConstructor)
             {
                 context.HandleError(TError.IllegalAssignment);
                 return;
             }
-            if (func is Binding)
+            if (Func is Binding)
             {
-                ((Binding) func).SetPartialValue(args, ArgIRs(), partial_value, inBrackets);
+                ((Binding) Func).SetPartialValue(_args, ArgIRs(), partialValue, InBrackets);
                 return;
             }
-            if (func is ThisLiteral)
+            if (Func is ThisLiteral)
             {
-                ((ThisLiteral) func).ResolveAssignmentToDefaultIndexedProperty(args, ArgIRs());
+                ((ThisLiteral) Func).ResolveAssignmentToDefaultIndexedProperty(_args, ArgIRs());
             }
         }
 
         internal override void SetValue(object value)
         {
-            var lateBinding = func.EvaluateAsLateBinding();
+            var lateBinding = Func.EvaluateAsLateBinding();
             try
             {
-                lateBinding.SetIndexedPropertyValue(argValues ?? args.EvaluateAsArray(), value);
+                lateBinding.SetIndexedPropertyValue(_argValues ?? _args.EvaluateAsArray(), value);
             }
             catch (TurboException ex)
             {
                 if (ex.context == null)
                 {
-                    ex.context = func.context;
+                    ex.context = Func.context;
                 }
                 throw;
             }
-            catch (Exception arg_57_0)
+            catch (Exception arg570)
             {
-                throw new TurboException(arg_57_0, func.context);
+                throw new TurboException(arg570, Func.context);
             }
         }
 
@@ -485,14 +485,14 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Nop);
             }
             var flag = true;
-            if (enclosingFunctionScope?.owner != null)
+            if (_enclosingFunctionScope?.owner != null)
             {
-                var binding = func as Binding;
-                if (binding != null && !enclosingFunctionScope.closuresMightEscape)
+                var binding = Func as Binding;
+                if (binding != null && !_enclosingFunctionScope.closuresMightEscape)
                 {
                     if (binding.member is TLocalField)
                     {
-                        enclosingFunctionScope.owner.TranslateToILToSaveLocals(il);
+                        _enclosingFunctionScope.owner.TranslateToILToSaveLocals(il);
                     }
                     else
                     {
@@ -501,19 +501,19 @@ namespace Turbo.Runtime
                 }
                 else
                 {
-                    enclosingFunctionScope.owner.TranslateToILToSaveLocals(il);
+                    _enclosingFunctionScope.owner.TranslateToILToSaveLocals(il);
                 }
             }
-            func.TranslateToILCall(il, rtype, args, isConstructor, inBrackets);
-            if (flag && enclosingFunctionScope?.owner != null)
+            Func.TranslateToILCall(il, rtype, _args, IsConstructor, InBrackets);
+            if (flag && _enclosingFunctionScope?.owner != null)
             {
-                if (outParameterCount == 0)
+                if (_outParameterCount == 0)
                 {
-                    enclosingFunctionScope.owner.TranslateToILToRestoreLocals(il);
+                    _enclosingFunctionScope.owner.TranslateToILToRestoreLocals(il);
                 }
                 else
                 {
-                    enclosingFunctionScope.owner.TranslateToILToRestoreLocals(il, LocalsThatWereOutParameters());
+                    _enclosingFunctionScope.owner.TranslateToILToRestoreLocals(il, LocalsThatWereOutParameters());
                 }
             }
             if (context.document.debugOn)
@@ -524,16 +524,16 @@ namespace Turbo.Runtime
 
         internal CustomAttribute ToCustomAttribute()
         {
-            return new CustomAttribute(context, func, args);
+            return new CustomAttribute(context, Func, _args);
         }
 
         internal override void TranslateToILDelete(ILGenerator il, Type rtype)
         {
-            var reflect = func.InferType(null);
+            var reflect = Func.InferType(null);
             var type = Convert.ToType(reflect);
-            func.TranslateToIL(il, type);
-            args.TranslateToIL(il, Typeob.ArrayOfObject);
-            if (func is Binding)
+            Func.TranslateToIL(il, type);
+            _args.TranslateToIL(il, Typeob.ArrayOfObject);
+            if (Func is Binding)
             {
                 MethodInfo methodInfo;
                 if (reflect is ClassScope)
@@ -558,7 +558,7 @@ namespace Turbo.Runtime
                     return;
                 }
             }
-            ConstantWrapper.TranslateToILInt(il, args.Count - 1);
+            ConstantWrapper.TranslateToILInt(il, _args.Count - 1);
             il.Emit(OpCodes.Ldelem_Ref);
             Convert.Emit(this, il, Typeob.Object, Typeob.String);
             il.Emit(OpCodes.Call, CompilerGlobals.deleteMemberMethod);
@@ -567,34 +567,34 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            func.TranslateToILInitializer(il);
-            args.TranslateToILInitializer(il);
+            Func.TranslateToILInitializer(il);
+            _args.TranslateToILInitializer(il);
         }
 
         internal override void TranslateToILPreSet(ILGenerator il)
         {
-            func.TranslateToILPreSet(il, args);
+            Func.TranslateToILPreSet(il, _args);
         }
 
         internal override void TranslateToILPreSet(ILGenerator il, ASTList args)
         {
-            isAssignmentToDefaultIndexedProperty = true;
+            _isAssignmentToDefaultIndexedProperty = true;
             base.TranslateToILPreSet(il, args);
         }
 
         internal override void TranslateToILPreSetPlusGet(ILGenerator il)
         {
-            func.TranslateToILPreSetPlusGet(il, args, inBrackets);
+            Func.TranslateToILPreSetPlusGet(il, _args, InBrackets);
         }
 
         internal override void TranslateToILSet(ILGenerator il, AST rhvalue)
         {
-            if (isAssignmentToDefaultIndexedProperty)
+            if (_isAssignmentToDefaultIndexedProperty)
             {
                 base.TranslateToILSet(il, rhvalue);
                 return;
             }
-            func.TranslateToILSet(il, rhvalue);
+            Func.TranslateToILSet(il, rhvalue);
         }
     }
 }

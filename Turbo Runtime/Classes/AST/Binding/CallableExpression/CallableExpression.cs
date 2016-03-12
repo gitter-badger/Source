@@ -82,9 +82,9 @@ namespace Turbo.Runtime
         internal object GetObject2()
         {
             var call = Expression as Call;
-            return call == null || !call.inBrackets
+            return call == null || !call.InBrackets
                 ? Convert.ToObject(Expression.Evaluate(), Engine)
-                : Convert.ToObject(call.func.Evaluate(), Engine);
+                : Convert.ToObject(call.Func.Evaluate(), Engine);
         }
 
         protected override void HandleNoSuchMemberError()
@@ -135,19 +135,19 @@ namespace Turbo.Runtime
         protected override void TranslateToILWithDupOfThisOb(ILGenerator il)
         {
             var call = Expression as Call;
-            if (call == null || !call.inBrackets)
+            if (call == null || !call.InBrackets)
             {
                 TranslateToILObject(il, null, false);
             }
             else
             {
-                if (call.isConstructor && call.inBrackets)
+                if (call.IsConstructor && call.InBrackets)
                 {
                     call.TranslateToIL(il, Typeob.Object);
                     il.Emit(OpCodes.Dup);
                     return;
                 }
-                call.func.TranslateToIL(il, Typeob.Object);
+                call.Func.TranslateToIL(il, Typeob.Object);
             }
             Expression.TranslateToIL(il, Typeob.Object);
         }

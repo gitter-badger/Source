@@ -4733,7 +4733,7 @@ namespace Turbo.Runtime
                                 {
                                     expression.context = (Context) newContexts[newContexts.Count - 1];
                                 }
-                                ((Call) expression).isConstructor = true;
+                                ((Call) expression).IsConstructor = true;
                                 newContexts.RemoveAt(newContexts.Count - 1);
                             }
                             if (ex != null)
@@ -4782,7 +4782,7 @@ namespace Turbo.Runtime
                             {
                                 ((Context) newContexts[newContexts.Count - 1]).UpdateWith(expression.context);
                                 expression.context = (Context) newContexts[newContexts.Count - 1];
-                                ((Call) expression).isConstructor = true;
+                                ((Call) expression).IsConstructor = true;
                                 newContexts.RemoveAt(newContexts.Count - 1);
                             }
                             GetNextToken();
@@ -4827,7 +4827,7 @@ namespace Turbo.Runtime
                                     ((Context) newContexts[newContexts.Count - 1]).UpdateWith(expression.context);
                                     expression = new Call((Context) newContexts[newContexts.Count - 1], expression,
                                         new ASTList(CurrentPositionContext()), false);
-                                    ((Call) expression).isConstructor = true;
+                                    ((Call) expression).IsConstructor = true;
                                     newContexts.RemoveAt(newContexts.Count - 1);
                                 }
                             }
