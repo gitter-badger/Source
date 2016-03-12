@@ -67,8 +67,8 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            var v = operand1.Evaluate();
-            var v2 = operand2.Evaluate();
+            var v = Operand1.Evaluate();
+            var v2 = Operand2.Evaluate();
             object result;
             try
             {
@@ -76,7 +76,7 @@ namespace Turbo.Runtime
             }
             catch (TurboException ex)
             {
-                if (ex.context == null) ex.context = operand2.context;
+                if (ex.context == null) ex.context = Operand2.context;
                 throw;
             }
             return result;
@@ -130,8 +130,8 @@ namespace Turbo.Runtime
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            operand1.TranslateToIL(il, Typeob.Object);
-            operand2.TranslateToIL(il, Typeob.Object);
+            Operand1.TranslateToIL(il, Typeob.Object);
+            Operand2.TranslateToIL(il, Typeob.Object);
             il.Emit(OpCodes.Call, CompilerGlobals.TurboInMethod);
             Convert.Emit(this, il, Typeob.Boolean, rtype);
         }

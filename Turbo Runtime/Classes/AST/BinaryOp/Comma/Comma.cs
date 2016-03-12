@@ -66,16 +66,16 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            operand1.Evaluate();
-            return operand2.Evaluate();
+            Operand1.Evaluate();
+            return Operand2.Evaluate();
         }
 
-        internal override IReflect InferType(TField inferenceTarget) => operand2.InferType(inferenceTarget);
+        internal override IReflect InferType(TField inferenceTarget) => Operand2.InferType(inferenceTarget);
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            operand1.TranslateToIL(il, Typeob.Void);
-            operand2.TranslateToIL(il, rtype);
+            Operand1.TranslateToIL(il, Typeob.Void);
+            Operand2.TranslateToIL(il, rtype);
         }
     }
 }

@@ -67,8 +67,8 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            var flag = TurboStrictEquals(operand1.Evaluate(), operand2.Evaluate(), THPMainEngine.executeForJSEE);
-            return operatorTokl == TToken.StrictEqual ? flag : !flag;
+            var flag = TurboStrictEquals(Operand1.Evaluate(), Operand2.Evaluate(), THPMainEngine.executeForJSEE);
+            return OperatorTokl == TToken.StrictEqual ? flag : !flag;
         }
 
         public static bool TurboStrictEquals(object v1, object v2) => TurboStrictEquals(v1, v2, false);
@@ -452,10 +452,10 @@ namespace Turbo.Runtime
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,
             bool shortForm)
         {
-            var type = Convert.ToType(operand1.InferType(null));
-            var type2 = Convert.ToType(operand2.InferType(null));
-            if (operand1 is ConstantWrapper && operand1.Evaluate() == null) type = Typeob.Empty;
-            if (operand2 is ConstantWrapper && operand2.Evaluate() == null) type2 = Typeob.Empty;
+            var type = Convert.ToType(Operand1.InferType(null));
+            var type2 = Convert.ToType(Operand2.InferType(null));
+            if (Operand1 is ConstantWrapper && Operand1.Evaluate() == null) type = Typeob.Empty;
+            if (Operand2 is ConstantWrapper && Operand2.Evaluate() == null) type2 = Typeob.Empty;
             if (type != type2 && type.IsPrimitive && type2.IsPrimitive)
             {
                 if (type == Typeob.Single) type2 = type;
@@ -468,31 +468,31 @@ namespace Turbo.Runtime
             {
                 var rtype = type;
                 if (!type.IsPrimitive) rtype = Typeob.Object;
-                operand1.TranslateToIL(il, rtype);
-                operand2.TranslateToIL(il, rtype);
+                Operand1.TranslateToIL(il, rtype);
+                Operand2.TranslateToIL(il, rtype);
                 if (type == Typeob.String) il.Emit(OpCodes.Call, CompilerGlobals.stringEqualsMethod);
                 else if (!type.IsPrimitive) il.Emit(OpCodes.Callvirt, CompilerGlobals.equalsMethod);
                 else flag = false;
             }
             else if (type == Typeob.Empty)
             {
-                operand2.TranslateToIL(il, Typeob.Object);
+                Operand2.TranslateToIL(il, Typeob.Object);
                 branchIfTrue = !branchIfTrue;
             }
             else if (type2 == Typeob.Empty)
             {
-                operand1.TranslateToIL(il, Typeob.Object);
+                Operand1.TranslateToIL(il, Typeob.Object);
                 branchIfTrue = !branchIfTrue;
             }
             else
             {
-                operand1.TranslateToIL(il, Typeob.Object);
-                operand2.TranslateToIL(il, Typeob.Object);
+                Operand1.TranslateToIL(il, Typeob.Object);
+                Operand2.TranslateToIL(il, Typeob.Object);
                 il.Emit(OpCodes.Call, CompilerGlobals.TurboStrictEqualsMethod);
             }
             if (branchIfTrue)
             {
-                if (operatorTokl == TToken.StrictEqual)
+                if (OperatorTokl == TToken.StrictEqual)
                 {
                     if (flag)
                     {
@@ -511,7 +511,7 @@ namespace Turbo.Runtime
                     il.Emit(shortForm ? OpCodes.Bne_Un_S : OpCodes.Bne_Un, label);
                 }
             }
-            else if (operatorTokl == TToken.StrictEqual)
+            else if (OperatorTokl == TToken.StrictEqual)
             {
                 if (flag)
                 {

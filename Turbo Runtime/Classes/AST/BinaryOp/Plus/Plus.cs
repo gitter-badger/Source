@@ -72,7 +72,7 @@ namespace Turbo.Runtime
         {
         }
 
-        internal override object Evaluate() => EvaluatePlus(operand1.Evaluate(), operand2.Evaluate());
+        internal override object Evaluate() => EvaluatePlus(Operand1.Evaluate(), Operand2.Evaluate());
 
         [DebuggerHidden, DebuggerStepThrough]
         public object EvaluatePlus(object v1, object v2)
@@ -355,14 +355,14 @@ namespace Turbo.Runtime
         {
             var type = (ir1 is Type) ? ((Type) ir1) : Typeob.Object;
             var type2 = (ir2 is Type) ? ((Type) ir2) : Typeob.Object;
-            if (type1 == type && loctype == type2) return operatorMeth;
+            if (Type1 == type && Loctype == type2) return OperatorMeth;
             if (type != Typeob.String && type2 != Typeob.String &&
                 ((!Convert.IsPrimitiveNumericType(type) && !Typeob.TObject.IsAssignableFrom(type)) ||
                  (!Convert.IsPrimitiveNumericType(type2) && !Typeob.TObject.IsAssignableFrom(type2))))
                 return base.GetOperator(type, type2);
-            operatorMeth = null;
-            type1 = type;
-            loctype = type2;
+            OperatorMeth = null;
+            Type1 = type;
+            Loctype = type2;
             return null;
         }
 
@@ -406,25 +406,25 @@ namespace Turbo.Runtime
 
         internal override IReflect InferType(TField inferenceTarget)
         {
-            var @operator = type1 == null || inferenceTarget != null
-                ? GetOperator(operand1.InferType(inferenceTarget), operand2.InferType(inferenceTarget))
-                : GetOperator(type1, loctype);
+            var @operator = Type1 == null || inferenceTarget != null
+                ? GetOperator(Operand1.InferType(inferenceTarget), Operand2.InferType(inferenceTarget))
+                : GetOperator(Type1, Loctype);
             if (@operator == null)
-                return type1 == Typeob.String || loctype == Typeob.String
+                return Type1 == Typeob.String || Loctype == Typeob.String
                     ? Typeob.String
-                    : (type1 == Typeob.Char && loctype == Typeob.Char
+                    : (Type1 == Typeob.Char && Loctype == Typeob.Char
                         ? Typeob.String
-                        : (Convert.IsPrimitiveNumericTypeFitForDouble(type1)
-                            ? (loctype == Typeob.Char
+                        : (Convert.IsPrimitiveNumericTypeFitForDouble(Type1)
+                            ? (Loctype == Typeob.Char
                                 ? Typeob.Char
-                                : (Convert.IsPrimitiveNumericTypeFitForDouble(loctype) ? Typeob.Double : Typeob.Object))
-                            : (Convert.IsPrimitiveNumericTypeFitForDouble(loctype)
-                                ? (type1 == Typeob.Char
+                                : (Convert.IsPrimitiveNumericTypeFitForDouble(Loctype) ? Typeob.Double : Typeob.Object))
+                            : (Convert.IsPrimitiveNumericTypeFitForDouble(Loctype)
+                                ? (Type1 == Typeob.Char
                                     ? Typeob.Char
-                                    : (Convert.IsPrimitiveNumericTypeFitForDouble(type1) ? Typeob.Double : Typeob.Object))
-                                : (type1 == Typeob.Boolean && loctype == Typeob.Char
+                                    : (Convert.IsPrimitiveNumericTypeFitForDouble(Type1) ? Typeob.Double : Typeob.Object))
+                                : (Type1 == Typeob.Boolean && Loctype == Typeob.Char
                                     ? Typeob.Char
-                                    : (type1 == Typeob.Char && loctype == Typeob.Boolean ? Typeob.Char : Typeob.Object)))));
+                                    : (Type1 == Typeob.Char && Loctype == Typeob.Boolean ? Typeob.Char : Typeob.Object)))));
             _metaData = @operator;
             return @operator.ReturnType;
         }
@@ -436,12 +436,12 @@ namespace Turbo.Runtime
             {
                 var type = (rtype == Typeob.Double)
                     ? rtype
-                    : (type1 == Typeob.Char && loctype == Typeob.Char)
+                    : (Type1 == Typeob.Char && Loctype == Typeob.Char)
                         ? Typeob.String
-                        : (Convert.IsPrimitiveNumericType(rtype) && Convert.IsPromotableTo(type1, rtype) &&
-                           Convert.IsPromotableTo(loctype, rtype))
+                        : (Convert.IsPrimitiveNumericType(rtype) && Convert.IsPromotableTo(Type1, rtype) &&
+                           Convert.IsPromotableTo(Loctype, rtype))
                             ? rtype
-                            : (type1 != Typeob.String && loctype != Typeob.String)
+                            : (Type1 != Typeob.String && Loctype != Typeob.String)
                                 ? Typeob.Double
                                 : Typeob.String;
 
@@ -450,47 +450,47 @@ namespace Turbo.Runtime
 
                 if (type == Typeob.String)
                 {
-                    if (!(operand1 is Plus) || !(type1 == type))
+                    if (!(Operand1 is Plus) || !(Type1 == type))
                     {
-                        TranslateToStringWithSpecialCaseForNull(il, operand1);
-                        TranslateToStringWithSpecialCaseForNull(il, operand2);
+                        TranslateToStringWithSpecialCaseForNull(il, Operand1);
+                        TranslateToStringWithSpecialCaseForNull(il, Operand2);
                         il.Emit(OpCodes.Call, CompilerGlobals.stringConcat2Method);
                         Convert.Emit(this, il, type, rtype);
                         return;
                     }
-                    var plus = (Plus) operand1;
-                    if (!(plus.operand1 is Plus) || !(plus.type1 == type))
+                    var plus = (Plus) Operand1;
+                    if (!(plus.Operand1 is Plus) || !(plus.Type1 == type))
                     {
-                        TranslateToStringWithSpecialCaseForNull(il, plus.operand1);
-                        TranslateToStringWithSpecialCaseForNull(il, plus.operand2);
-                        TranslateToStringWithSpecialCaseForNull(il, operand2);
+                        TranslateToStringWithSpecialCaseForNull(il, plus.Operand1);
+                        TranslateToStringWithSpecialCaseForNull(il, plus.Operand2);
+                        TranslateToStringWithSpecialCaseForNull(il, Operand2);
                         il.Emit(OpCodes.Call, CompilerGlobals.stringConcat3Method);
                         Convert.Emit(this, il, type, rtype);
                         return;
                     }
-                    var plus2 = (Plus) plus.operand1;
-                    if (plus2.operand1 is Plus && plus2.type1 == type)
+                    var plus2 = (Plus) plus.Operand1;
+                    if (plus2.Operand1 is Plus && plus2.Type1 == type)
                     {
                         var num = plus.TranslateToIlArrayOfStrings(il, 1);
                         il.Emit(OpCodes.Dup);
                         ConstantWrapper.TranslateToILInt(il, num - 1);
-                        operand2.TranslateToIL(il, type);
+                        Operand2.TranslateToIL(il, type);
                         il.Emit(OpCodes.Stelem_Ref);
                         il.Emit(OpCodes.Call, CompilerGlobals.stringConcatArrMethod);
                         Convert.Emit(this, il, type, rtype);
                         return;
                     }
-                    TranslateToStringWithSpecialCaseForNull(il, plus2.operand1);
-                    TranslateToStringWithSpecialCaseForNull(il, plus2.operand2);
-                    TranslateToStringWithSpecialCaseForNull(il, plus.operand2);
-                    TranslateToStringWithSpecialCaseForNull(il, operand2);
+                    TranslateToStringWithSpecialCaseForNull(il, plus2.Operand1);
+                    TranslateToStringWithSpecialCaseForNull(il, plus2.Operand2);
+                    TranslateToStringWithSpecialCaseForNull(il, plus.Operand2);
+                    TranslateToStringWithSpecialCaseForNull(il, Operand2);
                     il.Emit(OpCodes.Call, CompilerGlobals.stringConcat4Method);
                     Convert.Emit(this, il, type, rtype);
                 }
                 else
                 {
-                    operand1.TranslateToIL(il, type);
-                    operand2.TranslateToIL(il, type);
+                    Operand1.TranslateToIL(il, type);
+                    Operand2.TranslateToIL(il, type);
 
                     if (type == Typeob.Object) il.Emit(OpCodes.Call, CompilerGlobals.plusDoOpMethod);
                     else if (type == Typeob.Double || type == Typeob.Single) il.Emit(OpCodes.Add);
@@ -512,15 +512,15 @@ namespace Turbo.Runtime
                 {
                     var methodInfo = (MethodInfo) _metaData;
                     var parameters = methodInfo.GetParameters();
-                    operand1.TranslateToIL(il, parameters[0].ParameterType);
-                    operand2.TranslateToIL(il, parameters[1].ParameterType);
+                    Operand1.TranslateToIL(il, parameters[0].ParameterType);
+                    Operand2.TranslateToIL(il, parameters[1].ParameterType);
                     il.Emit(OpCodes.Call, methodInfo);
                     Convert.Emit(this, il, methodInfo.ReturnType, rtype);
                     return;
                 }
                 il.Emit(OpCodes.Ldloc, (LocalBuilder) _metaData);
-                operand1.TranslateToIL(il, Typeob.Object);
-                operand2.TranslateToIL(il, Typeob.Object);
+                Operand1.TranslateToIL(il, Typeob.Object);
+                Operand2.TranslateToIL(il, Typeob.Object);
                 il.Emit(OpCodes.Callvirt, CompilerGlobals.evaluatePlusMethod);
                 Convert.Emit(this, il, Typeob.Object, rtype);
             }
@@ -529,9 +529,9 @@ namespace Turbo.Runtime
         private int TranslateToIlArrayOfStrings(ILGenerator il, int n)
         {
             var num = n + 2;
-            if (operand1 is Plus && type1 == Typeob.String)
+            if (Operand1 is Plus && Type1 == Typeob.String)
             {
-                num = ((Plus) operand1).TranslateToIlArrayOfStrings(il, n + 1);
+                num = ((Plus) Operand1).TranslateToIlArrayOfStrings(il, n + 1);
             }
             else
             {
@@ -539,20 +539,20 @@ namespace Turbo.Runtime
                 il.Emit(OpCodes.Newarr, Typeob.String);
                 il.Emit(OpCodes.Dup);
                 il.Emit(OpCodes.Ldc_I4_0);
-                TranslateToStringWithSpecialCaseForNull(il, operand1);
+                TranslateToStringWithSpecialCaseForNull(il, Operand1);
                 il.Emit(OpCodes.Stelem_Ref);
             }
             il.Emit(OpCodes.Dup);
             ConstantWrapper.TranslateToILInt(il, num - 1 - n);
-            TranslateToStringWithSpecialCaseForNull(il, operand2);
+            TranslateToStringWithSpecialCaseForNull(il, Operand2);
             il.Emit(OpCodes.Stelem_Ref);
             return num;
         }
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            operand1.TranslateToILInitializer(il);
-            operand2.TranslateToILInitializer(il);
+            Operand1.TranslateToILInitializer(il);
+            Operand2.TranslateToILInitializer(il);
             if ((Type)InferType(null) != Typeob.Object) return;
             _metaData = il.DeclareLocal(Typeob.Plus);
             il.Emit(OpCodes.Newobj, CompilerGlobals.plusConstructor);

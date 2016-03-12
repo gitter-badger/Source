@@ -66,7 +66,7 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            var obj = operand1.Evaluate();
+            var obj = Operand1.Evaluate();
             MethodInfo methodInfo = null;
             Type type = null;
             if (obj != null && !(obj is IConvertible))
@@ -84,10 +84,10 @@ namespace Turbo.Runtime
                     methodInfo = null;
                 }
             }
-            if (methodInfo == null) return !Convert.ToBoolean(obj) ? obj : operand2.Evaluate();
+            if (methodInfo == null) return !Convert.ToBoolean(obj) ? obj : Operand2.Evaluate();
             methodInfo = new TMethodInfo(methodInfo);
             if ((bool) methodInfo.Invoke(null, BindingFlags.SuppressChangeType, null, new[]{obj}, null)) return obj;
-            var obj2 = operand2.Evaluate();
+            var obj2 = Operand2.Evaluate();
             if (obj2 == null || obj2 is IConvertible) return obj2;
             var type2 = obj2.GetType();
             if (type != type2) return obj2;
@@ -108,8 +108,8 @@ namespace Turbo.Runtime
         }
 
         internal override IReflect InferType(TField inferenceTarget)
-            => operand1.InferType(inferenceTarget) == operand2.InferType(inferenceTarget)
-                ? operand1.InferType(inferenceTarget)
+            => Operand1.InferType(inferenceTarget) == Operand2.InferType(inferenceTarget)
+                ? Operand1.InferType(inferenceTarget)
                 : Typeob.Object;
 
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,
@@ -118,19 +118,19 @@ namespace Turbo.Runtime
             var label2 = il.DefineLabel();
             if (branchIfTrue)
             {
-                operand1.TranslateToConditionalBranch(il, false, label2, shortForm);
-                operand2.TranslateToConditionalBranch(il, true, label, shortForm);
+                Operand1.TranslateToConditionalBranch(il, false, label2, shortForm);
+                Operand2.TranslateToConditionalBranch(il, true, label, shortForm);
                 il.MarkLabel(label2);
                 return;
             }
-            operand1.TranslateToConditionalBranch(il, false, label, shortForm);
-            operand2.TranslateToConditionalBranch(il, false, label, shortForm);
+            Operand1.TranslateToConditionalBranch(il, false, label, shortForm);
+            Operand2.TranslateToConditionalBranch(il, false, label, shortForm);
         }
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {
-            var type = Convert.ToType(operand1.InferType(null));
-            var right = Convert.ToType(operand2.InferType(null));
+            var type = Convert.ToType(Operand1.InferType(null));
+            var right = Convert.ToType(Operand2.InferType(null));
             if (type != right) type = Typeob.Object;
             var methodInfo = type.GetMethod("op_False",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.ExactBinding, null, new[]
@@ -159,14 +159,14 @@ namespace Turbo.Runtime
                 methodInfo = null;
             }
             var label = il.DefineLabel();
-            operand1.TranslateToIL(il, type);
+            Operand1.TranslateToIL(il, type);
             il.Emit(OpCodes.Dup);
             if (methodInfo != null)
             {
                 if (type.IsValueType) Convert.EmitLdloca(il, type);
                 il.Emit(OpCodes.Call, methodInfo);
                 il.Emit(OpCodes.Brtrue, label);
-                operand2.TranslateToIL(il, type);
+                Operand2.TranslateToIL(il, type);
                 il.Emit(OpCodes.Call, methodInfo2);
                 il.MarkLabel(label);
                 Convert.Emit(this, il, methodInfo2.ReturnType, rtype);
@@ -175,7 +175,7 @@ namespace Turbo.Runtime
             Convert.Emit(this, il, type, Typeob.Boolean, true);
             il.Emit(OpCodes.Brfalse, label);
             il.Emit(OpCodes.Pop);
-            operand2.TranslateToIL(il, type);
+            Operand2.TranslateToIL(il, type);
             il.MarkLabel(label);
             Convert.Emit(this, il, type, rtype);
         }

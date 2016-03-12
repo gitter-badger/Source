@@ -74,10 +74,10 @@ namespace Turbo.Runtime
 
         internal override object Evaluate()
         {
-            var v = operand1.Evaluate();
-            var v2 = operand2.Evaluate();
+            var v = Operand1.Evaluate();
+            var v2 = Operand2.Evaluate();
             var num = EvaluateRelational(v, v2);
-            switch (operatorTokl)
+            switch (OperatorTokl)
             {
                 case TToken.GreaterThan:
                     return num > 0.0;
@@ -123,7 +123,7 @@ namespace Turbo.Runtime
                 v1,
                 v2
             }, null));
-            switch (operatorTokl)
+            switch (OperatorTokl)
             {
                 case TToken.GreaterThan:
                 case TToken.GreaterThanEqual:
@@ -320,8 +320,8 @@ namespace Turbo.Runtime
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,
             bool shortForm)
         {
-            var type = type1;
-            var type2 = loctype;
+            var type = Type1;
+            var type2 = Loctype;
             var type3 = Typeob.Object;
             if (type.IsPrimitive && type2.IsPrimitive)
             {
@@ -345,8 +345,8 @@ namespace Turbo.Runtime
 
             if (_metaData == null)
             {
-                operand1.TranslateToIL(il, type3);
-                operand2.TranslateToIL(il, type3);
+                Operand1.TranslateToIL(il, type3);
+                Operand2.TranslateToIL(il, type3);
                 if (type3 == Typeob.Object)
                 {
                     il.Emit(OpCodes.Call, CompilerGlobals.TurboCompareMethod);
@@ -359,8 +359,8 @@ namespace Turbo.Runtime
             {
                 var methodInfo = (MethodInfo) _metaData;
                 var parameters = methodInfo.GetParameters();
-                operand1.TranslateToIL(il, parameters[0].ParameterType);
-                operand2.TranslateToIL(il, parameters[1].ParameterType);
+                Operand1.TranslateToIL(il, parameters[0].ParameterType);
+                Operand2.TranslateToIL(il, parameters[1].ParameterType);
                 il.Emit(OpCodes.Call, methodInfo);
                 if (branchIfTrue)
                 {
@@ -373,8 +373,8 @@ namespace Turbo.Runtime
             else
             {
                 il.Emit(OpCodes.Ldloc, (LocalBuilder) _metaData);
-                operand1.TranslateToIL(il, Typeob.Object);
-                operand2.TranslateToIL(il, Typeob.Object);
+                Operand1.TranslateToIL(il, Typeob.Object);
+                Operand2.TranslateToIL(il, Typeob.Object);
                 il.Emit(OpCodes.Call, CompilerGlobals.evaluateRelationalMethod);
                 il.Emit(OpCodes.Ldc_I4_0);
                 il.Emit(OpCodes.Conv_R8);
@@ -384,7 +384,7 @@ namespace Turbo.Runtime
             {
                 if (type3 == Typeob.UInt32 || type3 == Typeob.UInt64)
                 {
-                    switch (operatorTokl)
+                    switch (OperatorTokl)
                     {
                         case TToken.GreaterThan:
                             il.Emit(shortForm ? OpCodes.Bgt_Un_S : OpCodes.Bgt_Un, label);
@@ -402,7 +402,7 @@ namespace Turbo.Runtime
                             throw new TurboException(TError.InternalError, context);
                     }
                 }
-                switch (operatorTokl)
+                switch (OperatorTokl)
                 {
                     case TToken.GreaterThan:
                         il.Emit(shortForm ? OpCodes.Bgt_S : OpCodes.Bgt, label);
@@ -422,7 +422,7 @@ namespace Turbo.Runtime
             }
             if (type3 == Typeob.Int32 || type3 == Typeob.Int64)
             {
-                switch (operatorTokl)
+                switch (OperatorTokl)
                 {
                     case TToken.GreaterThan:
                         il.Emit(shortForm ? OpCodes.Ble_S : OpCodes.Ble, label);
@@ -440,7 +440,7 @@ namespace Turbo.Runtime
                         throw new TurboException(TError.InternalError, context);
                 }
             }
-            switch (operatorTokl)
+            switch (OperatorTokl)
             {
                 case TToken.GreaterThan:
                     il.Emit(shortForm ? OpCodes.Ble_Un_S : OpCodes.Ble_Un, label);
@@ -474,21 +474,21 @@ namespace Turbo.Runtime
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            operand1.TranslateToILInitializer(il);
-            operand2.TranslateToILInitializer(il);
-            var @operator = GetOperator(operand1.InferType(null), operand2.InferType(null));
+            Operand1.TranslateToILInitializer(il);
+            Operand2.TranslateToILInitializer(il);
+            var @operator = GetOperator(Operand1.InferType(null), Operand2.InferType(null));
             if (@operator != null)
             {
                 _metaData = @operator;
                 return;
             }
-            if ((type1.IsPrimitive || Typeob.TObject.IsAssignableFrom(type1)) &&
-                (loctype.IsPrimitive || Typeob.TObject.IsAssignableFrom(loctype)))
+            if ((Type1.IsPrimitive || Typeob.TObject.IsAssignableFrom(Type1)) &&
+                (Loctype.IsPrimitive || Typeob.TObject.IsAssignableFrom(Loctype)))
             {
                 return;
             }
             _metaData = il.DeclareLocal(Typeob.Relational);
-            ConstantWrapper.TranslateToILInt(il, (int) operatorTokl);
+            ConstantWrapper.TranslateToILInt(il, (int) OperatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.relationalConstructor);
             il.Emit(OpCodes.Stloc, (LocalBuilder) _metaData);
         }
