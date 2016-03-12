@@ -149,7 +149,7 @@ namespace Turbo.Runtime
             }
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.Boolean;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.Boolean;
 
         public static double TurboCompare(object v1, object v2)
         {

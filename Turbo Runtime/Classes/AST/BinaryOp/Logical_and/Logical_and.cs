@@ -116,9 +116,9 @@ namespace Turbo.Runtime
             }, null);
         }
 
-        internal override IReflect InferType(TField inference_target)
-            => operand1.InferType(inference_target) == operand2.InferType(inference_target)
-                ? operand1.InferType(inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
+            => operand1.InferType(inferenceTarget) == operand2.InferType(inferenceTarget)
+                ? operand1.InferType(inferenceTarget)
                 : Typeob.Object;
 
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,

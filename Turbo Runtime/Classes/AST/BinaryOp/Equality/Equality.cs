@@ -269,7 +269,7 @@ namespace Turbo.Runtime
             }
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.Boolean;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.Boolean;
 
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,
             bool shortForm)

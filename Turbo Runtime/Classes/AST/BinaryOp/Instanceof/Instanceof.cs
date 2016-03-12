@@ -84,7 +84,7 @@ namespace Turbo.Runtime
             return result;
         }
 
-        internal override IReflect InferType(TField inference_target) => Typeob.Boolean;
+        internal override IReflect InferType(TField inferenceTarget) => Typeob.Boolean;
 
         public static bool TurboInstanceof(object v1, object v2)
         {

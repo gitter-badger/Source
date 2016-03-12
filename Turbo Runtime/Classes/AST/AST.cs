@@ -141,7 +141,7 @@ namespace Turbo.Runtime
             return false;
         }
 
-        internal virtual IReflect InferType(TField inference_target)
+        internal virtual IReflect InferType(TField inferenceTarget)
         {
             return Typeob.Object;
         }

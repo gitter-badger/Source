@@ -259,10 +259,10 @@ namespace Turbo.Runtime
             return operatorMeth;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
-            var @operator = type == null || inference_target != null
-                ? GetOperator(operand.InferType(inference_target))
+            var @operator = type == null || inferenceTarget != null
+                ? GetOperator(operand.InferType(inferenceTarget))
                 : GetOperator(type);
             if (@operator == null)
                 return Convert.IsPrimitiveNumericType(type)

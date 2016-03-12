@@ -764,7 +764,7 @@ namespace Turbo.Runtime
 
         protected abstract void HandleNoSuchMemberError();
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
             if (isArrayElementAccess)
             {
@@ -793,7 +793,7 @@ namespace Turbo.Runtime
                 }
                 if (memberInfo is TVariableField)
                 {
-                    return ((TVariableField) memberInfo).GetInferredType(inference_target);
+                    return ((TVariableField) memberInfo).GetInferredType(inferenceTarget);
                 }
                 return ((FieldInfo) memberInfo).FieldType;
             }

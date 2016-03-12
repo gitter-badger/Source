@@ -83,7 +83,7 @@ namespace Turbo.Runtime
             return result;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
             return Typeob.Boolean;
         }

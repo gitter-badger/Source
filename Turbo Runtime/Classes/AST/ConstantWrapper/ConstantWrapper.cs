@@ -80,7 +80,7 @@ namespace Turbo.Runtime
             return value;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
             if (value == null || value is DBNull)
             {

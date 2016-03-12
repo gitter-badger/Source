@@ -87,7 +87,7 @@ namespace Turbo.Runtime
                 : ((GlobalScope) scriptObject).thisObject;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
             if (method != null)
             {

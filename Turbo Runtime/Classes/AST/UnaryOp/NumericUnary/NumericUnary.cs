@@ -334,12 +334,12 @@ namespace Turbo.Runtime
             return operatorMeth;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
             MethodInfo @operator;
-            if (type == null || inference_target != null)
+            if (type == null || inferenceTarget != null)
             {
-                @operator = GetOperator(operand.InferType(inference_target));
+                @operator = GetOperator(operand.InferType(inferenceTarget));
             }
             else
             {

@@ -70,7 +70,7 @@ namespace Turbo.Runtime
             return operand2.Evaluate();
         }
 
-        internal override IReflect InferType(TField inference_target) => operand2.InferType(inference_target);
+        internal override IReflect InferType(TField inferenceTarget) => operand2.InferType(inferenceTarget);
 
         internal override void TranslateToIL(ILGenerator il, Type rtype)
         {

@@ -412,13 +412,13 @@ namespace Turbo.Runtime
             memberNameContext.HandleError(TError.NoSuchMember, Convert.ToTypeName(reflect));
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
             if (members == null)
             {
-                BindName(inference_target);
+                BindName(inferenceTarget);
             }
-            else if (!rootObjectInferredType.Equals(rootObject.InferType(inference_target)))
+            else if (!rootObjectInferredType.Equals(rootObject.InferType(inferenceTarget)))
             {
                 InvalidateBinding();
             }

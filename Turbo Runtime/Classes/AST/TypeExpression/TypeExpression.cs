@@ -88,7 +88,7 @@ namespace Turbo.Runtime
 
         internal override object Evaluate() => ToIReflect();
 
-        internal override IReflect InferType(TField inference_target) => ToIReflect();
+        internal override IReflect InferType(TField inferenceTarget) => ToIReflect();
 
         internal bool IsCLSCompliant() => TypeIsCLSCompliant(expression.Evaluate());
 

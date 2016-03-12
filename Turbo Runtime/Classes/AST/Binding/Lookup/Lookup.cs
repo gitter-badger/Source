@@ -345,8 +345,8 @@ namespace Turbo.Runtime
             context.HandleError(TError.UndeclaredVariable, Engine.doFast);
         }
 
-        internal override IReflect InferType(TField inference_target)
-            => !isFullyResolved ? Typeob.Object : base.InferType(inference_target);
+        internal override IReflect InferType(TField inferenceTarget)
+            => !isFullyResolved ? Typeob.Object : base.InferType(inferenceTarget);
 
         internal bool InFunctionNestedInsideInstanceMethod()
         {

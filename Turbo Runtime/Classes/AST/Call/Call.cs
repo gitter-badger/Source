@@ -295,11 +295,11 @@ namespace Turbo.Runtime
             }
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
             if (func is Binding)
             {
-                return ((Binding) func).InferTypeOfCall(inference_target, isConstructor);
+                return ((Binding) func).InferTypeOfCall(inferenceTarget, isConstructor);
             }
             if (!(func is ConstantWrapper)) return Typeob.Object;
             var value = ((ConstantWrapper) func).value;

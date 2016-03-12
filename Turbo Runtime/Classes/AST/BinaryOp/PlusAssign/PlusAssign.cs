@@ -97,10 +97,10 @@ namespace Turbo.Runtime
             return result;
         }
 
-        internal override IReflect InferType(TField inference_target)
+        internal override IReflect InferType(TField inferenceTarget)
         {
-            var @operator = type1 == null || inference_target != null
-                ? GetOperator(operand1.InferType(inference_target), operand2.InferType(inference_target))
+            var @operator = type1 == null || inferenceTarget != null
+                ? GetOperator(operand1.InferType(inferenceTarget), operand2.InferType(inferenceTarget))
                 : GetOperator(type1, loctype);
             if (@operator == null)
                 return type1 == Typeob.String || loctype == Typeob.String
