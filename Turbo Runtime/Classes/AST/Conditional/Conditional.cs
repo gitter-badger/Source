@@ -59,55 +59,46 @@ namespace Turbo.Runtime
 {
     internal sealed class Conditional : AST
     {
-        private AST condition;
+        private AST _condition;
 
-        private AST operand1;
+        private AST _operand1;
 
-        private AST operand2;
+        private AST _operand2;
 
         internal Conditional(Context context, AST condition, AST operand1, AST operand2) : base(context)
         {
-            this.condition = condition;
-            this.operand1 = operand1;
-            this.operand2 = operand2;
+            _condition = condition;
+            _operand1 = operand1;
+            _operand2 = operand2;
         }
 
         internal override object Evaluate()
-            => Convert.ToBoolean(condition.Evaluate()) ? operand1.Evaluate() : operand2.Evaluate();
+            => Convert.ToBoolean(_condition.Evaluate()) ? _operand1.Evaluate() : _operand2.Evaluate();
 
         internal override AST PartiallyEvaluate()
         {
-            condition = condition.PartiallyEvaluate();
+            _condition = _condition.PartiallyEvaluate();
             var scriptObject = Globals.ScopeStack.Peek();
-            while (scriptObject is WithObject)
-            {
-                scriptObject = scriptObject.GetParent();
-            }
+            while (scriptObject is WithObject) scriptObject = scriptObject.GetParent();
             if (scriptObject is FunctionScope)
             {
-                var expr_41 = (FunctionScope) scriptObject;
-                var definedFlags = expr_41.DefinedFlags;
-                operand1 = operand1.PartiallyEvaluate();
-                var definedFlags2 = expr_41.DefinedFlags;
-                expr_41.DefinedFlags = definedFlags;
-                operand2 = operand2.PartiallyEvaluate();
-                var definedFlags3 = expr_41.DefinedFlags;
+                var o = (FunctionScope) scriptObject;
+                var definedFlags = o.DefinedFlags;
+                _operand1 = _operand1.PartiallyEvaluate();
+                var definedFlags2 = o.DefinedFlags;
+                o.DefinedFlags = definedFlags;
+                _operand2 = _operand2.PartiallyEvaluate();
+                var definedFlags3 = o.DefinedFlags;
                 var length = definedFlags2.Length;
                 var length2 = definedFlags3.Length;
-                if (length < length2)
-                {
-                    definedFlags2.Length = length2;
-                }
-                if (length2 < length)
-                {
-                    definedFlags3.Length = length;
-                }
-                expr_41.DefinedFlags = definedFlags2.And(definedFlags3);
+                if (length < length2) definedFlags2.Length = length2;
+                if (length2 < length) definedFlags3.Length = length;
+                o.DefinedFlags = definedFlags2.And(definedFlags3);
             }
             else
             {
-                operand1 = operand1.PartiallyEvaluate();
-                operand2 = operand2.PartiallyEvaluate();
+                _operand1 = _operand1.PartiallyEvaluate();
+                _operand2 = _operand2.PartiallyEvaluate();
             }
             return this;
         }
@@ -116,19 +107,19 @@ namespace Turbo.Runtime
         {
             var label = il.DefineLabel();
             var label2 = il.DefineLabel();
-            condition.TranslateToConditionalBranch(il, false, label, false);
-            operand1.TranslateToIL(il, rtype);
+            _condition.TranslateToConditionalBranch(il, false, label, false);
+            _operand1.TranslateToIL(il, rtype);
             il.Emit(OpCodes.Br, label2);
             il.MarkLabel(label);
-            operand2.TranslateToIL(il, rtype);
+            _operand2.TranslateToIL(il, rtype);
             il.MarkLabel(label2);
         }
 
         internal override void TranslateToILInitializer(ILGenerator il)
         {
-            condition.TranslateToILInitializer(il);
-            operand1.TranslateToILInitializer(il);
-            operand2.TranslateToILInitializer(il);
+            _condition.TranslateToILInitializer(il);
+            _operand1.TranslateToILInitializer(il);
+            _operand2.TranslateToILInitializer(il);
         }
     }
 }
