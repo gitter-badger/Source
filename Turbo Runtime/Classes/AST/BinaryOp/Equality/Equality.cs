@@ -61,7 +61,7 @@ namespace Turbo.Runtime
 {
     public class Equality : BinaryOp
     {
-        private object metaData;
+        private object _metaData;
 
         internal Equality(Context context, AST operand1, AST operand2, TToken operatorTok)
             : base(context, operand1, operand2, operatorTok)
@@ -274,7 +274,7 @@ namespace Turbo.Runtime
         internal override void TranslateToConditionalBranch(ILGenerator il, bool branchIfTrue, Label label,
             bool shortForm)
         {
-            if (metaData == null)
+            if (_metaData == null)
             {
                 var type = type1;
                 var type2 = loctype;
@@ -362,9 +362,9 @@ namespace Turbo.Runtime
                 il.Emit(shortForm ? OpCodes.Beq_S : OpCodes.Beq, label);
                 return;
             }
-            if (metaData is MethodInfo)
+            if (_metaData is MethodInfo)
             {
-                var methodInfo = (MethodInfo) metaData;
+                var methodInfo = (MethodInfo) _metaData;
                 var parameters = methodInfo.GetParameters();
                 operand1.TranslateToIL(il, parameters[0].ParameterType);
                 operand2.TranslateToIL(il, parameters[1].ParameterType);
@@ -377,7 +377,7 @@ namespace Turbo.Runtime
                 il.Emit(shortForm ? OpCodes.Brfalse_S : OpCodes.Brfalse, label);
                 return;
             }
-            il.Emit(OpCodes.Ldloc, (LocalBuilder) metaData);
+            il.Emit(OpCodes.Ldloc, (LocalBuilder) _metaData);
             operand1.TranslateToIL(il, Typeob.Object);
             operand2.TranslateToIL(il, Typeob.Object);
             il.Emit(OpCodes.Call, CompilerGlobals.evaluateEqualityMethod);
@@ -419,7 +419,7 @@ namespace Turbo.Runtime
             var @operator = GetOperator(operand1.InferType(null), operand2.InferType(null));
             if (@operator != null)
             {
-                metaData = @operator;
+                _metaData = @operator;
                 return;
             }
             if (operand1 is ConstantWrapper)
@@ -455,10 +455,10 @@ namespace Turbo.Runtime
             {
                 return;
             }
-            metaData = il.DeclareLocal(Typeob.Equality);
+            _metaData = il.DeclareLocal(Typeob.Equality);
             ConstantWrapper.TranslateToILInt(il, (int) operatorTokl);
             il.Emit(OpCodes.Newobj, CompilerGlobals.equalityConstructor);
-            il.Emit(OpCodes.Stloc, (LocalBuilder) metaData);
+            il.Emit(OpCodes.Stloc, (LocalBuilder) _metaData);
         }
     }
 }
